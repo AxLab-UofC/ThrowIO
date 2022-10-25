@@ -1,0 +1,12 @@
+/Users/timmylin/Desktop/Laptop-TOIO-main/rust_osc/target/release/deps/cocoa-2d972b1d059e683b.rmeta: /Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/lib.rs /Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/appkit.rs /Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/base.rs /Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/foundation.rs /Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/quartzcore.rs /Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/macros.rs
+
+/Users/timmylin/Desktop/Laptop-TOIO-main/rust_osc/target/release/deps/libcocoa-2d972b1d059e683b.rlib: /Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/lib.rs /Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/appkit.rs /Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/base.rs /Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/foundation.rs /Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/quartzcore.rs /Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/macros.rs
+
+/Users/timmylin/Desktop/Laptop-TOIO-main/rust_osc/target/release/deps/cocoa-2d972b1d059e683b.d: /Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/lib.rs /Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/appkit.rs /Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/base.rs /Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/foundation.rs /Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/quartzcore.rs /Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/macros.rs
+
+/Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/lib.rs:
+/Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/appkit.rs:
+/Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/base.rs:
+/Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/foundation.rs:
+/Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/quartzcore.rs:
+/Users/timmylin/.cargo/registry/src/github.com-1ecc6299db9ec823/cocoa-0.24.0/src/macros.rs:
