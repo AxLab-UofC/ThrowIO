@@ -545,14 +545,6 @@ void draw() {
   image(kinect.getVideoImage(), 0, 0);
   //image(kinect.getDepthImage(), 640, 0);
 
-  float avgX = 0;
-  float avgY = 0;
-
-  float avgDepth = 0;
-
-  int count = 0;
-
-
   if (clickCount < 4) {
 
     if (clickCount != 3) {
@@ -854,14 +846,14 @@ void draw() {
       
       //you must find ball here
       if(detectBall(false)){
-          scaledX = map(avgX, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);
-          scaledY = map(avgY, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);
+          scaledX = map(global_avgX, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);
+          scaledY = map(global_avgY, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);
           
           // Draw a circle at the tracked pixel
           fill(255);
           strokeWeight(4.0);
           stroke(0);
-          ellipse(avgX, avgY, 20, 20);
+          ellipse(global_avgX, global_avgY, 20, 20);
       }else{
         println("something is wrong here, you should see the ball");
         exit();
