@@ -525,7 +525,6 @@ boolean detectBall(boolean recordHistory) {
         global_dHist = append(global_dHist, global_avgDepth);
     }
 
-    
     return true;
   } else {
     return false;
@@ -606,7 +605,7 @@ void draw() {
         }
       }
 
-      if (millis() > time + 1500) { //wait for the ball to stick properly maybe # milliseconds
+      if (millis() > time + 300) { //wait for the ball to stick properly maybe # milliseconds
         startTime = false;
         
         //detect the location of the ball
@@ -760,6 +759,7 @@ void draw() {
         //cube 1 will push
         pushToio = 1;
         turnDegree1 = degrees(atan2(scaledY-cubes[1].y, scaledX-cubes[1].x));
+        
         if (turnDegree1 < 0) {
           turnDegree1+=360;
         }
@@ -851,50 +851,20 @@ void draw() {
     //recordpoint
 
     if (findPushedBallLocation == false) {
-
-      for (int x = 0; x < kinect.getVideoImage().width; x++ ) {
-        for (int y = 0; y < kinect.getVideoImage().height; y++ ) {
-          int loc = x + y * kinect.getVideoImage().width;
-          // What is current color
-          color currentColor = kinect.getVideoImage().pixels[loc];
-          float r1 = red(currentColor);
-          float g1 = green(currentColor);
-          float b1 = blue(currentColor);
-          float r2 = red(trackColor);
-          float g2 = green(trackColor);
-          float b2 = blue(trackColor);
-
-          float d = distSq(r1, g1, b1, r2, g2, b2);
-
-          if (d < threshold*threshold) {
-            stroke(255);
-            strokeWeight(1);
-            point(x, y);
-            avgX += x;
-            avgY += y;
-            count++;
-          }
-        }
-      }
-
-      // We only consider the color found if its color distance is less than 10.
-      // This threshold of 10 is arbitrary and you can adjust this number depending on how accurate you require the tracking to be.
-      if (count > 50) {
-
-        avgX = avgX / count;
-        avgY = avgY / count;
-
-        println("avgX", avgX);
-        println("avgY", avgY);
-
-        scaledX = map(avgX, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);  //615
-        scaledY = map(avgY, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);  //382
-
-        // Draw a circle at the tracked pixel
-        fill(255);
-        strokeWeight(4.0);
-        stroke(0);
-        ellipse(avgX, avgY, 20, 20);
+      
+      //you must find ball here
+      if(detectBall(false)){
+          scaledX = map(avgX, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);
+          scaledY = map(avgY, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);
+          
+          // Draw a circle at the tracked pixel
+          fill(255);
+          strokeWeight(4.0);
+          stroke(0);
+          ellipse(avgX, avgY, 20, 20);
+      }else{
+        println("something is wrong here, you should see the ball");
+        exit();
       }
 
       findPushedBallLocation = true;
