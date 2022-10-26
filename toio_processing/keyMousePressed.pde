@@ -138,9 +138,22 @@ void keyPressed() {
 }
 
 void mousePressed() {
-  chase = false;
-  spin = false;
-  mouseDrive=true;
+  //chase = false;
+  //spin = false;
+  //mouseDrive=true;
+
+  // Save color where the mouse is clicked in trackColor variable
+  int loc = mouseX + mouseY*kinect.getVideoImage().width;
+  mouseXLocation = mouseX;
+  mouseYLocation = mouseY;
+  mouseXLocationList[clickCount] = mouseX;
+  mouseYLocationList[clickCount] = mouseY;
+  //trackColor = kinect.getVideoImage().pixels[loc]; //need to uncomment this
+
+  clickCount+=1;
+  if(clickCount == 3){
+    trackColor = kinect.getVideoImage().pixels[loc]; //need to uncomment this
+  }
 }
 
 void mouseReleased() {
