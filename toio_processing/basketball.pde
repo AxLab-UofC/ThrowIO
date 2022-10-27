@@ -1276,7 +1276,7 @@ void draw() {
       startTime = true;
     } else {
 
-      if (millis() > time + 1000) { //wait for the ball to stick properly maybe 2 seconds
+      if (millis() > time + 1000) { //wait for virtual ball to drop
 
         aimCubeSpeed(0, scaledX, scaledY);
         aimCubeSpeed(1, scaledX, scaledY);
@@ -1286,7 +1286,7 @@ void draw() {
 
 
     if (abs(cubes[0].x - scaledX) < closeDistance && abs(cubes[1].x - scaledX) < closeDistance &&
-      abs(cubes[1].y - scaledY) < closeDistance &&  abs(cubes[1].y - scaledY) < closeDistance) {
+      abs(cubes[0].y - scaledY) < closeDistance &&  abs(cubes[1].y - scaledY) < closeDistance) {
       knockSucceed = true;
       startTime = false;
     }
@@ -1299,8 +1299,12 @@ void draw() {
     } else {
 
       if (millis() > time + 1000) { //wait for the ball to stick properly maybe 2 seconds
-        if (aimCubeSpeed(0, 100, 180) && aimCubeSpeed(1, 600, 250)) {
-
+      
+        aimCubeSpeed(0, 100, 180);
+        aimCubeSpeed(1, 600, 250);
+        
+        if (abs(cubes[0].x - 100) < 15 && abs(cubes[1].x - 600) < 15 &&
+          abs(cubes[0].y - 180) < 15 &&  abs(cubes[1].y - 250) < 15) {
           seeBall = false;
           ballSticks = false;
           findTangentPoints = false;
@@ -1342,6 +1346,7 @@ void draw() {
           findPushedBallLocation = false;
           nextBall = false;
         }
+
       }
     }
   }
