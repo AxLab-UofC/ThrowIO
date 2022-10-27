@@ -1,4 +1,4 @@
-//This is the application of monitor with basketball throwing.
+//Basketball game application
 //This is the code for demo for dropping
 import oscP5.*;
 import netP5.*;
@@ -112,6 +112,7 @@ float avgXVelocity;
 boolean addParticle = false;
 int time2 = millis();
 boolean startTime2 = false;
+
 // A reference to our box2d world
 Box2DProcessing box2d;
 float monitorWidth = 1280;
@@ -122,7 +123,7 @@ float ycoord = 100;
 float xcoord = 100;
 boolean hitTarget = false;
 float hitX = 720;
-float pushx = 420; //400 //410
+float pushx = 420; //420
 float pushy = 200; //300
 boolean travelOut = false;
 boolean travelToPush = false;
@@ -136,6 +137,7 @@ boolean nextBall = false;
 boolean startSprinkle = false;
 int scoreCount = 0;
 
+//global variables that helper functions would modify
 float global_avgX = 0;
 float global_avgY = 0;
 int global_count = 0;
@@ -143,10 +145,6 @@ float global_avgDepth = 0;
 float[] global_xHist = {};
 float[] global_yHist = {};
 float[] global_dHist = {};
-
-//void settings() {
-//  size(500, 500);
-//}
 
 void captureEvent(Capture video) {
   video.read();
@@ -164,7 +162,6 @@ void setup() {
   server[0] = new NetAddress("127.0.0.1", 3334);
   //server[1] = new NetAddress("192.168.0.103", 3334);
   //server[2] = new NetAddress("192.168.200.12", 3334);
-
 
   //create cubes
   cubes = new Cube[nCubes];
@@ -184,32 +181,32 @@ void setup() {
 
   box2d = new Box2DProcessing(this);
   box2d.createWorld();
-  box2d.setGravity(0, -120); //for my laptop -120
-  //box2d.setGravity(0, -400);
+  box2d.setGravity(0, -120); //we can change the gravity in box2D world here, currently using -120
 
-
+  //allow two windows showing up at the same time
+  //one for camera, the other for monitor screen
   String[] args = {"TwoFrameTest"};
-
   SecondApplet sa = new SecondApplet();
   PApplet.runSketch(args, sa);
 }
 
+//visual displays in the monitor window
 public class SecondApplet extends PApplet {
 
-  // An ArrayList of particles that will fall on the surface
+  //an ArrayList of particles that will fall on the surface
   ArrayList<Particle> particles;
 
-  // A list we'll use to track fixed objects
+  //a list we'll use to track fixed objects
   ArrayList<Boundary> boundaries;
 
   class Boundary {
 
-    // A boundary is a simple rectangle with x,y,width,and height
+    //a boundary is a simple rectangle with x,y,width, and height
     float x;
     float y;
     float w;
     float h;
-    // But we also have to make a body for box2d to know about it
+    //but we also have to make a body for box2d to know about it
     Body b;
 
     Boundary(float x_, float y_, float w_, float h_, float a) {
@@ -225,7 +222,6 @@ public class SecondApplet extends PApplet {
       float box2dH = box2d.scalarPixelsToWorld(h/2);
       // We're just a box
       sd.setAsBox(box2dW, box2dH);
-
 
       // Create the body
       BodyDef bd = new BodyDef();
@@ -253,14 +249,13 @@ public class SecondApplet extends PApplet {
     }
   }
 
+  //particle class is the ball that show up in our monitor
   class Particle {
 
     // We need to keep track of a Body and a radius
     Body body;
     float r;
-
     color col;
-
 
     Particle(float x, float y, float r_, float l, float v) { //x will be x velocity and y will be z velocity
       r = r_;
@@ -292,20 +287,16 @@ public class SecondApplet extends PApplet {
       return false;
     }
 
+    //check if a ball went into the hoop
     boolean goal() {
       // Let's find the screen position of the particle
       Vec2 pos = box2d.getBodyPixelCoord(body);
-      // Is it off the bottom of the screen?
-      if (pos.y > 350 && pos.y <= 550 && pos.x >= 450 && pos.x <= 750) {
-
-
+      if (pos.y > 350 && pos.y <= 550 && pos.x >= 450 && pos.x <= 750) { //this is the condition for scoring
         return true;
       }
       return false;
     }
 
-
-    //
     void display() {
       // We look at each body and get its screen position
       Vec2 pos = box2d.getBodyPixelCoord(body);
@@ -324,7 +315,9 @@ public class SecondApplet extends PApplet {
     }
 
     // Here's our function that adds the particle to the Box2D world
-    void makeBody(float x, float y, float r, float l, float v) { //x = 400, y = 720, r , l = 15, v = 95
+    // x is x position, y is y position, r is radius, l is linear velocity, v is vertical velocity
+    //x = 400, y = 720, r , l = 15, v = 95
+    void makeBody(float x, float y, float r, float l, float v) {
       // Define a body
       BodyDef bd = new BodyDef();
       // Set its position
@@ -350,7 +343,7 @@ public class SecondApplet extends PApplet {
       MassData massData = new MassData();
       massData.mass = 1000;
       //body.setAngularVelocity(random(-10, 10));
-      body.setLinearVelocity(new Vec2(l, v)); //Vec2(-20, 150)
+      body.setLinearVelocity(new Vec2(l, v));
       body.setMassData(massData);
     }
   }
@@ -362,15 +355,13 @@ public class SecondApplet extends PApplet {
     monitorWidth = displayWidth;
     monitorHeight = displayHeight;
 
-
-
     particles = new ArrayList<Particle>();
     boundaries = new ArrayList<Boundary>();
 
+    //this is the boundaries I made in the box2D world
     boundaries.add(new Boundary(750, 460, 20, 200, 0));
     boundaries.add(new Boundary(450, 460, 20, 200, 0));
     boundaries.add(new Boundary(600, 550, 300, 20, 0));
-
     boundaries.add(new Boundary(750, 0, 20, 200, 0));
     boundaries.add(new Boundary(950, 0, 20, 200, 0));
   }
@@ -378,84 +369,46 @@ public class SecondApplet extends PApplet {
   public void draw() {
     background(255);
 
+    //the text for 
     textSize(128);
     fill(0);
-    text("Score: "+str(scoreCount), 40, 120);
+    text("Score: "+str(scoreCount), 40, 120); 
 
     if (startSprinkle == false) {
 
+      //this is the list of particles add into the world
       particles.add(new Particle(570, 200, 40, 0, 0));
       particles.add(new Particle(500, 250, 40, 0, 0));
       particles.add(new Particle(600, 100, 40, 0, 0));
       particles.add(new Particle(700, 300, 40, 0, 0));
       particles.add(new Particle(600, 350, 40, 0, 0));
 
-      //if (pos.y > 460 && pos.y <= 550 && pos.x >= 450 && pos.x <= 750) {
-
       startSprinkle = true;
     }
-
 
     // Display all the boundaries
     for (Boundary wall : boundaries) {
       wall.display();
     }
 
-    //if (hitTarget == false) {
-    //  xcoord += xSpeed;
-
-    //  if ((xcoord > width) || (xcoord < 0)) {
-    //    xSpeed *=-1;
-    //  }
-    //}
-
+    //we add a new ball when nextBall flag is true
     if (nextBall == true) {
-
-      particles.add(new Particle(850, 0, 40, 0, 0));
-
+      particles.add(new Particle(850, 0, 40, 0, 0)); //this is the ball that drops from the tube
       nextBall = false;
     }
 
 
     //display ball
-    if (hitTarget == false) {
-      //UFO
-      //stroke(0);
-      //fill(255);
-      //ellipse(xcoord, ycoord-25, 80, 100);
-
-      //noStroke();
-      //fill(0);
-      //ellipse(xcoord, ycoord, 150, 60);
-
-      //noStroke();
-      //fill(255);
-      //ellipse(xcoord, ycoord-23, 80, 15);
-    } else {
-
-      //if(){
-      //  //if the ball particle hits the UFO
-      //  stroke(0);
-      //  fill(255, 0, 0);
-      //  ellipse(xcoord, ycoord-25, 80, 100);
-
-      //  noStroke();
-      //  fill(0);
-      //  ellipse(xcoord, ycoord, 150, 60);
-
-      //  noStroke();
-      //  fill(255, 0, 0);
-      //  ellipse(xcoord, ycoord-23, 80, 15);
-
-      //}
+    if (hitTarget == true){ 
 
       if (addParticle == false) {
-        particles.add(new Particle(random(330, 360), 720, 40, random(10, 11), random(120, 140))); //avgXVelocity //x = 400, y = 720, r , l = 15, v = 95
+        particles.add(new Particle(random(330, 360), 720, 40, random(10, 11), random(120, 140))); //this is where we currently define the ball speed and velocity 
         addParticle = true;
       }
     }
 
     scoreCount = 0;
+    
     for (int i = particles.size()-1; i >= 0; i--) {
       Particle p = particles.get(i);
       p.display();
@@ -554,12 +507,7 @@ void draw() {
       ellipse(mouseXLocation, mouseYLocation, 10, 10);
     }
 
-    //1
-    //  2
-
-    //println("x0:", cubes[0].x);
-    //println("y0:", cubes[0].y);
-
+    //this is the original starting position of the ThrowIO
     aimCubeSpeed(0, 100, 350);
     aimCubeSpeed(1, 600, 250);
   }
@@ -645,6 +593,7 @@ void draw() {
   } else if (clickCount >= 4 && seeBall == true && ballSticks == true && travelOut == false && facePushLocation == false && travelToPush == false && turning == false && pushDone == false) {
     
     println("toio travelling out and prepare for pushing");
+    //this is the block of code where we can have some travel code to move toios outward
     hitTarget = true;
     
     if (startTime == false) {
@@ -734,19 +683,22 @@ void draw() {
     //    }
     //  }
     //}
+    
   } else if (clickCount >= 4 && seeBall == true && ballSticks == true && travelOut == true && facePushLocation == false && travelToPush == false && turning == false && pushDone == false) {
 
-
+    println("toio rotates to the correct angle");
     if (recordDegree2 == false) {
 
-      if (cubes[0].x < pushx) {
+      //assuming that the ball always sticks in between the spaces between the toio robots
+      if (scaledX < pushx) {
         //cube 0 will push
         pushToio = 0;
 
         turnDegree0 = degrees(atan2(scaledY-cubes[0].y, scaledX-cubes[0].x));
-        if (turnDegree0 < 0) {
+        if (turnDegree0 < 0){
           turnDegree0+=360;
         }
+        
       } else {
         //cube 1 will push
         pushToio = 1;
@@ -772,7 +724,7 @@ void draw() {
     }
   } else if (clickCount >= 4 && seeBall == true && ballSticks == true && travelOut == true && facePushLocation == true && travelToPush == false && turning == false && pushDone == false) {
 
-    println("one toio travels to push");
+    println("one toio travels to ball, preparing to push");
     //depending on where the toio wants to go (push x and push y)
     if (pushToio == 0) {
       //cube 0 will push
@@ -794,10 +746,7 @@ void draw() {
       }
     }
   } else if (clickCount >= 4 && seeBall == true && ballSticks == true && travelOut == true && facePushLocation == true && travelToPush == true && turning == false && pushDone == false) {
-    println("toio turns angle to face push location");
-
-    println("pushx: ", pushx);
-    println("pushy: ", pushy);
+    println("toio rotates with the ball to face push location");
 
     if (pushToio == 0) {
       //0 is the pushing toio
@@ -812,7 +761,7 @@ void draw() {
       }
     }
   } else if (clickCount >= 4 && seeBall == true && ballSticks == true && travelOut == true && facePushLocation == true && travelToPush == true && turning == true && pushDone == false) {
-    println("toio pushes");
+    println("toio pushes ball to the location");
     if (pushToio == 0) {
       //0 is the pushing toio
       aimCubeSpeed(0, pushx, pushy);
@@ -828,19 +777,14 @@ void draw() {
     }
   } else if (clickCount >= 4 && seeBall == true && ballSticks == true && pushDone == true && outsideRadius == true && findTangentPoints == false && scaledX != sx && scaledY != sy) {
 
-
     hitX = map(scaledX, 32, 614+32, 0, 1280);
 
     println("hitX: ", hitX);
     println("xcoord: ", xcoord);
-    //if (abs(hitX - xcoord) < 500) {
-    //hitTarget = true; //determine whether the ball hits the UFO or not (only care about x axis)
-    //}
 
     println("find tangent points");
 
     //findTangentPoints means checking if we can find tangent points
-    //recordpoint
 
     if (findPushedBallLocation == false) {
       
@@ -1107,9 +1051,6 @@ void draw() {
     println("handle case when the ball is within radius");
     //handle the case that the ball is within radius
 
-
-    //------extra notes------//
-
     if (findDistBall == false) {
       c0_dist_ball = cubes[0].distance(scaledX, scaledY);
       c1_dist_ball = cubes[1].distance(scaledX, scaledY);
@@ -1125,10 +1066,8 @@ void draw() {
       }
     }
 
-
     //see which toio is closer to the ball
 
-    //println("1 is closer toio to the ball");
     //find which quadrant the ball is in
     if ( (scaledX >= tangentX && scaledY <= tangentY) ||  (scaledX <= tangentX && scaledY >= tangentY)) {
       //ball is in first and thrid quadrant
@@ -1160,7 +1099,7 @@ void draw() {
       }
     } else {
 
-      c0_dist = cubes[0].distance(200, 200);
+      c0_dist = cubes[0].distance(200, 200); //not sure about this part
       c1_dist = cubes[1].distance(200, 200); //in this example, we use cube 1 as the other dropper
 
       if (c0_dist < c1_dist) {
@@ -1262,11 +1201,6 @@ void draw() {
         turnFlag = true;
       }
 
-
-      //println("cubes[0].deg: ", cubes[0].deg);
-      //println("turnDegree0: ", turnDegree0);
-      //println("cubes[1].deg: ", cubes[1].deg);
-      //println("turnDegree1: ", turnDegree1);
     }
   } else if (clickCount >= 4 && seeBall == true && ballSticks == true && outsideRadius == true && findTangentPoints == true
     && convergeFlag == true && turnFlag == true && knockSucceed == false) {
