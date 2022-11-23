@@ -115,6 +115,7 @@
 
 //// A reference to our box2d world
 //Box2DProcessing box2d;
+
 //float monitorWidth = 1280;
 //float monitorHeight = 0;
 //float ySpeed = 1;
@@ -146,6 +147,13 @@
 //float[] global_yHist = {};
 //float[] global_dHist = {};
 
+//float initHandPosX = -1;  
+//float initHandPosY = -1;  
+//boolean findHand = false;  
+//boolean seeHand = false;
+
+//KinectTracker tracker;
+
 //void captureEvent(Capture video) {
 //  video.read();
 //}
@@ -170,7 +178,7 @@
 //  }
 
 //  //camera
-//  size(640, 360);
+//  size(1280, 360);
 //  kinect = new Kinect(this);
 //  kinect.initDepth();
 //  kinect.initVideo();
@@ -185,9 +193,11 @@
 
 //  //allow two windows showing up at the same time
 //  //one for camera, the other for monitor screen
-//  String[] args = {"TwoFrameTest"};
-//  SecondApplet sa = new SecondApplet();
-//  PApplet.runSketch(args, sa);
+//  //String[] args = {"TwoFrameTest"};
+//  //SecondApplet sa = new SecondApplet();
+//  //PApplet.runSketch(args, sa);
+  
+//  tracker = new KinectTracker();
 //}
 
 ////visual displays in the monitor window
@@ -369,10 +379,10 @@
 //  public void draw() {
 //    background(255);
 
-//    //the text for score
+//    //the text for 
 //    textSize(128);
 //    fill(0);
-//    text("Score: "+str(scoreCount), 40, 120);
+//    text("Score: "+str(scoreCount), 40, 120); 
 
 //    if (startSprinkle == false) {
 
@@ -399,16 +409,16 @@
 
 
 //    //display ball
-//    if (hitTarget == true) {
+//    if (hitTarget == true){ 
 
 //      if (addParticle == false) {
-//        particles.add(new Particle(random(330, 360), 720, 40, random(10, 11), random(120, 140))); //this is where we currently define the ball speed and velocity
+//        particles.add(new Particle(random(330, 360), 720, 40, random(10, 11), random(120, 140))); //this is where we currently define the ball speed and velocity 
 //        addParticle = true;
 //      }
 //    }
 
 //    scoreCount = 0;
-
+    
 //    for (int i = particles.size()-1; i >= 0; i--) {
 //      Particle p = particles.get(i);
 //      p.display();
@@ -431,7 +441,132 @@
 //  return d;
 //}
 
+//class KinectTracker {
 
+//  // Depth threshold
+//  int threshold = 500;
+
+//  // Raw location
+//  PVector loc;
+
+//  // Interpolated location
+//  PVector lerpedLoc;
+
+//  // Depth data
+//  int[] depth;
+  
+//  // What we'll show the user
+//  PImage display;
+   
+//  KinectTracker() {
+//    // This is an awkard use of a global variable here
+//    // But doing it this way for simplicity
+//    kinect.initDepth();
+//    //kinect.enableMirror(true);
+//    // Make a blank image
+//    display = createImage(kinect.width, kinect.height, RGB);
+//    // Set up the vectors
+//    loc = new PVector(0, 0);
+//    lerpedLoc = new PVector(0, 0);
+//  }
+
+//  void track() {
+//    // Get the raw depth as array of integers
+//    depth = kinect.getRawDepth();
+
+//    // Being overly cautious here
+//    if (depth == null) return;
+
+//    float sumX = 0;
+//    float sumY = 0;
+//    float count = 0;
+        
+//    //for (int x = 0; x < kinect.width; x++) {
+//    //  for (int y = 0; y < kinect.height; y++) {
+        
+//    for (int x = kinect.width-1; x > 0; x--) {
+//      for (int y = kinect.height-1; y > 0; y--) {
+        
+//        int offset =  x + y*kinect.width;
+//        // Grabbing the raw depth
+//        int rawDepth = depth[offset];
+        
+//        if (x == int(kinect.width/2) && y == int(kinect.height/2)){
+//          //println("rawDepth: ", rawDepth);
+//        }
+        
+//        // Testing against threshold
+//        if (rawDepth < threshold && count < 200) {
+//          sumX += x;
+//          sumY += y;
+//          count++;
+//        }
+        
+//        //if (count == 10000){
+//        //    loc = new PVector(sumX/count, sumY/count);
+//        //    break;
+//        //}
+//      }
+//    }
+//    // As long as we found something
+//    if (count > 100) {
+//      loc = new PVector(sumX/count, sumY/count);
+//      println("count: ", count);
+      
+//    }
+
+//    // Interpolating the location, doing it arbitrarily for now
+//    lerpedLoc.x = PApplet.lerp(lerpedLoc.x, loc.x, 0.3f);
+//    lerpedLoc.y = PApplet.lerp(lerpedLoc.y, loc.y, 0.3f);
+//  }
+
+//  PVector getLerpedPos() {
+//    return lerpedLoc;
+//  }
+
+//  PVector getPos() {
+//    return loc;
+//  }
+
+//  void display() {
+//    PImage img = kinect.getDepthImage();
+
+//    // Being overly cautious here
+//    if (depth == null || img == null) return;
+
+//    // Going to rewrite the depth image to show which pixels are in threshold
+//    // A lot of this is redundant, but this is just for demonstration purposes
+//    display.loadPixels();
+//    for (int x = 0; x < kinect.width; x++) {
+//      for (int y = 0; y < kinect.height; y++) {
+
+//        int offset = x + y * kinect.width;
+//        // Raw depth
+//        int rawDepth = depth[offset];
+//        int pix = x + y * display.width;
+//        if (rawDepth < threshold) {
+//          // A red color instead
+//          display.pixels[pix] = color(150, 50, 50);
+//        } else {
+//          display.pixels[pix] = img.pixels[offset];
+//        }
+//      }
+//    }
+//    display.updatePixels();
+
+//    // Draw the image
+//    image(display, 640, 0);
+    
+//  }
+
+//  int getThreshold() {
+//    return threshold;
+//  }
+
+//  void setThreshold(int t) {
+//    threshold =  t;
+//  }
+//}
 
 //boolean detectBall(boolean recordHistory) {
 
@@ -474,19 +609,54 @@
 //    global_avgDepth = kinect.getRawDepth()[int(global_avgX) + int(global_avgY) * kinect.getVideoImage().width];
 
 //    //we are appending the historical positions here
-//    if (recordHistory) {
-//      global_xHist = append(global_xHist, global_avgX);
-//      global_yHist = append(global_yHist, global_avgY);
-//      global_dHist = append(global_dHist, global_avgDepth);
+//    if (recordHistory){
+//        global_xHist = append(global_xHist, global_avgX);
+//        global_yHist = append(global_yHist, global_avgY);
+//        global_dHist = append(global_dHist, global_avgDepth);
 //    }
 
 //    return true;
 //  } else {
 //    return false;
 //  }
+
 //}
 
 //void draw() {
+//  //ceiling code//
+//  // Run the tracking analysis
+//  tracker.track();
+//  // Show the image
+//  tracker.display();
+
+//  // Let's draw the raw location
+//  PVector v1 = tracker.getPos();
+//  //fill(50, 100, 250, 200);
+//  //noStroke();
+//  //ellipse(v1.x+640-70, v1.y, 20, 20);
+  
+//  //println("v1.x: ", v1.x);
+//  //println("mouseXLocationList[0]: ", mouseXLocationList[0]);
+//  //println("mouseXLocationList[1]: ", mouseXLocationList[1]);
+  
+//  //pushx = map(v1.x, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);  //615
+//  //pushy = map(v1.y, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);  //382
+
+
+  
+//  // Let's draw the "lerped" location
+//  PVector v2 = tracker.getLerpedPos();
+//  //fill(100, 250, 50, 200);
+//  //noStroke();
+//  //ellipse(v2.x+640-70, v2.y, 20, 20);
+
+//  // Display some info
+//  int t = tracker.getThreshold();
+//  fill(0);
+//  text("threshold: " + t + "    " +  "framerate: " + int(frameRate) + "    " + 
+//    "UP increase threshold, DOWN decrease threshold", 10, 500);
+//  //ceiling code//
+  
 //  box2d.step(); //step through time in box2d
 //  background(255);
 //  stroke(0);
@@ -518,13 +688,14 @@
 //    println("System starts to detect the ball");
 
 //    //call detectBall function
-//    if (detectBall(false)) {
+//    if (detectBall(false)){
 //      seeBall = true;
-//    } else {
+//    }else{
 //      seeBall = false;
 //    }
+    
 //  } else if (clickCount >= 4 && seeBall == true && ballSticks == false) {
-
+    
 //    println("Seen ball, check if it sticks");
 
 //    if (startTime == false) {
@@ -539,7 +710,7 @@
 //        println("I am here");
 //        if (millis() > time2 + 50) { //every 50 millisecond record a point
 //          startTime2 = false;
-
+          
 //          //detect ball while also record the ball's travel history
 //          detectBall(true);
 //        }
@@ -547,53 +718,55 @@
 
 //      if (millis() > time + 300) { //wait for the ball to stick properly maybe # milliseconds
 //        startTime = false;
-
+        
 //        //detect the location of the ball
-//        if (detectBall(false)) {
+//        if(detectBall(false)){
 //          scaledX = map(global_avgX, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);  //615
 //          scaledY = map(global_avgY, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);  //382
-
+          
 //          // Draw a circle at the tracked pixel
 //          fill(255);
 //          strokeWeight(4.0);
 //          stroke(0);
 //          ellipse(global_avgX, global_avgY, 20, 20);
 //          hitX = global_avgX; //store the position of hitX
-
+          
 //          //find ball velocity and angle
 //          //depthDiff  = global_dHist[global_dHist.length-1]-global_dHist[int(global_dHist.length/2)]; // this value should be positive
 //          //xDiff  = global_xHist[global_xHist.length-1]-global_xHist[int(global_xHist.length/2)];
-
+  
 //          //throwDegree = degrees(atan2(depthDiff, xDiff));
 //          throwDegree = degrees(atan2(3, 4));
-
+            
 //          //caculate velocity, we can just find the velocty of the five points after mid point
-
+  
 //          //avgZVelocity = ((global_dHist[int(global_dHist.length/2)] - global_dHist[0]))/3;
-
+  
 //          //avgXVelocity = ((global_xHist[int(global_xHist.length/2)] - global_xHist[0]))/3; //here we adjust the x velocity
-
+            
 //          ballSticks = true;
-
+           
 //          //upper left corber coordinate is (32, 32) and lower right corver is (646, 465)
 //          if (scaledX > 596 || scaledY > 415 || scaledY < 82 || scaledX < 82) {
 //            ballSticks = false;
 //            seeBall = false;
 //          }
+
 //        } else {
 //          ballSticks = false;
 //          seeBall = false;
 //        }
+
 //      }
 //    }
 
 //    println("ballSticks :", ballSticks);
 //  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && travelOut == false && facePushLocation == false && travelToPush == false && turning == false && pushDone == false) {
-
+    
 //    println("toio travelling out and prepare for pushing");
 //    //this is the block of code where we can have some travel code to move toios outward
 //    hitTarget = true;
-
+    
 //    if (startTime == false) {
 //      time = millis();
 //      startTime = true;
@@ -604,8 +777,8 @@
 //        travelOut = true;
 //      }
 //    }
-
-
+    
+    
 //    //give push x location and push y location
 
 //    //if (findDistBall2 == false) {
@@ -681,6 +854,7 @@
 //    //    }
 //    //  }
 //    //}
+    
 //  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && travelOut == true && facePushLocation == false && travelToPush == false && turning == false && pushDone == false) {
 
 //    println("toio rotates to the correct angle");
@@ -692,14 +866,15 @@
 //        pushToio = 0;
 
 //        turnDegree0 = degrees(atan2(scaledY-cubes[0].y, scaledX-cubes[0].x));
-//        if (turnDegree0 < 0) {
+//        if (turnDegree0 < 0){
 //          turnDegree0+=360;
 //        }
+        
 //      } else {
 //        //cube 1 will push
 //        pushToio = 1;
 //        turnDegree1 = degrees(atan2(scaledY-cubes[1].y, scaledX-cubes[1].x));
-
+        
 //        if (turnDegree1 < 0) {
 //          turnDegree1+=360;
 //        }
@@ -783,18 +958,18 @@
 //    //findTangentPoints means checking if we can find tangent points
 
 //    if (findPushedBallLocation == false) {
-
+      
 //      //you must find ball here
-//      if (detectBall(false)) {
-//        scaledX = map(global_avgX, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);
-//        scaledY = map(global_avgY, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);
-
-//        // Draw a circle at the tracked pixel
-//        fill(255);
-//        strokeWeight(4.0);
-//        stroke(0);
-//        ellipse(global_avgX, global_avgY, 20, 20);
-//      } else {
+//      if(detectBall(false)){
+//          scaledX = map(global_avgX, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);
+//          scaledY = map(global_avgY, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);
+          
+//          // Draw a circle at the tracked pixel
+//          fill(255);
+//          strokeWeight(4.0);
+//          stroke(0);
+//          ellipse(global_avgX, global_avgY, 20, 20);
+//      }else{
 //        println("something is wrong here, you should see the ball");
 //        exit();
 //      }
@@ -802,10 +977,9 @@
 //      findPushedBallLocation = true;
 //    }
 
-//    //find the tangent points
 
 //    c0_dist = cubes[0].distance(scaledX, scaledY);
-//    c1_dist = cubes[1].distance(scaledX, scaledY);
+//    c1_dist = cubes[1].distance(scaledX, scaledY); //in this example, we use cube 1 as the other dropper
 
 //    if (c0_dist < c1_dist) {
 //      closer_toio_id = 0; //closer toio
@@ -1197,6 +1371,7 @@
 
 //        turnFlag = true;
 //      }
+
 //    }
 //  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && outsideRadius == true && findTangentPoints == true
 //    && convergeFlag == true && turnFlag == true && knockSucceed == false) {
@@ -1229,10 +1404,10 @@
 //    } else {
 
 //      if (millis() > time + 1000) { //wait for the ball to stick properly maybe 2 seconds
-
+      
 //        aimCubeSpeed(0, 100, 180);
 //        aimCubeSpeed(1, 600, 250);
-
+        
 //        if (abs(cubes[0].x - 100) < 15 && abs(cubes[1].x - 600) < 15 &&
 //          abs(cubes[0].y - 180) < 15 &&  abs(cubes[1].y - 250) < 15) {
 //          seeBall = false;
@@ -1276,6 +1451,7 @@
 //          findPushedBallLocation = false;
 //          nextBall = false;
 //        }
+
 //      }
 //    }
 //  }

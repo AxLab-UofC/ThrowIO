@@ -1,15 +1,11 @@
 void keyPressed() {
   
   switch(key) {
-    case 'o':
-      println("o shape");
-      rotateCube(0, 180);
-      rotateCube(1, 180);
-    case 'a':
-      println("o shape");
-   
-      aimCubeSpeed(0, 170, 200);
-      aimCubeSpeed(1, 200, 200);
+    case 'c':
+      println("calibration mode!");
+      //myflag = true;
+
+    
   
   //case 'f':
   //  try {

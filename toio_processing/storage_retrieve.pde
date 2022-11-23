@@ -1,5 +1,3 @@
-////Basketball game application
-////This is the code for demo for dropping
 //import oscP5.*;
 //import netP5.*;
 //import processing.serial.*;
@@ -25,14 +23,14 @@
 //color trackColor;
 //float threshold = 40; //150 for red
 //int clickCount = 0;
-//int mouseXLocation = -50;
-//int mouseYLocation = -50;
+//int mouseXLocation;
+//int mouseYLocation;
 //boolean ballSticks = false;
-//int[] mouseXLocationList = new int[4];
-//int[] mouseYLocationList = new int[4];
+//int[] mouseXLocationList = new int[3];
+//int[] mouseYLocationList = new int[3];
 //float scaledX = -1000;
 //float scaledY = -1000;
-
+//float hitX = -1000;
 ////for OSC
 //OscP5 oscP5;
 ////where to send the commands to
@@ -96,35 +94,16 @@
 //boolean findDist = false;
 //float tangentX = 0;
 //float tangentY = 0;
-//boolean firstRotation = false;
-//boolean secondRotation = false;
-//boolean separate = false;
-
-//float[] xHist = {};
-//float[] yHist = {};
-//float[] dHist = {};
-//int rawDepth = 0;
-//float depthDiff;
-//float xDiff;
-//float throwDegree;
-//float avgZVelocity;
-//float avgXVelocity;
-//boolean addParticle = false;
-//int time2 = millis();
-//boolean startTime2 = false;
-
-//// A reference to our box2d world
-//Box2DProcessing box2d;
-//float monitorWidth = 1280;
-//float monitorHeight = 0;
 //float ySpeed = 1;
 //float xSpeed = 1;
 //float ycoord = 100;
 //float xcoord = 100;
+//float pushx = 400; //400
+//float pushy = 300; //300
 //boolean hitTarget = false;
-//float hitX = 720;
-//float pushx = 420; //420
-//float pushy = 200; //300
+//float monitorWidth = 0;
+//int pushToio = 0;
+
 //boolean travelOut = false;
 //boolean travelToPush = false;
 //boolean turning = false;
@@ -132,19 +111,19 @@
 //boolean findDistBall2 = false;
 //boolean facePushLocation = false;
 //boolean findPushedBallLocation = false;
-//int pushToio = 0;
-//boolean nextBall = false;
-//boolean startSprinkle = false;
-//int scoreCount = 0;
+//float initHandPosX = -1;
+//float initHandPosY = -1;
+//boolean findHand = false;
+//boolean seeHand = false;
+//// A reference to our box2d world
+//Box2DProcessing box2d;
 
-////global variables that helper functions would modify
-//float global_avgX = 0;
-//float global_avgY = 0;
-//int global_count = 0;
-//float global_avgDepth = 0;
-//float[] global_xHist = {};
-//float[] global_yHist = {};
-//float[] global_dHist = {};
+////void settings() {
+////  size(500, 500);
+////}
+
+//KinectTracker tracker;
+
 
 //void captureEvent(Capture video) {
 //  video.read();
@@ -163,6 +142,7 @@
 //  //server[1] = new NetAddress("192.168.0.103", 3334);
 //  //server[2] = new NetAddress("192.168.200.12", 3334);
 
+
 //  //create cubes
 //  cubes = new Cube[nCubes];
 //  for (int i = 0; i< cubes.length; ++i) {
@@ -170,7 +150,7 @@
 //  }
 
 //  //camera
-//  size(640, 360);
+//  size(1280, 360);
 //  kinect = new Kinect(this);
 //  kinect.initDepth();
 //  kinect.initVideo();
@@ -181,249 +161,257 @@
 
 //  box2d = new Box2DProcessing(this);
 //  box2d.createWorld();
-//  box2d.setGravity(0, -120); //we can change the gravity in box2D world here, currently using -120
+//  //String[] args = {"TwoFrameTest"};
 
-//  //allow two windows showing up at the same time
-//  //one for camera, the other for monitor screen
-//  String[] args = {"TwoFrameTest"};
-//  SecondApplet sa = new SecondApplet();
-//  PApplet.runSketch(args, sa);
+//  //SecondApplet sa = new SecondApplet();
+//  //PApplet.runSketch(args, sa);
+  
+//  tracker = new KinectTracker();
 //}
 
-////visual displays in the monitor window
 //public class SecondApplet extends PApplet {
 
-//  //an ArrayList of particles that will fall on the surface
+
+//  // An ArrayList of particles that will fall on the surface
 //  ArrayList<Particle> particles;
 
-//  //a list we'll use to track fixed objects
-//  ArrayList<Boundary> boundaries;
-
-//  class Boundary {
-
-//    //a boundary is a simple rectangle with x,y,width, and height
-//    float x;
-//    float y;
-//    float w;
-//    float h;
-//    //but we also have to make a body for box2d to know about it
-//    Body b;
-
-//    Boundary(float x_, float y_, float w_, float h_, float a) {
-//      x = x_;
-//      y = y_;
-//      w = w_;
-//      h = h_;
-
-//      // Define the polygon
-//      PolygonShape sd = new PolygonShape();
-//      // Figure out the box2d coordinates
-//      float box2dW = box2d.scalarPixelsToWorld(w/2);
-//      float box2dH = box2d.scalarPixelsToWorld(h/2);
-//      // We're just a box
-//      sd.setAsBox(box2dW, box2dH);
-
-//      // Create the body
-//      BodyDef bd = new BodyDef();
-//      bd.type = BodyType.STATIC;
-//      bd.angle = a;
-//      bd.position.set(box2d.coordPixelsToWorld(x, y));
-//      b = box2d.createBody(bd);
-
-//      // Attached the shape to the body using a Fixture
-//      b.createFixture(sd, 1);
-//    }
-
-//    // Draw the boundary, it doesn't move so we don't have to ask the Body for location
-//    void display() {
-//      fill(0);
-//      stroke(0);
-//      strokeWeight(1);
-//      rectMode(CENTER);
-//      float a = b.getAngle();
-//      pushMatrix();
-//      translate(x, y);
-//      rotate(-a);
-//      rect(0, 0, w, h);
-//      popMatrix();
-//    }
-//  }
-
-//  //particle class is the ball that show up in our monitor
+      
 //  class Particle {
 
-//    // We need to keep track of a Body and a radius
-//    Body body;
-//    float r;
-//    color col;
+//  // We need to keep track of a Body and a radius
+//  Body body;
+//  float r;
 
-//    Particle(float x, float y, float r_, float l, float v) { //x will be x velocity and y will be z velocity
-//      r = r_;
-//      // This function puts the particle in the Box2d world
-//      makeBody(x, y, r, l, v);
-//      body.setUserData(this);
-//      col = color(204, 102, 0);
-//    }
+//  color col;
 
-//    // This function removes the particle from the box2d world
-//    void killBody() {
-//      box2d.destroyBody(body);
-//    }
 
-//    // Change color when hit
-//    void change() {
-//      col = color(255, 0, 0);
-//    }
-
-//    // Is the particle ready for deletion?
-//    boolean done() {
-//      // Let's find the screen position of the particle
-//      Vec2 pos = box2d.getBodyPixelCoord(body);
-//      // Is it off the bottom of the screen?
-//      if (pos.y > height+r*2) {
-//        killBody();
-//        return true;
-//      }
-//      return false;
-//    }
-
-//    //check if a ball went into the hoop
-//    boolean goal() {
-//      // Let's find the screen position of the particle
-//      Vec2 pos = box2d.getBodyPixelCoord(body);
-//      if (pos.y > 350 && pos.y <= 550 && pos.x >= 450 && pos.x <= 750) { //this is the condition for scoring
-//        return true;
-//      }
-//      return false;
-//    }
-
-//    void display() {
-//      // We look at each body and get its screen position
-//      Vec2 pos = box2d.getBodyPixelCoord(body);
-//      // Get its angle of rotation
-//      float a = body.getAngle();
-//      pushMatrix();
-//      translate(pos.x, pos.y);
-//      rotate(a);
-//      fill(col);
-//      stroke(0);
-//      strokeWeight(1);
-//      ellipse(0, 0, r*2, r*2);
-//      // Let's add a line so we can see the rotation
-//      //line(0, 0, r, 0);
-//      popMatrix();
-//    }
-
-//    // Here's our function that adds the particle to the Box2D world
-//    // x is x position, y is y position, r is radius, l is linear velocity, v is vertical velocity
-//    //x = 400, y = 720, r , l = 15, v = 95
-//    void makeBody(float x, float y, float r, float l, float v) {
-//      // Define a body
-//      BodyDef bd = new BodyDef();
-//      // Set its position
-
-//      bd.position = box2d.coordPixelsToWorld(x, y); //monitor is 720 height and 1280 width
-//      bd.type = BodyType.DYNAMIC;
-//      body = box2d.createBody(bd);
-
-//      // Make the body's shape a circle
-//      CircleShape cs = new CircleShape();
-//      cs.m_radius = box2d.scalarPixelsToWorld(r);
-
-//      FixtureDef fd = new FixtureDef();
-//      fd.shape = cs;
-//      // Parameters that affect physics
-//      fd.density = 1;
-//      fd.friction = 0.01;
-//      fd.restitution = 0.3;
-
-//      // Attach fixture to body
-//      body.createFixture(fd);
-
-//      MassData massData = new MassData();
-//      massData.mass = 1000;
-//      //body.setAngularVelocity(random(-10, 10));
-//      body.setLinearVelocity(new Vec2(l, v));
-//      body.setMassData(massData);
-//    }
+//  Particle(float x, float y, float r_) {
+//    r = r_;
+//    // This function puts the particle in the Box2d world
+//    makeBody(x, y, r);
+//    body.setUserData(this);
+//    col = color(175);
 //  }
 
+//  // This function removes the particle from the box2d world
+//  void killBody() {
+//    box2d.destroyBody(body);
+//  }
+
+//  // Change color when hit
+//  void change() {
+//    col = color(255, 0, 0);
+//  }
+
+//  // Is the particle ready for deletion?
+//  boolean done() {
+//    // Let's find the screen position of the particle
+//    Vec2 pos = box2d.getBodyPixelCoord(body);
+//    // Is it off the bottom of the screen?
+//    if (pos.y > height+r*2) {
+//      killBody();
+//      return true;
+//    }
+//    return false;
+//  }
+
+
+//  //
+//  void display() {
+//    // We look at each body and get its screen position
+//    Vec2 pos = box2d.getBodyPixelCoord(body);
+//    // Get its angle of rotation
+//    float a = body.getAngle();
+//    pushMatrix();
+//    translate(pos.x, pos.y);
+//    rotate(a);
+//    fill(col);
+//    stroke(0);
+//    strokeWeight(1);
+//    ellipse(0, 0, r*2, r*2);
+//    // Let's add a line so we can see the rotation
+//    //line(0, 0, r, 0);
+//    popMatrix();
+//  }
+
+//  // Here's our function that adds the particle to the Box2D world
+//  void makeBody(float x, float y, float r) {
+//    // Define a body
+//    BodyDef bd = new BodyDef();
+//    // Set its position
+//    bd.position = box2d.coordPixelsToWorld(900, 900);
+//    bd.type = BodyType.DYNAMIC;
+//    body = box2d.createBody(bd);
+
+//    // Make the body's shape a circle
+//    CircleShape cs = new CircleShape();
+//    cs.m_radius = box2d.scalarPixelsToWorld(r);
+
+//    FixtureDef fd = new FixtureDef();
+//    fd.shape = cs;
+//    // Parameters that affect physics
+//    fd.density = 1;
+//    fd.friction = 0.01;
+//    fd.restitution = 0.3;
+
+//    // Attach fixture to body
+//    body.createFixture(fd);
+
+//    //body.setAngularVelocity(random(-10, 10));
+//    body.setLinearVelocity(new Vec2(-5, 40));
+//  }
+//}
 
 //  public void settings() {
 
 //    fullScreen();
-//    monitorWidth = displayWidth;
-//    monitorHeight = displayHeight;
+//    monitorWidth = width;
 
 //    particles = new ArrayList<Particle>();
-//    boundaries = new ArrayList<Boundary>();
-
-//    //this is the boundaries I made in the box2D world
-//    boundaries.add(new Boundary(750, 460, 20, 200, 0));
-//    boundaries.add(new Boundary(450, 460, 20, 200, 0));
-//    boundaries.add(new Boundary(600, 550, 300, 20, 0));
-//    boundaries.add(new Boundary(750, 0, 20, 200, 0));
-//    boundaries.add(new Boundary(950, 0, 20, 200, 0));
+//    particles.add(new Particle(width/2, -20, 100));
 //  }
-
+  
 //  public void draw() {
+//    box2d.step(); //step through time in box2d
 //    background(255);
 
-//    //the text for score
-//    textSize(128);
-//    fill(0);
-//    text("Score: "+str(scoreCount), 40, 120);
+//    if (hitTarget == false) {
+//      xcoord += xSpeed;
 
-//    if (startSprinkle == false) {
-
-//      //this is the list of particles add into the world
-//      particles.add(new Particle(570, 200, 40, 0, 0));
-//      particles.add(new Particle(500, 250, 40, 0, 0));
-//      particles.add(new Particle(600, 100, 40, 0, 0));
-//      particles.add(new Particle(700, 300, 40, 0, 0));
-//      particles.add(new Particle(600, 350, 40, 0, 0));
-
-//      startSprinkle = true;
-//    }
-
-//    // Display all the boundaries
-//    for (Boundary wall : boundaries) {
-//      wall.display();
-//    }
-
-//    //we add a new ball when nextBall flag is true
-//    if (nextBall == true) {
-//      particles.add(new Particle(850, 0, 40, 0, 0)); //this is the ball that drops from the tube
-//      nextBall = false;
-//    }
-
-
-//    //display ball
-//    if (hitTarget == true) {
-
-//      if (addParticle == false) {
-//        particles.add(new Particle(random(330, 360), 720, 40, random(10, 11), random(120, 140))); //this is where we currently define the ball speed and velocity
-//        addParticle = true;
+//      if ((xcoord > width) || (xcoord < 0)) {
+//        xSpeed *=-1;
 //      }
 //    }
 
-//    scoreCount = 0;
 
-//    for (int i = particles.size()-1; i >= 0; i--) {
-//      Particle p = particles.get(i);
-//      p.display();
-//      // Particles that leave the screen, we delete them
-//      // (note they have to be deleted from both the box2d world and our list
-//      if (p.done()) {
-//        particles.remove(i);
-//        hitTarget = false;
-//        addParticle = false;
+//    //UFO structure
+//    if (hitTarget == false) {
+//      //stroke(0);
+//      //fill(255);
+//      //ellipse(xcoord, ycoord-25, 80, 100);
+
+//      //noStroke();
+//      //fill(0);
+//      //ellipse(xcoord, ycoord, 150, 60);
+
+//      //noStroke();
+//      //fill(255);
+//      //ellipse(xcoord, ycoord-23, 80, 15);
+
+//      for (int i = particles.size()-1; i >= 0; i--) {
+//        Particle p = particles.get(i);
+//        p.display();
+//        // Particles that leave the screen, we delete them
+//        // (note they have to be deleted from both the box2d world and our list
+//        if (p.done()) {
+//          particles.remove(i);
+//        }
 //      }
-//      if (p.goal()) {
-//        scoreCount += 1;
-//      }
+      
+//    } else {
+//      stroke(0);
+//      fill(255, 0, 0);
+//      ellipse(xcoord, ycoord-25, 80, 100);
+
+//      noStroke();
+//      fill(0);
+//      ellipse(xcoord, ycoord, 150, 60);
+
+//      noStroke();
+//      fill(255, 0, 0);
+//      ellipse(xcoord, ycoord-23, 80, 15);
 //    }
+
+
+
+
+//    //if(hitTarget == true) {
+//    //  fill(255, 0, 255);
+//    //  ellipse(300, 300, 200, 200);
+//    //}else{
+//    //  fill(0, 0, 0);
+//    //  noStroke();
+//    //  ellipse(300, 300, 200, 200);
+
+//    //}
+//    //show the ball in the image to hit target
+
+
+//    //  fill(256);
+//    //  ellipse(x, y, 400, 400);
+//    //  if (startTime == false){
+//    //    time = millis();
+//    //    startTime = true;
+//    //  }else{
+//    //    if (millis() > time + 5000){
+//    //      hitTarget = false;
+//    //      startTime = false;
+//    //    }
+
+//    //  }
 //  };
+
+
+
+
+
+//  //y += ySpeed;
+//  //if (y > height || y < 0){
+//  //  ySpeed *=-1;
+//  //}
+
+
+
+
+//  //}
+
+//  //if (paintx != null){
+//  //  for (int i = 0; i <= paintcount; i += 1) {
+//  //  fill(255, 0, 255);
+
+//  //  paintscaledX = map(paintx[i], 0, 615, 0, width);
+//  //  paintscaledY = map(painty[i], 0, 382, 0, height);
+//  //  if(paintscaledX != 0 || paintscaledY != 0){
+//  //     ellipse(paintscaledX, paintscaledY, 400, 400);
+//  //  }
+
+//  //  }
+
+//  //}
+
+//  //draw rectangles
+//  //if (upperleft == false){
+//  //  fill(255, 255, 255);
+//  //  rect(0, 0, width/2, height/2);
+//  //}else if (upperleft == true){
+//  //   fill(255, 0, 0);
+//  //  rect(0, 0, width/2, height/2);
+//  //}
+
+//  //if (upperright == false){
+//  //  fill(255, 255, 255);
+//  //  rect(width/2, 0, width/2, height/2);
+//  //}else if (upperright == true){
+//  //   fill(0, 255, 0);
+//  //  rect(width/2, 0, width/2, height/2);
+//  //}
+
+//  //if (lowerright == false){
+//  //  fill(255, 255, 255);
+//  //  rect(width/2, height/2, width/2, height/2);
+//  //}else if (lowerright == true){
+//  //   fill(0, 0, 255);
+//  //   rect(width/2, height/2, width/2, height/2);
+//  //}
+
+//  //if (lowerleft == false){
+//  //  fill(255, 255, 255);
+//  //  rect(0, height/2, width/2, height/2);
+//  //}else if (lowerleft == true){
+//  //  fill(255, 0, 255);
+//  //  rect(0, height/2, width/2, height/2);
+
+//  //}
 //}
 
 //float distSq(float x1, float y1, float z1, float x2, float y2, float z2) {
@@ -431,64 +419,170 @@
 //  return d;
 //}
 
+//class KinectTracker {
 
+//  // Depth threshold
+//  int threshold = 500;
 
-//boolean detectBall(boolean recordHistory) {
+//  // Raw location
+//  PVector loc;
 
-//  global_avgX = 0;
-//  global_avgY = 0;
-//  global_count = 0;
+//  // Interpolated location
+//  PVector lerpedLoc;
 
-//  //begin loop to walk through every pixel
-//  for (int x = 0; x < kinect.getVideoImage().width; x++ ) {
-//    for (int y = 0; y < kinect.getVideoImage().height; y++ ) {
-
-//      int loc = x + y * kinect.getVideoImage().width; //find the location of each pixel
-
-//      color currentColor = kinect.getVideoImage().pixels[loc];
-//      float r1 = red(currentColor);
-//      float g1 = green(currentColor);
-//      float b1 = blue(currentColor);
-//      float r2 = red(trackColor);
-//      float g2 = green(trackColor);
-//      float b2 = blue(trackColor);
-
-//      float d = distSq(r1, g1, b1, r2, g2, b2);
-
-//      //compared the pixel color to the ball color
-//      if (d < threshold*threshold) {
-//        stroke(255);
-//        strokeWeight(1);
-//        point(x, y);
-//        global_avgX += x;
-//        global_avgY += y;
-//        global_count++;
-//      }
-//    }
+//  // Depth data
+//  int[] depth;
+  
+//  // What we'll show the user
+//  PImage display;
+   
+//  KinectTracker() {
+//    // This is an awkard use of a global variable here
+//    // But doing it this way for simplicity
+//    kinect.initDepth();
+//    //kinect.enableMirror(true);
+//    // Make a blank image
+//    display = createImage(kinect.width, kinect.height, RGB);
+//    // Set up the vectors
+//    loc = new PVector(0, 0);
+//    lerpedLoc = new PVector(0, 0);
 //  }
 
-//  // we find the ball if count > 50 (this threshold can be changed)
-//  if (global_count > 50) {
-//    global_avgX = global_avgX / global_count;
-//    global_avgY = global_avgY / global_count;
-//    global_avgDepth = kinect.getRawDepth()[int(global_avgX) + int(global_avgY) * kinect.getVideoImage().width];
+//  void track() {
+//    // Get the raw depth as array of integers
+//    depth = kinect.getRawDepth();
 
-//    //we are appending the historical positions here
-//    if (recordHistory) {
-//      global_xHist = append(global_xHist, global_avgX);
-//      global_yHist = append(global_yHist, global_avgY);
-//      global_dHist = append(global_dHist, global_avgDepth);
+//    // Being overly cautious here
+//    if (depth == null) return;
+
+//    float sumX = 0;
+//    float sumY = 0;
+//    float count = 0;
+        
+//    //for (int x = 0; x < kinect.width; x++) {
+//    //  for (int y = 0; y < kinect.height; y++) {
+        
+//    for (int x = kinect.width-1; x > 0; x--) {
+//      for (int y = kinect.height-1; y > 0; y--) {
+        
+//        int offset =  x + y*kinect.width;
+//        // Grabbing the raw depth
+//        int rawDepth = depth[offset];
+        
+//        if (x == int(kinect.width/2) && y == int(kinect.height/2)){
+//          //println("rawDepth: ", rawDepth);
+//        }
+        
+//        // Testing against threshold
+//        if (rawDepth < threshold && count < 200) {
+//          sumX += x;
+//          sumY += y;
+//          count++;
+//        }
+        
+//        //if (count == 10000){
+//        //    loc = new PVector(sumX/count, sumY/count);
+//        //    break;
+//        //}
+//      }
+//    }
+//    // As long as we found something
+//    if (count > 100) {
+//      loc = new PVector(sumX/count, sumY/count);
+//      println("count: ", count);
+      
 //    }
 
-//    return true;
-//  } else {
-//    return false;
+//    // Interpolating the location, doing it arbitrarily for now
+//    lerpedLoc.x = PApplet.lerp(lerpedLoc.x, loc.x, 0.3f);
+//    lerpedLoc.y = PApplet.lerp(lerpedLoc.y, loc.y, 0.3f);
+//  }
+
+//  PVector getLerpedPos() {
+//    return lerpedLoc;
+//  }
+
+//  PVector getPos() {
+//    return loc;
+//  }
+
+//  void display() {
+//    PImage img = kinect.getDepthImage();
+
+//    // Being overly cautious here
+//    if (depth == null || img == null) return;
+
+//    // Going to rewrite the depth image to show which pixels are in threshold
+//    // A lot of this is redundant, but this is just for demonstration purposes
+//    display.loadPixels();
+//    for (int x = 0; x < kinect.width; x++) {
+//      for (int y = 0; y < kinect.height; y++) {
+
+//        int offset = x + y * kinect.width;
+//        // Raw depth
+//        int rawDepth = depth[offset];
+//        int pix = x + y * display.width;
+//        if (rawDepth < threshold) {
+//          // A red color instead
+//          display.pixels[pix] = color(150, 50, 50);
+//        } else {
+//          display.pixels[pix] = img.pixels[offset];
+//        }
+//      }
+//    }
+//    display.updatePixels();
+
+//    // Draw the image
+//    image(display, 640, 0);
+    
+//  }
+
+//  int getThreshold() {
+//    return threshold;
+//  }
+
+//  void setThreshold(int t) {
+//    threshold =  t;
 //  }
 //}
 
 //void draw() {
-//  box2d.step(); //step through time in box2d
 //  background(255);
+  
+//  //ceiling code//
+//  // Run the tracking analysis
+//  tracker.track();
+//  // Show the image
+//  tracker.display();
+
+//  // Let's draw the raw location
+//  PVector v1 = tracker.getPos();
+//  //fill(50, 100, 250, 200);
+//  //noStroke();
+//  //ellipse(v1.x+640-70, v1.y, 20, 20);
+  
+//  //println("v1.x: ", v1.x);
+//  //println("mouseXLocationList[0]: ", mouseXLocationList[0]);
+//  //println("mouseXLocationList[1]: ", mouseXLocationList[1]);
+  
+//  //pushx = map(v1.x, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);  //615
+//  //pushy = map(v1.y, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);  //382
+
+
+  
+//  // Let's draw the "lerped" location
+//  PVector v2 = tracker.getLerpedPos();
+//  fill(100, 250, 50, 200);
+//  noStroke();
+//  ellipse(v2.x+640-70, v2.y, 20, 20);
+
+//  // Display some info
+//  int t = tracker.getThreshold();
+//  fill(0);
+//  text("threshold: " + t + "    " +  "framerate: " + int(frameRate) + "    " + 
+//    "UP increase threshold, DOWN decrease threshold", 10, 500);
+//  //ceiling code//
+    
 //  stroke(0);
 //  long now = System.currentTimeMillis();
 
@@ -499,79 +593,194 @@
 //  image(kinect.getVideoImage(), 0, 0);
 //  //image(kinect.getDepthImage(), 640, 0);
 
-//  if (clickCount < 4) {
+//  float avgX = 0;
+//  float avgY = 0;
 
-//    if (clickCount != 3) {
-//      fill(color(255, 0, 0));
-//      strokeWeight(1.0);
-//      stroke(255, 255, 255);
-//      ellipse(mouseXLocation, mouseYLocation, 10, 10);
-//    }
+//  int count = 0;
+//  //int depthcount = 0;
 
-//    //this is the original starting position of the ThrowIO
-//    aimCubeSpeed(0, 100, 350);
-//    aimCubeSpeed(1, 600, 250);
+
+//  if (clickCount < 3) {
+
+//    fill(255);
+//    strokeWeight(1.0);
+//    stroke(0);
+//    ellipse(mouseXLocation, mouseYLocation, 10, 10);
+//    //1
+//    //  2
+
+//    //println("x0:", cubes[0].x); //524, 115
+//    //println("y0:", cubes[0].y);
+
+//    //aimCubeSpeed(0, 150, 100);
+//    //aimCubeSpeed(1, 550, 400);
+    
+//    aimCubeSpeed(0, 90, 250);
+//    aimCubeSpeed(1, 550, 300);
+    
 //  }
 
+//  //record hand position 
+  
+//  //if(clickCount >= 3 && seeHand == false && findHand == false && seeBall == false && ballSticks == false){
+//  //  println("check hand");
+    
+//  //  for (int x = 0; x < kinect.width; x++) {
+//  //    for (int y = 0; y < kinect.height; y++) {
+        
+//  //      int offset =  x + y*kinect.width;
+//  //      // Grabbing the raw depth
+//  //      int rawDepth = kinect.getRawDepth()[offset];
+        
+        
+//  //      // Testing against threshold
+//  //      if (rawDepth < threshold) {
 
-//  if (clickCount >= 4 && seeBall == false && ballSticks == false) {
-//    println("System starts to detect the ball");
+//  //        depthcount++;
+//  //      }
 
-//    //call detectBall function
-//    if (detectBall(false)) {
+//  //    }
+//  //  }
+    
+//  //  println("depthcount: ", depthcount);
+//  //  if (depthcount > 500){
+//  //    seeHand = true;
+//  //  }
+  
+//  //}else 
+  
+//  if(clickCount >= 3 && findHand == false && seeBall == false && ballSticks == false){
+//    println("record hand");
+//    if (startTime == false) {
+//      time = millis();
+//      startTime = true;
+      
+//      initHandPosX = v2.x;
+//      initHandPosY = v2.y;
+      
+//    } else {
+//      if (millis() > time + 300) { //wait for the hand to stop
+//        startTime = false;
+        
+//        if(abs(initHandPosX -  v2.x) < 50 && abs(initHandPosY -  v2.y) < 50){
+          
+//          //record hand position here
+//          //pushx = map(v2.x-70, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);  //615
+//          //pushy = map(v2.y, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);  //382
+          
+//          //code for demo purpose
+//          pushx = 400;
+//          pushy = 250;
+          
+//          println("v2.x", v2.x);
+//          println("pushx", pushx);
+//          println("pushy", pushy);
+          
+//          ////pink
+//          //fill(500, 100, 250, 200);
+//          //noStroke();
+//          //ellipse(350, 250, 20, 20); //ellipse(v2.x-70,v2.y, 20, 20);
+          
+//          findHand = true;
+
+//         }
+//       }
+//    }
+//  }else if (clickCount >= 3 && findHand == true && seeBall == false && ballSticks == false) { //must include other flags as well //we actually can't include ballSticks == false
+//    //println("start detect if see ball");
+//    // Begin loop to walk through every pixel
+//    for (int x = 0; x < kinect.getVideoImage().width; x++ ) {
+//      for (int y = 0; y < kinect.getVideoImage().height; y++ ) {
+//        int loc = x + y * kinect.getVideoImage().width;
+//        // What is current color
+//        color currentColor = kinect.getVideoImage().pixels[loc];
+//        float r1 = red(currentColor);
+//        float g1 = green(currentColor);
+//        float b1 = blue(currentColor);
+//        float r2 = red(trackColor);
+//        float g2 = green(trackColor);
+//        float b2 = blue(trackColor);
+
+//        float d = distSq(r1, g1, b1, r2, g2, b2);
+
+//        if (d < threshold*threshold) {
+//          stroke(255);
+//          strokeWeight(1);
+//          point(x, y);
+//          avgX += x;
+//          avgY += y;
+//          count++;
+//        }
+//      }
+//    }
+
+//    // We only consider the color found if its color distance is less than 10.
+//    // This threshold of 10 is arbitrary and you can adjust this number depending on how accurate you require the tracking to be.
+//    if (count > 50) {
+
+
 //      seeBall = true;
 //    } else {
 //      seeBall = false;
 //    }
-//  } else if (clickCount >= 4 && seeBall == true && ballSticks == false) {
-
-//    println("Seen ball, check if it sticks");
+//  } else if (clickCount >= 3 && seeBall == true && ballSticks == false) {
+//    //check if ball sticks or not
 
 //    if (startTime == false) {
 //      time = millis();
 //      startTime = true;
 //    } else {
-
-//      if (startTime2 == false) {
-//        time2 = millis();
-//        startTime2 = true;
-//      } else {
-//        println("I am here");
-//        if (millis() > time2 + 50) { //every 50 millisecond record a point
-//          startTime2 = false;
-
-//          //detect ball while also record the ball's travel history
-//          detectBall(true);
-//        }
-//      }
-
-//      if (millis() > time + 300) { //wait for the ball to stick properly maybe # milliseconds
+//      if (millis() > time + 1000) { //wait for the ball to stick properly maybe 2 seconds
 //        startTime = false;
 
-//        //detect the location of the ball
-//        if (detectBall(false)) {
-//          scaledX = map(global_avgX, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);  //615
-//          scaledY = map(global_avgY, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);  //382
+//        //we can do the detect here!
+
+//        println("check if ballSticks and find its location");
+//        //redo color detection
+//        for (int x = 0; x < kinect.getVideoImage().width; x++ ) {
+//          for (int y = 0; y < kinect.getVideoImage().height; y++ ) {
+//            int loc = x + y * kinect.getVideoImage().width;
+//            // What is current color
+//            color currentColor = kinect.getVideoImage().pixels[loc];
+//            float r1 = red(currentColor);
+//            float g1 = green(currentColor);
+//            float b1 = blue(currentColor);
+//            float r2 = red(trackColor);
+//            float g2 = green(trackColor);
+//            float b2 = blue(trackColor);
+
+//            float d = distSq(r1, g1, b1, r2, g2, b2);
+
+//            if (d < threshold*threshold) {
+//              stroke(255);
+//              strokeWeight(1);
+//              point(x, y);
+//              avgX += x;
+//              avgY += y;
+//              count++;
+//            }
+//          }
+//        }
+
+//        // We only consider the color found if its color distance is less than 10.
+//        // This threshold of 10 is arbitrary and you can adjust this number depending on how accurate you require the tracking to be.
+//        if (count > 50) {
+
+//          avgX = avgX / count;
+//          avgY = avgY / count;
+
+//          println("avgX", avgX);
+//          println("avgY", avgY);
+
+//          scaledX = map(avgX, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);  //615
+//          scaledY = map(avgY, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);  //382
 
 //          // Draw a circle at the tracked pixel
 //          fill(255);
 //          strokeWeight(4.0);
 //          stroke(0);
-//          ellipse(global_avgX, global_avgY, 20, 20);
-//          hitX = global_avgX; //store the position of hitX
+//          ellipse(avgX, avgY, 20, 20);
 
-//          //find ball velocity and angle
-//          //depthDiff  = global_dHist[global_dHist.length-1]-global_dHist[int(global_dHist.length/2)]; // this value should be positive
-//          //xDiff  = global_xHist[global_xHist.length-1]-global_xHist[int(global_xHist.length/2)];
-
-//          //throwDegree = degrees(atan2(depthDiff, xDiff));
-//          throwDegree = degrees(atan2(3, 4));
-
-//          //caculate velocity, we can just find the velocty of the five points after mid point
-
-//          //avgZVelocity = ((global_dHist[int(global_dHist.length/2)] - global_dHist[0]))/3;
-
-//          //avgXVelocity = ((global_xHist[int(global_xHist.length/2)] - global_xHist[0]))/3; //here we adjust the x velocity
 
 //          ballSticks = true;
 
@@ -587,27 +796,11 @@
 //      }
 //    }
 
-//    println("ballSticks :", ballSticks);
-//  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && travelOut == false && facePushLocation == false && travelToPush == false && turning == false && pushDone == false) {
-
+//    println("ballSticks :", ballSticks); //need to determine which toio to push
+//  } else if (clickCount >= 3 && seeBall == true && ballSticks == true && travelOut == false && facePushLocation == false && travelToPush == false && turning == false && pushDone == false) {
 //    println("toio travelling out and prepare for pushing");
-//    //this is the block of code where we can have some travel code to move toios outward
-//    hitTarget = true;
-
-//    if (startTime == false) {
-//      time = millis();
-//      startTime = true;
-//    } else {
-
-//      if (millis() > time + 200) { //wait for the ball to stick properly maybe 2 seconds //2000 this part in basketball should be 2000
-//        startTime = false;
-//        travelOut = true;
-//      }
-//    }
-
-
 //    //give push x location and push y location
-
+    
 //    //if (findDistBall2 == false) {
 //    //  c0_dist_ball = cubes[0].distance(scaledX, scaledY);
 //    //  c1_dist_ball = cubes[1].distance(scaledX, scaledY);
@@ -681,13 +874,15 @@
 //    //    }
 //    //  }
 //    //}
-//  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && travelOut == true && facePushLocation == false && travelToPush == false && turning == false && pushDone == false) {
+    
+//    travelOut = true;
+    
+//  } else if (clickCount >= 3 && seeBall == true && ballSticks == true && travelOut == true && facePushLocation == false && travelToPush == false && turning == false && pushDone == false) {
 
-//    println("toio rotates to the correct angle");
+    
 //    if (recordDegree2 == false) {
 
-//      //assuming that the ball always sticks in between the spaces between the toio robots
-//      if (scaledX < pushx) {
+//      if (cubes[0].x < pushx) {
 //        //cube 0 will push
 //        pushToio = 0;
 
@@ -699,7 +894,6 @@
 //        //cube 1 will push
 //        pushToio = 1;
 //        turnDegree1 = degrees(atan2(scaledY-cubes[1].y, scaledX-cubes[1].x));
-
 //        if (turnDegree1 < 0) {
 //          turnDegree1+=360;
 //        }
@@ -718,13 +912,13 @@
 //        }
 //      }
 //    }
-//  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && travelOut == true && facePushLocation == true && travelToPush == false && turning == false && pushDone == false) {
+//  } else if (clickCount >= 3 && seeBall == true && ballSticks == true && travelOut == true && facePushLocation == true && travelToPush == false && turning == false && pushDone == false) {
 
-//    println("one toio travels to ball, preparing to push");
+//    println("one toio travels to push");
 //    //depending on where the toio wants to go (push x and push y)
 //    if (pushToio == 0) {
 //      //cube 0 will push
-
+      
 //      aimCubeSpeed(0, scaledX, scaledY); //may need to control distance
 
 //      if (abs(cubes[0].x - scaledX) < closeDistance2 && abs(cubes[0].y - scaledY) < closeDistance2) {
@@ -733,7 +927,7 @@
 //      }
 //    } else {
 //      //cube 1 will push
-
+      
 //      aimCubeSpeed(1, scaledX, scaledY);
 
 //      if (abs(cubes[1].x - scaledX) < closeDistance2 && abs(cubes[1].y - scaledY) < closeDistance2) {
@@ -741,9 +935,12 @@
 //        travelToPush = true;
 //      }
 //    }
-//  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && travelOut == true && facePushLocation == true && travelToPush == true && turning == false && pushDone == false) {
-//    println("toio rotates with the ball to face push location");
-
+//  } else if (clickCount >= 3 && seeBall == true && ballSticks == true && travelOut == true && facePushLocation == true && travelToPush == true && turning == false && pushDone == false) {
+//    println("toio turns angle to face push location");
+    
+//    println("pushx: ", pushx);
+//    println("pushy: ", pushy);
+    
 //    if (pushToio == 0) {
 //      //0 is the pushing toio
 
@@ -756,56 +953,101 @@
 //        turning = true;
 //      }
 //    }
-//  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && travelOut == true && facePushLocation == true && travelToPush == true && turning == true && pushDone == false) {
-//    println("toio pushes ball to the location");
+//  } else if (clickCount >= 3 && seeBall == true && ballSticks == true && travelOut == true && facePushLocation == true && travelToPush == true && turning == true && pushDone == false) {
+//    println("toio pushes");
 //    if (pushToio == 0) {
 //      //0 is the pushing toio
-//      aimCubeSpeed(0, pushx, pushy);
-//      if (abs(cubes[0].x - pushx) < 25 && abs(cubes[0].y - pushy) < 25) {
-//        pushDone = true;
-//      }
+//        aimCubeSpeed(0, pushx, pushy);
+//        if (abs(cubes[0].x - pushx) < 25 && abs(cubes[0].y - pushy) < 25) {
+//          pushDone = true;
+        
+//        }
+        
+      
 //    } else {
 //      //1 is the pushing toio
 //      aimCubeSpeed(1, pushx, pushy);
-//      if (abs(cubes[1].x - pushx) < 25 && abs(cubes[1].y - pushy) < 25) {
-//        pushDone = true;
-//      }
+//        if (abs(cubes[1].x - pushx) < 25 && abs(cubes[1].y - pushy) < 25) {
+//          pushDone = true;
+        
+//        }
 //    }
-//  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && pushDone == true && outsideRadius == true && findTangentPoints == false && scaledX != sx && scaledY != sy) {
+//  } else if (clickCount >= 3 && seeBall == true && ballSticks == true && pushDone == true && outsideRadius == true && findTangentPoints == false && scaledX != sx && scaledY != sy) {
 
-//    hitX = map(scaledX, 32, 614+32, 0, 1280);
+
+//    hitX = map(scaledX, 32, 614+32, 0, 1440);
 
 //    println("hitX: ", hitX);
 //    println("xcoord: ", xcoord);
+//    if (abs(hitX - xcoord) < 500) {
+//      hitTarget = true; //determine whether the ball hits the UFO or not (only care about x axis)
+//    }
 
 //    println("find tangent points");
 
 //    //findTangentPoints means checking if we can find tangent points
+//    //recordpoint
 
-//    if (findPushedBallLocation == false) {
+//    //if (findPushedBallLocation == false) {
 
-//      //you must find ball here
-//      if (detectBall(false)) {
-//        scaledX = map(global_avgX, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);
-//        scaledY = map(global_avgY, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);
+//    //  for (int x = 0; x < kinect.getVideoImage().width; x++ ) {
+//    //    for (int y = 0; y < kinect.getVideoImage().height; y++ ) {
+//    //      int loc = x + y * kinect.getVideoImage().width;
+//    //      // What is current color
+//    //      color currentColor = kinect.getVideoImage().pixels[loc];
+//    //      float r1 = red(currentColor);
+//    //      float g1 = green(currentColor);
+//    //      float b1 = blue(currentColor);
+//    //      float r2 = red(trackColor);
+//    //      float g2 = green(trackColor);
+//    //      float b2 = blue(trackColor);
 
-//        // Draw a circle at the tracked pixel
-//        fill(255);
-//        strokeWeight(4.0);
-//        stroke(0);
-//        ellipse(global_avgX, global_avgY, 20, 20);
-//      } else {
-//        println("something is wrong here, you should see the ball");
-//        exit();
-//      }
+//    //      float d = distSq(r1, g1, b1, r2, g2, b2);
 
-//      findPushedBallLocation = true;
-//    }
+//    //      if (d < threshold*threshold) {
+//    //        stroke(255);
+//    //        strokeWeight(1);
+//    //        point(x, y);
+//    //        avgX += x;
+//    //        avgY += y;
+//    //        count++;
+//    //      }
+//    //    }
+//    //  }
 
-//    //find the tangent points
+//    //  // We only consider the color found if its color distance is less than 10.
+//    //  // This threshold of 10 is arbitrary and you can adjust this number depending on how accurate you require the tracking to be.
+//    //  if (count > 50) {
+
+//    //    avgX = avgX / count;
+//    //    avgY = avgY / count;
+
+//    //    println("avgX", avgX);
+//    //    println("avgY", avgY);
+
+//    //    scaledX = map(avgX, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);  //615
+//    //    scaledY = map(avgY, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);  //382
+
+//    //    // Draw a circle at the tracked pixel
+//    //    fill(255);
+//    //    strokeWeight(4.0);
+//    //    stroke(0);
+//    //    ellipse(avgX, avgY, 20, 20);
+//    //  }
+
+//    //  findPushedBallLocation = true;
+//    //}
+
+
+//    scaledX = pushx+25;
+//    scaledY = pushy;
+
+//    scaledX = 400;
+//    scaledY = 250;
+    
 
 //    c0_dist = cubes[0].distance(scaledX, scaledY);
-//    c1_dist = cubes[1].distance(scaledX, scaledY);
+//    c1_dist = cubes[1].distance(scaledX, scaledY); //in this example, we use cube 1 as the other dropper
 
 //    if (c0_dist < c1_dist) {
 //      closer_toio_id = 0; //closer toio
@@ -1043,10 +1285,13 @@
 //    println("outsideRadius: ", outsideRadius);
 //    println("convergeFlag: ", convergeFlag);
 //    println("knockSucceed: ", knockSucceed);
-//  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && outsideRadius == false) {
+//  } else if (clickCount >= 3 && seeBall == true && ballSticks == true && outsideRadius == false) {
 
 //    println("handle case when the ball is within radius");
 //    //handle the case that the ball is within radius
+
+
+//    //------extra notes------//
 
 //    if (findDistBall == false) {
 //      c0_dist_ball = cubes[0].distance(scaledX, scaledY);
@@ -1063,60 +1308,62 @@
 //      }
 //    }
 
+
 //    //see which toio is closer to the ball
 
+//    //println("1 is closer toio to the ball");
 //    //find which quadrant the ball is in
 //    if ( (scaledX >= tangentX && scaledY <= tangentY) ||  (scaledX <= tangentX && scaledY >= tangentY)) {
 //      //ball is in first and thrid quadrant
 
-//      c0_dist = cubes[0].distance(250, 200);
-//      c1_dist = cubes[1].distance(250, 200); //in this example, we use cube 1 as the other dropper
+//      c0_dist = cubes[0].distance(250, 250);
+//      c1_dist = cubes[1].distance(300, 250); //in this example, we use cube 1 as the other dropper
 
 //      if (c0_dist < c1_dist) {
 //        //println("0 is closer toio to (150, 100)");
-//        aimCubeSpeed(0, 250, 200);
-//        aimCubeSpeed(1, 600, 200);
+//        aimCubeSpeed(0, 250, 250);
+//        aimCubeSpeed(1, 550, 400);
 //      } else {
 //        //println("1 is closer toio  to (150, 100)");
-//        aimCubeSpeed(1, 250, 200);
-//        aimCubeSpeed(0, 600, 200);
+//        aimCubeSpeed(1, 250, 250);
+//        aimCubeSpeed(0, 550, 400);
 //      }
 
 //      ///TODO: Found a bug. if the toios are at the original position and the ball is still within radius, then the toios won't move
 //      if (c0_dist < c1_dist) {
-//        if (abs(cubes[0].x - 250) < 15 && abs(cubes[0].y - 200) < 15 && abs(cubes[1].x - 600) < 15 && abs(cubes[1].y - 200) < 15 ) {
+//        if (abs(cubes[0].x - 250) < 15 && abs(cubes[0].y - 250) < 15 && abs(cubes[1].x - 550) < 15 && abs(cubes[1].y - 400) < 15 ) {
 //          println("outside radius true? [1]");
 //          outsideRadius = true;
 //        }
 //      } else {
-//        if (abs(cubes[0].x - 600) < 15 && abs(cubes[0].y - 200) < 15 && abs(cubes[1].x -250) < 15 && abs(cubes[1].y - 200) < 15 ) {
+//        if (abs(cubes[0].x - 550) < 15 && abs(cubes[0].y - 400) < 15 && abs(cubes[1].x -250) < 15 && abs(cubes[1].y - 250) < 15 ) {
 //          println("outside radius true? [2]");
 //          outsideRadius = true;
 //        }
 //      }
 //    } else {
 
-//      c0_dist = cubes[0].distance(200, 200); //not sure about this part
-//      c1_dist = cubes[1].distance(200, 200); //in this example, we use cube 1 as the other dropper
+//      c0_dist = cubes[0].distance(300, 400);
+//      c1_dist = cubes[1].distance(300, 400); //in this example, we use cube 1 as the other dropper
 
 //      if (c0_dist < c1_dist) {
 //        //println("0 is closer toio to (150, 400)");
-//        aimCubeSpeed(0, 250, 200);
-//        aimCubeSpeed(1, 600, 200);
+//        aimCubeSpeed(0, 300, 400);
+//        aimCubeSpeed(1, 550, 100);
 //      } else {
 //        //println("1 is closer toio  to (150, 400)");
-//        aimCubeSpeed(1, 250, 200);
-//        aimCubeSpeed(0, 600, 200);
+//        aimCubeSpeed(1, 300, 400);
+//        aimCubeSpeed(0, 550, 100);
 //      }
 
 //      ///TODO: Found a bug. if the toios are at the original position and the ball is still within radius, then the toios won't move
 //      if (c0_dist < c1_dist) {
-//        if (abs(cubes[0].x - 250) < 15 && abs(cubes[0].y - 200) < 15 && abs(cubes[1].x - 600) < 15 && abs(cubes[1].y - 200) < 15 ) {
+//        if (abs(cubes[0].x - 300) < 15 && abs(cubes[0].y - 400) < 15 && abs(cubes[1].x - 550) < 15 && abs(cubes[1].y - 100) < 15 ) {
 //          println("outside radius true? [1]");
 //          outsideRadius = true;
 //        }
 //      } else {
-//        if (abs(cubes[0].x - 600) < 15 && abs(cubes[0].y - 200) < 15 && abs(cubes[1].x - 250) < 15 && abs(cubes[1].y - 200) < 15 ) {
+//        if (abs(cubes[0].x - 550) < 15 && abs(cubes[0].y - 100) < 15 && abs(cubes[1].x - 300) < 15 && abs(cubes[1].y - 400) < 15 ) {
 //          println("outside radius true? [2]");
 //          outsideRadius = true;
 //        }
@@ -1125,15 +1372,15 @@
 
 
 //    //------extra notes------//
-//  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && errorFlag == true) {
+//  } else if (clickCount >= 3 && seeBall == true && ballSticks == true && errorFlag == true) {
 //    //just in case we don't find a lower tangent point
 //    errorFlag = false;
-//  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && errorFlag2 == true) {
+//  } else if (clickCount >= 3 && seeBall == true && ballSticks == true && errorFlag2 == true) {
 //    //just in case we don't find a higer tangent point
 //    errorFlag2 = false;
-//  } else if (clickCount >= 4  && seeBall == true && ballSticks == true && errorFlag3 == true) {
+//  } else if (clickCount >= 3  && seeBall == true && ballSticks == true && errorFlag3 == true) {
 //    errorFlag3 = false;
-//  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && errorFlag == false && errorFlag2 == false && errorFlag3 == false &&
+//  } else if (clickCount >= 3 && seeBall == true && ballSticks == true && errorFlag == false && errorFlag2 == false && errorFlag3 == false &&
 //    findTangentPoints == true && outsideRadius == true && convergeFlag == false && knockSucceed == false) {
 //    println("toios are travelling");
 //    //maybe I would want the toios to move back to the tangent points after they converge
@@ -1144,7 +1391,6 @@
 //      if (abs(cubes[0].x - finalx) < 15 && abs(cubes[0].y - finaly) < 15 && abs(cubes[1].x - xprime) < 15 && abs(cubes[1].y - yprime) < 15 ) {
 //        //findTangentPoints = false;
 //        convergeFlag = true;
-//        nextBall = true;
 //      }
 //    } else {
 //      aimCubeSpeed(1, finalx, finaly);
@@ -1152,15 +1398,12 @@
 //      if (abs(cubes[1].x - finalx) < 15 && abs(cubes[1].y - finaly) < 15 && abs(cubes[0].x - xprime) < 15 && abs(cubes[0].y - yprime) < 15) {
 //        //findTangentPoints = false;
 //        convergeFlag = true;
-//        nextBall = true;
 //      }
 //    }
-//  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && outsideRadius == true && findTangentPoints == true &&
+//  } else if (clickCount >= 3 && seeBall == true && ballSticks == true && outsideRadius == true && findTangentPoints == true &&
 //    convergeFlag == true && turnFlag == false && knockSucceed == false) {
 
 //    println("turn angle!");
-
-
 //    //spin to the right direction
 //    //say let 0 be front and let 1 be back
 
@@ -1177,112 +1420,72 @@
 //      }
 //      recordDegree = true;
 //    } else {
-
-
-//      if (abs(cubes[0].deg - turnDegree0) < 10) {
+      
+     
+//      if (abs(cubes[0].deg - turnDegree0) < 10){
 //        turnFlag1 = true;
-//      } else {
+      
+//      }else{
 //        rotateCube(0, turnDegree0);
 //      }
-
-
+      
+      
 //      if (abs(cubes[1].deg - (turnDegree1-180)) < 10 || abs(cubes[1].deg - (turnDegree1-180+360)) < 10) {
 
 //        turnFlag2 = true;
-//      } else {
+//      }else{
 //        rotateCube(1, turnDegree1-180); //cube 1 use chopstick side
 //      }
 
-//      if (turnFlag1 && turnFlag2) {
-
+//      if (turnFlag1 && turnFlag2){
+        
 //        turnFlag = true;
+      
 //      }
+
+
+//      //println("cubes[0].deg: ", cubes[0].deg);
+//      //println("turnDegree0: ", turnDegree0);
+//      //println("cubes[1].deg: ", cubes[1].deg);
+//      //println("turnDegree1: ", turnDegree1);
 //    }
-//  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && outsideRadius == true && findTangentPoints == true
+//  } else if (clickCount >= 3 && seeBall == true && ballSticks == true && outsideRadius == true && findTangentPoints == true
 //    && convergeFlag == true && turnFlag == true && knockSucceed == false) {
 //    println("converging");
-//    if (startTime == false) {
-//      time = millis();
-//      startTime = true;
-//    } else {
-
-//      if (millis() > time + 1000) { //wait for virtual ball to drop
-
-//        aimCubeSpeed(0, scaledX, scaledY);
-//        aimCubeSpeed(1, scaledX, scaledY);
-//      }
-//    }
-
-
+//    aimCubeSpeed(0, scaledX, scaledY);
+//    aimCubeSpeed(1, scaledX, scaledY);
 
 //    if (abs(cubes[0].x - scaledX) < closeDistance && abs(cubes[1].x - scaledX) < closeDistance &&
-//      abs(cubes[0].y - scaledY) < closeDistance &&  abs(cubes[1].y - scaledY) < closeDistance) {
+//      abs(cubes[1].y - scaledY) < closeDistance &&  abs(cubes[1].y - scaledY) < closeDistance) {
 //      knockSucceed = true;
-//      startTime = false;
 //    }
-//  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && outsideRadius == true &&  findTangentPoints == true
+//  } else if (clickCount >= 3 && seeBall == true && ballSticks == true && outsideRadius == true &&  findTangentPoints == true
 //    && convergeFlag == true && turnFlag == true && knockSucceed == true) {
 //    //  println("knocksucceed");
-//    if (startTime == false) {
-//      time = millis();
-//      startTime = true;
-//    } else {
+//    seeBall = false;
+//    ballSticks = false;
+//    findTangentPoints = false;
+//    convergeFlag = false;
+//    turnFlag = false;
+//    turnFlag1 = false;
+//    turnFlag2 = false;
+//    recordDegree = false;
+//    knockSucceed = false;
+//    findDistBall = false;
+//    findDist = false;
+//    hitTarget = false;
 
-//      if (millis() > time + 1000) { //wait for the ball to stick properly maybe 2 seconds
-
-//        aimCubeSpeed(0, 100, 180);
-//        aimCubeSpeed(1, 600, 250);
-
-//        if (abs(cubes[0].x - 100) < 15 && abs(cubes[1].x - 600) < 15 &&
-//          abs(cubes[0].y - 180) < 15 &&  abs(cubes[1].y - 250) < 15) {
-//          seeBall = false;
-//          ballSticks = false;
-//          findTangentPoints = false;
-//          convergeFlag = false;
-//          turnFlag = false;
-//          turnFlag1 = false;
-//          turnFlag2 = false;
-//          recordDegree = false;
-//          recordDegree2 = false;
-//          knockSucceed = false;
-//          findDistBall = false;
-//          findDistBall2 = false;
-//          findDist = false;
-//          separate = false;
-//          xHist = new float[] {};
-//          yHist = new float[] {};
-//          dHist = new float[] {};
-
-//          hitTarget = false;
-//          travelOut = false;
-//          travelToPush = false;
-//          turning = false;
-//          pushDone = false;
-
-//          facePushLocation = false;
-
-
-//          errorFlag = false;
-//          errorFlag2 = false;
-//          errorFlag3 = false;
-//          outsideRadius = true;
-
-//          turnDegree1 = 0;
-//          turnDegree0 = 0;
-//          tangentX = 0;
-//          tangentY = 0;
-//          addParticle = false;
-//          hitTarget = false;
-//          findPushedBallLocation = false;
-//          nextBall = false;
-//        }
-//      }
-//    }
+//    travelOut = false;
+//    travelToPush = false;
+//    turning = true;
+//    pushDone = true;
+//    findDistBall2 = false;
+//    facePushLocation = false;
+//    recordDegree2 = false;
+//    facePushLocation = false;
+//    findHand = false;
+//    seeHand = false;
 //  }
-
-
-
-
 
 
 
@@ -1344,6 +1547,7 @@
 //}
 
 ////helper functions to drive the cubes
+
 //boolean rotateCubeMax(int id, float ta) {
 //  float diff = ta-cubes[id].deg;
 //  if (diff>180) diff-=360;
@@ -1372,10 +1576,10 @@
 ////  int strength = int(abs(diff) / 10);
 ////  strength = 1;//
 ////  if (diff<0)dir=-1;
-////  float left = ( 10*(1*strength)*dir); //use to be 5 as constant
+////  float left = ( 10*(1*strength)*dir);
 ////  float right = (-10*(1+strength)*dir);
 
-////  println("rotate speed", id, left, right); //maybe the speed here is kinda slow and can adjust the constant
+////  //println("rotate speed", id, left, right); //maybe the speed here is kinda slow and can adjust the constant
 ////  int duration = 300;
 ////  motorControl(id, left, right, duration);
 ////  //println("rotate false "+diff +" "+ id+" "+ta +" "+cubes[id].deg);
@@ -1441,19 +1645,6 @@
 ////  case 'n':
 ////    motorControl(0, -115, -115, 200);//(toioID, left-speed, right-speed, duration[ms])
 ////    break;
-////  case 'h':
-////    hitTarget = true;
-////    break;
-////  case 'f':
-////    hitTarget = false;
-////    break;
-////  case 'b':
-////    addParticle = true;
-////    break;
-////  case 'q':
-////    addParticle = false;
-////    break;
-
 ////  default:
 ////    break;
 ////  }
@@ -1496,6 +1687,8 @@
 
 
 ////void mousePressed() {
+
+
 ////  //chase = false;
 ////  //spin = false;
 ////  //mouseDrive=true;
@@ -1506,23 +1699,18 @@
 ////  mouseYLocation = mouseY;
 ////  mouseXLocationList[clickCount] = mouseX;
 ////  mouseYLocationList[clickCount] = mouseY;
-////  //trackColor = kinect.getVideoImage().pixels[loc]; //need to uncomment this
+////  trackColor = kinect.getVideoImage().pixels[loc]; //need to uncomment this
 
 ////  clickCount+=1;
-////  if(clickCount == 3){
-////    trackColor = kinect.getVideoImage().pixels[loc]; //need to uncomment this
-////  }
-
-
 ////}
 
-////void mouseReleased() {
-////  mouseDrive=false;
-////}
+//////void mouseReleased() {
+//////  mouseDrive=false;
+//////}
 
 
 
-////OSC message handling (receive)
+//////OSC message handling (receive)
 
 ////void oscEvent(OscMessage msg) {
 ////  if (msg.checkAddrPattern("/position") == true) {
