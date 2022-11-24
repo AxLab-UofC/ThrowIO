@@ -27,7 +27,7 @@ float threshold = 40; //150 for red
 int clickCount = 0;
 int mouseXLocation = -50;
 int mouseYLocation = -50;
-boolean ballSticks = false;
+boolean flag_ballSticks = false;
 int[] mouseXLocationList = new int[4];
 int[] mouseYLocationList = new int[4];
 //float scaledX = -1000;
@@ -57,7 +57,7 @@ float global_finalx = 0.0;
 float global_finaly = 0.0;
 float global_xprime = 0.0;
 float global_yprime = 0.0;
-boolean findTangentPoints = false;
+boolean flag_findTangentPoints = false;
 
 float global_c0_dist = 0.0;
 float global_c1_dist = 0.0;
@@ -70,16 +70,19 @@ float global_scaledY = 100;
 float c0_dist_ball = 0.0;
 float c1_dist_ball = 0.0;
 String global_furtherTangentPoint;
+float global_backoutx0 = 0;
+float global_backouty0 = 0;
+float global_backoutx1 = 0;
+float global_backouty1 = 0;
+float global_bitMoreThanRadius = global_radius+20;
 
-boolean errorFlag = false;
-boolean errorFlag2 = false;
-boolean errorFlag3 = false;
+
 boolean flag_outsideRadius = true;
-boolean convergeFlag = false;
-boolean knockSucceed = false;
+boolean flag_converge = false;
+boolean flag_knockSucceed = false;
 int closeDistance = 45;
 int closeDistance2 = 45;
-boolean seeBall = false;
+boolean flag_seeBall = false;
 int time = millis();
 boolean startTime = false;
 boolean turnFlag = false;
@@ -87,6 +90,7 @@ boolean turnFlag1 = false;
 boolean turnFlag2 = false;
 boolean recordDegree = false;
 boolean recordDegree2 = false;
+boolean prepareBackout = false;
 float turnDegree1 = 0;
 float turnDegree0 = 0;
 boolean findDistBall = false;
@@ -120,12 +124,12 @@ float ycoord = 100;
 float xcoord = 100;
 boolean hitTarget = false;
 float hitX = 720;
-float pushx = 420; //420
+float pushx = 300; //400
 float pushy = 200; //300
 boolean travelOut = false;
 boolean travelToPush = false;
 boolean turning = false;
-boolean pushDone = false;
+boolean flag_pushDone = false;
 boolean findDistBall2 = false;
 boolean facePushLocation = false;
 boolean findPushedBallLocation = false;
@@ -428,8 +432,6 @@ float distSq(float x1, float y1, float z1, float x2, float y2, float z2) {
   return d;
 }
 
-
-
 boolean detectBall(boolean recordHistory) {
 
   global_avgX = 0;
@@ -507,20 +509,7 @@ boolean setTangentPoint(float theta1, float theta2, float theta3, float d2, Stri
     tempx = global_toio_center_x;
     tempy = global_toio_center_y;
   }
-  
-  println("tempx: ", tempx);
-  println("tempy: ", tempy);
-  println("global_ball_x: ", global_ball_x);
-  println("global_ball_y: ", global_ball_y);
-  println("global_x: ", global_x);
-  println("global_y: ", global_y);
-  println("global_x2: ", global_x2);
-  println("global_y2: ", global_y2);
-  println("global_furtherTangentPoint: ", global_furtherTangentPoint);
-  println("global_finalx: ", global_finalx);
-  println("global_finaly: ", global_finaly);
-  println("global_xprime: ", global_xprime);
-  println("global_yprime: ", global_yprime);
+
     
   if ((global_ball_x - tempx)> 0 & (global_ball_y - tempy) < 0) { //we already convert quadrant coordinates to toio mat coordinates
 
@@ -726,7 +715,7 @@ boolean findLocation(){
     println("global_xprime: ", global_xprime);
     println("global_yprime: ", global_yprime);
     
-    findTangentPoints = true;
+    flag_findTangentPoints = true;
     
   } else {
     //case when the ball is in the radius of the circle
@@ -734,6 +723,104 @@ boolean findLocation(){
     println("toio is within radius, which is bad");
   }
   
+  return true;
+}
+
+  
+boolean findbackoutLocation(int toio_number) {
+  float x = 0.0;
+  float y = 0.0;
+  PVector v5, v6;
+  float theta5 = 0.0;
+  
+  float tempx = 0.0;
+  float tempy = 0.0;
+  
+  if(toio_number == 0){
+    //change this to cube[0].x for example
+    tempx = cubes[0].x;
+    tempy = cubes[0].y;
+  }else{
+    tempx = cubes[1].x;
+    tempy = cubes[1].y;
+  }
+  
+  float tempDist = sqrt ( pow ( global_scaledX - tempx, 2 ) + pow (global_scaledY - tempy, 2 ));
+  float ratio = global_bitMoreThanRadius/tempDist;
+  
+  v5 = new PVector(global_scaledX-tempx, global_scaledY-tempy); //final x and final y to ball
+  v6 = new PVector(global_scaledX-tempx, tempy-tempy); //final x and final y horizontal extension
+
+  theta5 = acos(v5.dot(v6)/(v5.mag()*v6.mag()));
+
+
+  if ((global_scaledX - tempx)> 0 & (global_scaledY - tempy) < 0) { //we already convert quadrant coordinates to toio mat coordinates
+
+    println("ball in quadrant 1");
+    x = global_scaledX-ratio*tempDist*cos(theta5);
+    y = global_scaledY+ratio*tempDist*sin(theta5);
+  } else if ((global_scaledX - tempx) < 0 & (global_scaledY - tempy) < 0) {
+
+    println("ball in quadrant 2");
+    x = global_scaledX+ratio*tempDist*cos(theta5);
+    y = global_scaledY+ratio*tempDist*sin(theta5);
+  } else if ((global_scaledX - tempx) < 0 & (global_scaledY - tempy) > 0) {
+
+    println("ball in quadrant 3");
+    x = global_scaledX+ratio*tempDist*cos(theta5);
+    y = global_scaledY-ratio*tempDist*sin(theta5);
+  } else if ((global_scaledX - tempx) > 0 & (global_scaledY - tempy) > 0) {
+
+    println("ball in quadrant 4");
+
+    x = global_scaledX-ratio*tempDist*cos(theta5);
+    y = global_scaledY-ratio*tempDist*sin(theta5);
+  } else {
+
+    theta5 = 0;
+
+    if ((global_scaledX - tempx) == 0 & (global_scaledY - tempy) > 0) {
+
+      println("ball in between 3 and 4 quadrants");
+      x = global_scaledX-ratio*tempDist*sin(theta5);
+      y = global_scaledY-ratio*tempDist*cos(theta5);
+    } else if ((global_scaledX - tempx) > 0 & (global_scaledY - tempy) == 0) {
+
+      println("ball in between 1 and 4 quadrants");
+      x = global_scaledX-ratio*tempDist*cos(theta5);
+      y = global_scaledY+ratio*tempDist*sin(theta5);
+    } else if ((global_scaledX - tempx) == 0 & (global_scaledY - tempy) < 0) {
+
+      println("ball in between 1 and 2 quadrants");
+      x = global_scaledX-ratio*tempDist*sin(theta5);
+      y = global_scaledY+ratio*tempDist*cos(theta5);
+    } else if ((global_scaledX - tempx) < 0 & (global_scaledY - tempy) == 0) {
+
+      println("ball in between 2 and 3 quadrants");
+      x = global_scaledX+ratio*tempDist*cos(theta5);
+      y = global_scaledY+ratio*tempDist*sin(theta5);
+    } else {
+
+      println("Something is wrong here!!");
+    }
+  }
+  
+  if(toio_number == 0){
+    global_backoutx0 = x;
+    global_backouty0 = y;
+  }else{
+    global_backoutx1 = x;
+    global_backouty1 = y;
+  
+  }
+  println("x: ", x);
+  println("y: ", y);
+  println("global_scaledX: ", global_scaledX);
+  println("global_scaledY: ", global_scaledY);
+  println("global_backoutx0: ", global_backoutx0);
+  println("global_backouty0: ", global_backouty0);
+  println("global_backoutx1: ", global_backoutx1);
+  println("global_backouty1: ", global_backouty1);
   return true;
 }
 
@@ -765,16 +852,16 @@ void draw() {
   }
 
 
-  if (clickCount >= 4 && seeBall == false && ballSticks == false) {
+  if (clickCount >= 4 && flag_seeBall == false && flag_ballSticks == false) {
     println("System starts to detect the ball");
 
     //call detectBall function
     if (detectBall(false)) {
-      seeBall = true;
+      flag_seeBall = true;
     } else {
-      seeBall = false;
+      flag_seeBall = false;
     }
-  } else if (clickCount >= 4 && seeBall == true && ballSticks == false) {
+  } else if (clickCount >= 4 && flag_seeBall == true && flag_ballSticks == false) {
 
     println("Seen ball, check if it sticks");
 
@@ -824,22 +911,23 @@ void draw() {
 
           //avgXVelocity = ((global_xHist[int(global_xHist.length/2)] - global_xHist[0]))/3; //here we adjust the x velocity
 
-          ballSticks = true;
+          flag_ballSticks = true;
 
           //upper left corber coordinate is (32, 32) and lower right corver is (646, 465)
           if (global_scaledX > 596 || global_scaledY > 415 || global_scaledY < 82 || global_scaledX < 82) {
-            ballSticks = false;
-            seeBall = false;
+            flag_ballSticks = false;
+            flag_seeBall = false;
           }
         } else {
-          ballSticks = false;
-          seeBall = false;
+          flag_ballSticks = false;
+          flag_seeBall = false;
         }
       }
     }
 
-    println("ballSticks :", ballSticks);
-  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && travelOut == false && facePushLocation == false && travelToPush == false && turning == false && pushDone == false) {
+    println("flag_ballSticks :", flag_ballSticks);
+    
+  } else if (clickCount >= 4 && flag_seeBall == true && flag_ballSticks == true && travelOut == false && facePushLocation == false && travelToPush == false && turning == false && flag_pushDone == false) {
 
     println("toio travelling out and prepare for pushing");
     //this is the block of code where we can have some travel code to move toios outward
@@ -932,7 +1020,7 @@ void draw() {
     //    }
     //  }
     //}
-  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && travelOut == true && facePushLocation == false && travelToPush == false && turning == false && pushDone == false) {
+  } else if (clickCount >= 4 && flag_seeBall == true && flag_ballSticks == true && travelOut == true && facePushLocation == false && travelToPush == false && turning == false && flag_pushDone == false) {
 
     println("toio rotates to the correct angle");
     if (recordDegree2 == false) {
@@ -969,10 +1057,11 @@ void draw() {
         }
       }
     }
-  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && travelOut == true && facePushLocation == true && travelToPush == false && turning == false && pushDone == false) {
+  } else if (clickCount >= 4 && flag_seeBall == true && flag_ballSticks == true && travelOut == true && facePushLocation == true && travelToPush == false && turning == false && flag_pushDone == false) {
 
     println("one toio travels to ball, preparing to push");
     //depending on where the toio wants to go (push x and push y)
+    
     if (pushToio == 0) {
       //cube 0 will push
 
@@ -992,7 +1081,9 @@ void draw() {
         travelToPush = true;
       }
     }
-  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && travelOut == true && facePushLocation == true && travelToPush == true && turning == false && pushDone == false) {
+    
+    
+  } else if (clickCount >= 4 && flag_seeBall == true && flag_ballSticks == true && travelOut == true && facePushLocation == true && travelToPush == true && turning == false && flag_pushDone == false) {
     println("toio rotates with the ball to face push location");
 
     if (pushToio == 0) {
@@ -1007,22 +1098,25 @@ void draw() {
         turning = true;
       }
     }
-  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && travelOut == true && facePushLocation == true && travelToPush == true && turning == true && pushDone == false) {
+    
+  } else if (clickCount >= 4 && flag_seeBall == true && flag_ballSticks == true && travelOut == true && facePushLocation == true && travelToPush == true && turning == true && flag_pushDone == false) {
     println("toio pushes ball to the location");
+    
     if (pushToio == 0) {
       //0 is the pushing toio
       aimCubeSpeed(0, pushx, pushy);
       if (abs(cubes[0].x - pushx) < 25 && abs(cubes[0].y - pushy) < 25) {
-        pushDone = true;
+        flag_pushDone = true;
       }
     } else {
       //1 is the pushing toio
       aimCubeSpeed(1, pushx, pushy);
       if (abs(cubes[1].x - pushx) < 25 && abs(cubes[1].y - pushy) < 25) {
-        pushDone = true;
+        flag_pushDone = true;
       }
     }
-  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && pushDone == true && flag_outsideRadius == true && findTangentPoints == false && global_scaledX != global_ball_x && global_scaledY != global_ball_y) {
+    
+  } else if (clickCount >= 4 && flag_seeBall == true && flag_ballSticks == true && flag_pushDone == true && flag_outsideRadius == true && flag_findTangentPoints == false && global_scaledX != global_ball_x && global_scaledY != global_ball_y) {
 
     hitX = map(global_scaledX, 32, 614+32, 0, 1280);
 
@@ -1031,7 +1125,7 @@ void draw() {
 
     println("find tangent points");
 
-    //findTangentPoints means checking if we can find tangent points
+    //flag_findTangentPoints means checking if we can find tangent points
 
     if (findPushedBallLocation == false) {
 
@@ -1057,103 +1151,121 @@ void draw() {
     findLocation();
 
     
-  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && flag_outsideRadius == false) {
+  } else if (clickCount >= 4 && flag_seeBall == true && flag_ballSticks == true && flag_outsideRadius == false) {
 
     println("handle case when the ball is within radius");
+    //new below
+    if(prepareBackout == false){
+      if(detectBall(false)){
+        global_scaledX = map(global_avgX, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);  //615
+        global_scaledY = map(global_avgY, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);  //382
+        findbackoutLocation(0);
+        findbackoutLocation(1);
+        
+        prepareBackout = true;
+
+      }
+    }else{
+      
+      aimCubeSpeed(0, global_backoutx0, global_backouty0);
+      aimCubeSpeed(1, global_backoutx1, global_backouty1);
+      
+      if (abs(cubes[0].x - global_backoutx0) < 15 && abs(cubes[0].y - global_backouty0) < 15 && abs(cubes[1].x - global_backoutx1) < 15 && abs(cubes[1].y - global_backouty1) < 15 ) {
+        println("hahahaha");
+        flag_outsideRadius = true;
+      }
+    
+    }
+    
+    
+
+    
+    //new above
+
     //handle the case that the ball is within radius
 
-    if (findDistBall == false) {
-      c0_dist_ball = cubes[0].distance(global_scaledX, global_scaledY);
-      c1_dist_ball = cubes[1].distance(global_scaledX, global_scaledY);
+    //if (findDistBall == false) {
+    //  c0_dist_ball = cubes[0].distance(global_scaledX, global_scaledY);
+    //  c1_dist_ball = cubes[1].distance(global_scaledX, global_scaledY);
 
-      findDistBall = true;
+    //  findDistBall = true;
 
-      if (c0_dist_ball < c1_dist_ball) {
-        tangentX = cubes[0].x;
-        tangentY = cubes[0].y;
-      } else {
-        tangentX = cubes[1].x;
-        tangentY = cubes[1].y;
-      }
-    }
+    //  if (c0_dist_ball < c1_dist_ball) {
+    //    tangentX = cubes[0].x;
+    //    tangentY = cubes[0].y;
+    //  } else {
+    //    tangentX = cubes[1].x;
+    //    tangentY = cubes[1].y;
+    //  }
+    //}
 
-    //see which toio is closer to the ball
+    ////see which toio is closer to the ball
 
-    //find which quadrant the ball is in
-    if ( (global_scaledX >= tangentX && global_scaledY <= tangentY) ||  (global_scaledX <= tangentX && global_scaledY >= tangentY)) {
-       println("check 1");
+    ////find which quadrant the ball is in
+    //if ( (global_scaledX >= tangentX && global_scaledY <= tangentY) ||  (global_scaledX <= tangentX && global_scaledY >= tangentY)) {
+    //   println("check 1");
        
-      //ball is in first and thrid quadrant
+    //  //ball is in first and thrid quadrant
 
-      global_c0_dist = cubes[0].distance(250, 200);
-      global_c1_dist = cubes[1].distance(250, 200); //in this example, we use cube 1 as the other dropper
+    //  global_c0_dist = cubes[0].distance(250, 200);
+    //  global_c1_dist = cubes[1].distance(250, 200); //in this example, we use cube 1 as the other dropper
 
-      if (global_c0_dist < global_c1_dist) {
-        println("0 is closer toio to (250, 200)");
+    //  if (global_c0_dist < global_c1_dist) {
+    //    println("0 is closer toio to (250, 200)");
         
-        aimCubeSpeed(0, 250, 200);
-        aimCubeSpeed(1, 600, 200);
-      } else {
-        //println("1 is closer toio  to (150, 100)");
-        aimCubeSpeed(1, 250, 200);
-        aimCubeSpeed(0, 600, 200);
-      }
+    //    aimCubeSpeed(0, 250, 200);
+    //    aimCubeSpeed(1, 600, 200);
+    //  } else {
+    //    //println("1 is closer toio  to (150, 100)");
+    //    aimCubeSpeed(1, 250, 200);
+    //    aimCubeSpeed(0, 600, 200);
+    //  }
 
-      ///TODO: Found a bug. if the toios are at the original position and the ball is still within radius, then the toios won't move
-      if (global_c0_dist < global_c1_dist) {
-        println("check 3");
-        if (abs(cubes[0].x - 250) < 15 && abs(cubes[0].y - 200) < 15 && abs(cubes[1].x - 600) < 15 && abs(cubes[1].y - 200) < 15 ) {
-          println("outside radius true? [1]");
-          flag_outsideRadius = true;
-        }
-      } else {
-        println("check 4");
-        if (abs(cubes[0].x - 600) < 15 && abs(cubes[0].y - 200) < 15 && abs(cubes[1].x -250) < 15 && abs(cubes[1].y - 200) < 15 ) {
-          println("outside radius true? [2]");
-          flag_outsideRadius = true;
-        }
-      }
-    } else {
-      println("check 2");
-      global_c0_dist = cubes[0].distance(200, 200); //not sure about this part
-      global_c1_dist = cubes[1].distance(200, 200); //in this example, we use cube 1 as the other dropper
+    //  ///TODO: Found a bug. if the toios are at the original position and the ball is still within radius, then the toios won't move
+    //  if (global_c0_dist < global_c1_dist) {
+    //    println("check 3");
+    //    if (abs(cubes[0].x - 250) < 15 && abs(cubes[0].y - 200) < 15 && abs(cubes[1].x - 600) < 15 && abs(cubes[1].y - 200) < 15 ) {
+    //      println("outside radius true? [1]");
+    //      flag_outsideRadius = true;
+    //    }
+    //  } else {
+    //    println("check 4");
+    //    if (abs(cubes[0].x - 600) < 15 && abs(cubes[0].y - 200) < 15 && abs(cubes[1].x -250) < 15 && abs(cubes[1].y - 200) < 15 ) {
+    //      println("outside radius true? [2]");
+    //      flag_outsideRadius = true;
+    //    }
+    //  }
+    //} else {
+    //  println("check 2");
+    //  global_c0_dist = cubes[0].distance(200, 200); //not sure about this part
+    //  global_c1_dist = cubes[1].distance(200, 200); //in this example, we use cube 1 as the other dropper
 
-      if (global_c0_dist < global_c1_dist) {
-        //println("0 is closer toio to (150, 400)");
-        aimCubeSpeed(0, 250, 200);
-        aimCubeSpeed(1, 600, 200);
-      } else {
-        //println("1 is closer toio  to (150, 400)");
-        aimCubeSpeed(1, 250, 200);
-        aimCubeSpeed(0, 600, 200);
-      }
+    //  if (global_c0_dist < global_c1_dist) {
+    //    //println("0 is closer toio to (150, 400)");
+    //    aimCubeSpeed(0, 250, 200);
+    //    aimCubeSpeed(1, 600, 200);
+    //  } else {
+    //    //println("1 is closer toio  to (150, 400)");
+    //    aimCubeSpeed(1, 250, 200);
+    //    aimCubeSpeed(0, 600, 200);
+    //  }
 
-      ///TODO: Found a bug. if the toios are at the original position and the ball is still within radius, then the toios won't move
-      if (global_c0_dist < global_c1_dist) {
-        if (abs(cubes[0].x - 250) < 15 && abs(cubes[0].y - 200) < 15 && abs(cubes[1].x - 600) < 15 && abs(cubes[1].y - 200) < 15 ) {
-          println("outside radius true? [1]");
-          flag_outsideRadius = true;
-        }
-      } else {
-        if (abs(cubes[0].x - 600) < 15 && abs(cubes[0].y - 200) < 15 && abs(cubes[1].x - 250) < 15 && abs(cubes[1].y - 200) < 15 ) {
-          println("outside radius true? [2]");
-          flag_outsideRadius = true;
-        }
-      }
-    }
+    //  ///TODO: Found a bug. if the toios are at the original position and the ball is still within radius, then the toios won't move
+    //  if (global_c0_dist < global_c1_dist) {
+    //    if (abs(cubes[0].x - 250) < 15 && abs(cubes[0].y - 200) < 15 && abs(cubes[1].x - 600) < 15 && abs(cubes[1].y - 200) < 15 ) {
+    //      println("outside radius true? [1]");
+    //      flag_outsideRadius = true;
+    //    }
+    //  } else {
+    //    if (abs(cubes[0].x - 600) < 15 && abs(cubes[0].y - 200) < 15 && abs(cubes[1].x - 250) < 15 && abs(cubes[1].y - 200) < 15 ) {
+    //      println("outside radius true? [2]");
+    //      flag_outsideRadius = true;
+    //    }
+    //  }
+    //}
 
-
-    //------extra notes------//
-  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && errorFlag == true) {
-    //just in case we don't find a lower tangent point
-    errorFlag = false;
-  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && errorFlag2 == true) {
-    //just in case we don't find a higer tangent point
-    errorFlag2 = false;
-  } else if (clickCount >= 4  && seeBall == true && ballSticks == true && errorFlag3 == true) {
-    errorFlag3 = false;
-  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && errorFlag == false && errorFlag2 == false && errorFlag3 == false &&
-    findTangentPoints == true && flag_outsideRadius == true && convergeFlag == false && knockSucceed == false) {
+  }else if (clickCount >= 4 && flag_seeBall == true && flag_ballSticks == true &&
+    flag_findTangentPoints == true && flag_outsideRadius == true && flag_converge == false && flag_knockSucceed == false) {
     println("toios are travelling");
     //maybe I would want the toios to move back to the tangent points after they converge
 
@@ -1161,21 +1273,21 @@ void draw() {
       aimCubeSpeed(0, global_finalx, global_finaly);
       aimCubeSpeed(1, global_xprime, global_yprime);
       if (abs(cubes[0].x - global_finalx) < 15 && abs(cubes[0].y - global_finaly) < 15 && abs(cubes[1].x - global_xprime) < 15 && abs(cubes[1].y - global_yprime) < 15 ) {
-        //findTangentPoints = false;
-        convergeFlag = true;
+        //flag_findTangentPoints = false;
+        flag_converge = true;
         nextBall = true;
       }
     } else {
       aimCubeSpeed(1, global_finalx, global_finaly);
       aimCubeSpeed(0, global_xprime, global_yprime);
       if (abs(cubes[1].x - global_finalx) < 15 && abs(cubes[1].y - global_finaly) < 15 && abs(cubes[0].x - global_xprime) < 15 && abs(cubes[0].y - global_yprime) < 15) {
-        //findTangentPoints = false;
-        convergeFlag = true;
+        //flag_findTangentPoints = false;
+        flag_converge = true;
         nextBall = true;
       }
     }
-  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && flag_outsideRadius == true && findTangentPoints == true &&
-    convergeFlag == true && turnFlag == false && knockSucceed == false) {
+  } else if (clickCount >= 4 && flag_seeBall == true && flag_ballSticks == true && flag_outsideRadius == true && flag_findTangentPoints == true &&
+    flag_converge == true && turnFlag == false && flag_knockSucceed == false) {
 
     println("turn angle!");
 
@@ -1217,8 +1329,8 @@ void draw() {
         turnFlag = true;
       }
     }
-  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && flag_outsideRadius == true && findTangentPoints == true
-    && convergeFlag == true && turnFlag == true && knockSucceed == false) {
+  } else if (clickCount >= 4 && flag_seeBall == true && flag_ballSticks == true && flag_outsideRadius == true && flag_findTangentPoints == true
+    && flag_converge == true && turnFlag == true && flag_knockSucceed == false) {
     println("converging");
     if (startTime == false) {
       time = millis();
@@ -1236,11 +1348,11 @@ void draw() {
 
     if (abs(cubes[0].x - global_scaledX) < closeDistance && abs(cubes[1].x - global_scaledX) < closeDistance &&
       abs(cubes[0].y - global_scaledY) < closeDistance &&  abs(cubes[1].y - global_scaledY) < closeDistance) {
-      knockSucceed = true;
+      flag_knockSucceed = true;
       startTime = false;
     }
-  } else if (clickCount >= 4 && seeBall == true && ballSticks == true && flag_outsideRadius == true &&  findTangentPoints == true
-    && convergeFlag == true && turnFlag == true && knockSucceed == true) {
+  } else if (clickCount >= 4 && flag_seeBall == true && flag_ballSticks == true && flag_outsideRadius == true &&  flag_findTangentPoints == true
+    && flag_converge == true && turnFlag == true && flag_knockSucceed == true) {
     //  println("knocksucceed");
     if (startTime == false) {
       time = millis();
@@ -1254,16 +1366,17 @@ void draw() {
 
         if (abs(cubes[0].x - 100) < 15 && abs(cubes[1].x - 600) < 15 &&
           abs(cubes[0].y - 180) < 15 &&  abs(cubes[1].y - 250) < 15) {
-          seeBall = false;
-          ballSticks = false;
-          findTangentPoints = false;
-          convergeFlag = false;
+          flag_seeBall = false;
+          flag_ballSticks = false;
+          flag_findTangentPoints = false;
+          flag_converge = false;
           turnFlag = false;
           turnFlag1 = false;
           turnFlag2 = false;
           recordDegree = false;
           recordDegree2 = false;
-          knockSucceed = false;
+          flag_knockSucceed = false;
+          prepareBackout = false;
           findDistBall = false;
           findDistBall2 = false;
           findDist = false;
@@ -1276,14 +1389,12 @@ void draw() {
           travelOut = false;
           travelToPush = false;
           turning = false;
-          pushDone = false;
+          flag_pushDone = false;
 
           facePushLocation = false;
 
 
-          errorFlag = false;
-          errorFlag2 = false;
-          errorFlag3 = false;
+
           flag_outsideRadius = true;
 
           turnDegree1 = 0;
