@@ -1497,7 +1497,7 @@ void draw() {
       //Phase 9. One toio rotates to use the prong side to and the other rotates to use the wedge side for drop operation
       println("Phase 9. One toio rotates to use the prong side to and the other rotates to use the wedge side for drop operation");
 
-      //We arbitrarily let 0 use the front (wedge) and let 1 use the back (prong) //TODO: please confirm this!!
+      //We arbitrarily let 0 use the front (wedge) and let 1 use the back (prong)
 
       if (flag_recordToioAndBallAngle == false) {
         turnDegree0 = degrees(atan2(global_scaledY-cubes[0].y, global_scaledX-cubes[0].x));
