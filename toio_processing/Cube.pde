@@ -101,21 +101,21 @@ class Cube {
       float frac = cos(diffAngle);
       if (diffAngle > 0) {
         //up-left
-        left = floor(100*pow(frac, 2));
-        right = 100;
+        left = floor(maxMotorSpeed*pow(frac, 2));
+        right = maxMotorSpeed;
       } else {
-        left = 100;
-        right = floor(100*pow(frac, 2));
+        left = maxMotorSpeed;
+        right = floor(maxMotorSpeed*pow(frac, 2));
       }
     } else {
       //face back
       float frac = -cos(diffAngle);
       if (diffAngle > 0) {
-        left  = -floor(100*frac);
+        left  = -floor(maxMotorSpeed*frac);
         right =  -100;
       } else {
         left  =  -100;
-        right = -floor(100*frac);
+        right = -floor(maxMotorSpeed*frac);
       }
     }
 

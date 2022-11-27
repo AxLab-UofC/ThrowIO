@@ -88,7 +88,7 @@
 //boolean turnFlag1 = false;
 //boolean turnFlag2 = false;
 //boolean recordDegree = false;
-//boolean recordDegree2 = false;
+//boolean flag_recordPushingToioPushLocationAngle = false;
 //float turnDegree1 = 0;
 //float turnDegree0 = 0;
 //boolean findDistBall = false;
@@ -511,7 +511,7 @@
 //      travelOut = true;
 //    } else if (clickCount >= 4 && seeBall == true && ballSticks == true && travelOut == true && facePushLocation == false && travelToPush == false && turning == false && pushDone == false) {
 
-//      if (recordDegree2 == false) {
+//      if (flag_recordPushingToioPushLocationAngle == false) {
 
 //        if (cubes[0].x > pushx) {
 //          //cube 0 will push
@@ -530,7 +530,7 @@
 //          }
 //        }
 
-//        recordDegree2 = true;
+//        flag_recordPushingToioPushLocationAngle = true;
 //      } else {
 
 //        if (pushToio == 0) {
@@ -714,7 +714,7 @@
 //      pushDone = true;
 //      findDistBall2 = false;
 //      facePushLocation = false;
-//      recordDegree2 = false;
+//      flag_recordPushingToioPushLocationAngle = false;
 //      facePushLocation = false;
 
 
@@ -912,7 +912,7 @@
 //      } else if (clickCount >= 3 && seeBall == true && ballSticks == true && travelOut == true && facePushLocation == false && travelToPush == false && turning == false && pushDone == false) {
 
 
-//        if (recordDegree2 == false) {
+//        if (flag_recordPushingToioPushLocationAngle == false) {
 
 //          if (cubes[0].x < pushx) {
 //            //cube 0 will push
@@ -931,7 +931,7 @@
 //            }
 //          }
 
-//          recordDegree2 = true;
+//          flag_recordPushingToioPushLocationAngle = true;
 //        } else {
 
 //          if (pushToio == 0) {
@@ -1521,7 +1521,7 @@
 //        pushDone = true;
 //        findDistBall2 = false;
 //        facePushLocation = false;
-//        recordDegree2 = false;
+//        flag_recordPushingToioPushLocationAngle = false;
 //        facePushLocation = false;
 //        findHand = false;
 //        seeHand = false;
@@ -1547,7 +1547,7 @@
 //      pushDone = false;
 //      findDistBall2 = false;
 //      facePushLocation = false;
-//      recordDegree2 = false;
+//      flag_recordPushingToioPushLocationAngle = false;
 //      facePushLocation = false;
 //      findHand = false;
 //      seeHand = false;

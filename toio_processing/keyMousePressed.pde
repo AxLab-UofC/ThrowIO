@@ -142,8 +142,13 @@ void mousePressed() {
   int loc = mouseX + mouseY*kinect.getVideoImage().width;
   mouseXLocation = mouseX;
   mouseYLocation = mouseY;
-  mouseXLocationList[clickCount] = mouseX;
-  mouseYLocationList[clickCount] = mouseY;
+  
+
+  mouseXLocationList[clickCount] = mouseX; //need to uncomment everything
+  mouseYLocationList[clickCount] = mouseY; //need to uncomment everything
+
+
+  
   //trackColor = kinect.getVideoImage().pixels[loc]; //need to uncomment this
 
   clickCount+=1;

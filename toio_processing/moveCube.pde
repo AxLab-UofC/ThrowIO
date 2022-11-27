@@ -25,6 +25,8 @@ boolean aimCubeSpeed(int id, float tx, float ty) {
   //println("left: "+ lr[0] + ";" + "right: " + lr[1]);
   int duration = (100);
   motorControl(id, left, right, duration);
+  
+ // println()
   return false;
 }
 

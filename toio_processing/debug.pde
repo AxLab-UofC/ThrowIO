@@ -89,7 +89,7 @@
 //boolean turnFlag1 = false;
 //boolean turnFlag2 = false;
 //boolean recordDegree = false;
-//boolean recordDegree2 = false;
+//boolean flag_recordPushingToioPushLocationAngle = false;
 //boolean prepareBackout = false;
 //float turnDegree1 = 0;
 //float turnDegree0 = 0;
@@ -1023,7 +1023,7 @@
 //  } else if (clickCount >= 4 && flag_seeBall == true && flag_ballSticks == true && travelOut == true && facePushLocation == false && travelToPush == false && turning == false && flag_pushDone == false) {
 
 //    println("toio rotates to the correct angle");
-//    if (recordDegree2 == false) {
+//    if (flag_recordPushingToioPushLocationAngle == false) {
 
 //      //assuming that the ball always sticks in between the spaces between the toio robots
 //      if (global_scaledX < pushx) {
@@ -1044,7 +1044,7 @@
 //        }
 //      }
 
-//      recordDegree2 = true;
+//      flag_recordPushingToioPushLocationAngle = true;
 //    } else {
 
 //      if (pushToio == 0) {
@@ -1371,7 +1371,7 @@
 //          turnFlag1 = false;
 //          turnFlag2 = false;
 //          recordDegree = false;
-//          recordDegree2 = false;
+//          flag_recordPushingToioPushLocationAngle = false;
 //          flag_knockSucceed = false;
 //          prepareBackout = false;
 //          findDistBall = false;
