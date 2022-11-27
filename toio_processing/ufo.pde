@@ -28,7 +28,7 @@ float threshold = 40; //150 for red
 int clickCount = 0;
 int mouseXLocation = -50;
 int mouseYLocation = -50;
-boolean flag_ballSticks = false;
+boolean phase_ballSticks = false;
 int[] mouseXLocationList = new int[4];
 int[] mouseYLocationList = new int[4];
 //float scaledX = -1000;
@@ -48,7 +48,7 @@ boolean mouseDrive = false;
 boolean chase = false;
 boolean spin = false;
 
-
+//global variables that helper functions would modify
 float global_radius = 120;
 float global_x = 0.0;
 float global_y = 0.0;
@@ -58,8 +58,6 @@ float global_finalx = 0.0;
 float global_finaly = 0.0;
 float global_xprime = 0.0;
 float global_yprime = 0.0;
-boolean flag_findTangentPoints = false;
-
 float global_c0_dist = 0.0;
 float global_c1_dist = 0.0;
 float global_ball_x = 0; //sx
@@ -68,35 +66,46 @@ float global_toio_center_x = 0; //cx
 float global_toio_center_y = 0; //cy
 float global_scaledX = 60;
 float global_scaledY = 100;
-float c0_dist_ball = 0.0;
-float c1_dist_ball = 0.0;
 String global_furtherTangentPoint;
 float global_backoutx0 = 0;
 float global_backouty0 = 0;
 float global_backoutx1 = 0;
 float global_backouty1 = 0;
 float global_bitMoreThanRadius = global_radius+20;
-
-
-boolean flag_toioTravelToPrepLocation = false;
-boolean flag_dropSucceed = false;
+float global_avgX = 0;
+float global_avgY = 0;
+int global_count = 0;
+float global_avgDepth = 0;
+float[] global_xHist = {};
+float[] global_yHist = {};
+float[] global_dHist = {};
 int convergeDistance = 45;
 int distanceBetweenPushingToioAndBall = 45;
 int distanceBetweenPushingToioAndPushLocation = 25;
-boolean flag_seeBall = false;
 int time = millis();
 boolean startTime = false;
-boolean flag_rotateToDrop = false;
+float turnDegree1 = 0;
+float turnDegree0 = 0;
+
+boolean phase_findTangentPoints = false;
+boolean phase_toioTravelToPrepLocation = false;
+boolean phase_dropSucceed = false;
+boolean phase_seeBall = false;
+boolean phase_rotateToDrop = false;
+boolean phase_travelToBallToPush = false;
+boolean phase_rotateBallToPushLocation = false;
+boolean phase_pushDone = false;
+boolean phase_facePushLocation = false;
+
 boolean flag_rotate0 = false;
 boolean flag_rotate1 = false;
 boolean flag_recordToioAndBallAngle = false;
 boolean flag_recordPushingToioAndBallAngle = false;
 boolean flag_prepareBackout = false;
-float turnDegree1 = 0;
-float turnDegree0 = 0;
 
-boolean killUFO = false;
-boolean bombSound = false;
+
+boolean second_flag_killUFO = false;
+boolean second_flag_bombSound = false;
 
 float[] xHist = {};
 float[] yHist = {};
@@ -107,7 +116,7 @@ float xDiff;
 float throwDegree;
 float avgZVelocity = 0.0;
 float avgXVelocity = 0.0;
-boolean addParticle = false;
+boolean second_flag_addParticle = false;
 int time2 = millis();
 boolean startTime2 = false;
 float bulletx = 0;
@@ -122,37 +131,23 @@ float ySpeed = 1;
 float xSpeed = 1;
 float ycoord = 300;
 float xcoord = 400;
-boolean global_hitTarget = false;
+boolean second_flag_hitTarget = false;
 float hitX = 720;
 float pushx = 360; //400
 float pushy = 240; //300
-boolean flag_travelToBallToPush = false;
-boolean flag_rotateBallToPushLocation = false;
-boolean flag_pushDone = false;
 
-boolean flag_facePushLocation = false;
 boolean flag_findPushedBallLocation = false;
 int pushToio = 0;
-boolean flag_nextBall = false;
+boolean second_flag_nextBall = false;
 boolean startSprinkle = false;
 boolean ballDidNotStick = false;
 int scoreCount = 0;
 boolean flag_needBackout = false;
 
-//global variables that helper functions would modify
-float global_avgX = 0;
-float global_avgY = 0;
-int global_count = 0;
-float global_avgDepth = 0;
-float[] global_xHist = {};
-float[] global_yHist = {};
-float[] global_dHist = {};
-
 SoundFile file;
 boolean startCrash = false;
 boolean startSelfCrash = false;
 String instruction = "Throw ball! Hit UFO!";
-//text("Nice try!\nThrow slower!", 605, 450);
 
 void captureEvent(Capture video) {
   video.read();
@@ -310,12 +305,12 @@ public class SecondApplet extends PApplet {
         bullety = pos.y;
         killBody();
         return true;
-      } else if (abs(pos.x - xcoord) < 80 && abs(pos.y - ycoord) < 80 && killUFO == false) {
+      } else if (abs(pos.x - xcoord) < 80 && abs(pos.y - ycoord) < 80 && second_flag_killUFO == false) {
 
         //this is when you hit the UFO
         instruction = "Good job! Next ball!";
-        bombSound = true;
-        killUFO = true;
+        second_flag_bombSound = true;
+        second_flag_killUFO = true;
         startCrash = true;
         scoreCount+=1;
 
@@ -626,7 +621,7 @@ public class SecondApplet extends PApplet {
     }
 
     //UFO
-    if (killUFO == false) {
+    if (second_flag_killUFO == false) {
 
       stroke(0);
       strokeWeight(1);
@@ -642,10 +637,10 @@ public class SecondApplet extends PApplet {
       ellipse(xcoord, ycoord-23, 80, 15);
     }
 
-    if (bombSound == true) {
+    if (second_flag_bombSound == true) {
 
       file.play();
-      bombSound = false;
+      second_flag_bombSound = false;
     }
 
 
@@ -703,17 +698,17 @@ public class SecondApplet extends PApplet {
       wall.display();
     }
 
-    //we add a new ball when flag_nextBall flag is true
-    if (flag_nextBall == true) {
+    //we add a new ball when second_flag_nextBall flag is true
+    if (second_flag_nextBall == true) {
       particles.add(new Particle(width-50, height, 40, -30, 65)); //this is the ball that drops from the tube
-      flag_nextBall = false;
+      second_flag_nextBall = false;
     }
 
 
     //display ball
-    if (global_hitTarget == true) {
+    if (second_flag_hitTarget == true) {
 
-      if (addParticle == false) {
+      if (second_flag_addParticle == false) {
 
         //particles.add(new Particle(random(330, 360), 720, 40, random(10, 11), random(120, 140))); //this is where we currently define the ball speed and velocity
 
@@ -723,7 +718,7 @@ public class SecondApplet extends PApplet {
           particles.add(new Particle(hitX, 720, 40, -random(10, 11), random(65, 70))); //this is where we currently define the ball speed and velocity //random(120, 140)
         }
 
-        addParticle = true;
+        second_flag_addParticle = true;
       }
     }
 
@@ -754,8 +749,8 @@ public class SecondApplet extends PApplet {
       // (note they have to be deleted from both the box2d world and our list
       if (p.done()) {
         particles.remove(i);
-        global_hitTarget = false;
-        addParticle = false;
+        second_flag_hitTarget = false;
+        second_flag_addParticle = false;
       }
       //if (p.goal()) {
       //  scoreCount += 1;
@@ -1046,7 +1041,7 @@ boolean findLocation() {
     println("global_xprime: ", global_xprime);
     println("global_yprime: ", global_yprime);
 
-    //flag_findTangentPoints = true;
+    //phase_findTangentPoints = true;
   } else {
     //case when the ball is in the radius of the circle
     println("toio is within radius, which is bad");
@@ -1189,17 +1184,17 @@ void draw() {
   } else {
 
 
-    if (flag_seeBall == false) {
+    if (phase_seeBall == false) {
       //Phase 1. Check if the camera sees a ball
       println("System starts to detect the ball");
 
       //call detectBall function
       if (detectBall(false)) {
-        flag_seeBall = true;
+        phase_seeBall = true;
       } else {
-        flag_seeBall = false;
+        phase_seeBall = false;
       }
-    } else if (flag_seeBall == true && flag_ballSticks == false) {
+    } else if (phase_seeBall == true && phase_ballSticks == false) {
 
       //Phase 2. Check if ball sticks
       println("Seen ball, check if it sticks");
@@ -1236,8 +1231,8 @@ void draw() {
 
             if (global_avgDepth > 710) { //we may need to adjust this number depending on the environment (this is why we call detectBall when clickCount == 3)
 
-              flag_ballSticks = false;
-              flag_seeBall = false;
+              phase_ballSticks = false;
+              phase_seeBall = false;
               instruction = "Nice try! Throw carefully!" ;
             }
 
@@ -1262,33 +1257,31 @@ void draw() {
             avgZVelocity = ((global_dHist[int(global_dHist.length/2)] - global_dHist[0]))/3;
             avgXVelocity = ((global_xHist[int(global_xHist.length/2)] - global_xHist[0]))/3;
 
-            flag_ballSticks = true;
+            phase_ballSticks = true;
 
             //upper left corber coordinate is (32, 32) and lower right corver is (646, 465)
             if (global_scaledX > 596 || global_scaledY > 415 || global_scaledY < 82 || global_scaledX < 82) {
               //this is the case when ball sticks on the edge of the ceiling so that robot can't travel to drop it
               //in this case, a user needs to manually grab the ball and re-throw it again
-              flag_ballSticks = false;
-              flag_seeBall = false;
+              phase_ballSticks = false;
+              phase_seeBall = false;
               instruction = "Nice try! Throw carefully!" ;
             }
           } else {
 
             //this is the case when ball enters the camera but didn't stick
             //it is most likely causes by a user throwing to hard or too soft
-            flag_ballSticks = false;
-            flag_seeBall = false;
+            phase_ballSticks = false;
+            phase_seeBall = false;
             instruction = "Nice try! Throw carefully!" ;
           }
         }
       }
 
-      println("flag_ballSticks :", flag_ballSticks);
-
       //this flag is used to tell the second window that the ball hits and sticks on the ceilling
       //so that the vertical screen can show the trajectory of the ball
-      global_hitTarget = true;
-    } else if (flag_ballSticks == true && flag_facePushLocation == false) {
+      second_flag_hitTarget = true;
+    } else if (phase_ballSticks == true && phase_facePushLocation == false) {
 
       //Phase 3. Let toio prong side face the ball
       //This is an important step because we want the prong side to face the ball or else toio might use the wedge side to approach the object
@@ -1328,16 +1321,16 @@ void draw() {
         if (pushToio == 0) {
           // we rotate the cube0 180 degress so that now its back (prong) side is facing toward the ball location
           if (rotateCube(0, turnDegree0-180)) {
-            flag_facePushLocation = true;
+            phase_facePushLocation = true;
           }
         } else {
           // we rotate the cube1 180 degress so that now its back (prong) side is facing toward the ball location
           if (rotateCube(1, turnDegree1-180)) {
-            flag_facePushLocation = true;
+            phase_facePushLocation = true;
           }
         }
       }
-    } else if (flag_facePushLocation == true && flag_travelToBallToPush == false) {
+    } else if (phase_facePushLocation == true && phase_travelToBallToPush == false) {
 
       //Phase 4. Let pushing toio travel to ball (preparing to push)
       println("one toio travels to ball, preparing to push");
@@ -1349,7 +1342,7 @@ void draw() {
 
         if (abs(cubes[0].x - global_scaledX) < distanceBetweenPushingToioAndBall && abs(cubes[0].y - global_scaledY) < distanceBetweenPushingToioAndBall) {
 
-          flag_travelToBallToPush = true;
+          phase_travelToBallToPush = true;
         }
       } else {
         //cube 1 is pushing so it travels to the ball location
@@ -1358,10 +1351,10 @@ void draw() {
 
         if (abs(cubes[1].x - global_scaledX) < distanceBetweenPushingToioAndBall && abs(cubes[1].y - global_scaledY) < distanceBetweenPushingToioAndBall) {
 
-          flag_travelToBallToPush = true;
+          phase_travelToBallToPush = true;
         }
       }
-    } else if (flag_travelToBallToPush == true && flag_rotateBallToPushLocation == false) {
+    } else if (phase_travelToBallToPush == true && phase_rotateBallToPushLocation == false) {
 
       //Phase 5. Pushing toio rotates the ball such that they face the push location
       println("toio rotates with the ball to face push location");
@@ -1370,15 +1363,15 @@ void draw() {
         //cube0 is the pushing toio and rotates itself with the ball facing push location
 
         if (rotateCubeMax(0, turnDegree1-180)) {
-          flag_rotateBallToPushLocation = true;
+          phase_rotateBallToPushLocation = true;
         }
       } else {
         //cube1 is the pushing toio and rotates itself with the ball facing push location
         if (rotateCubeMax(1, turnDegree1-180)) {
-          flag_rotateBallToPushLocation = true;
+          phase_rotateBallToPushLocation = true;
         }
       }
-    } else if (flag_rotateBallToPushLocation == true && flag_pushDone == false) {
+    } else if (phase_rotateBallToPushLocation == true && phase_pushDone == false) {
 
       //Phase 6. Pushing toio pushes the ball to the push location
       println("Phase 6. Pushing toio pushes the ball to the push location");
@@ -1387,16 +1380,16 @@ void draw() {
         //cube0 is the pushing toio and pushes the ball to push location
         aimCubeSpeed(0, pushx, pushy);
         if (abs(cubes[0].x - pushx) < distanceBetweenPushingToioAndPushLocation && abs(cubes[0].y - pushy) < distanceBetweenPushingToioAndPushLocation) {
-          flag_pushDone = true;
+          phase_pushDone = true;
         }
       } else {
         //cube1 is the pushing toio and pushes the ball to push location
         aimCubeSpeed(1, pushx, pushy);
         if (abs(cubes[1].x - pushx) < distanceBetweenPushingToioAndPushLocation && abs(cubes[1].y - pushy) < distanceBetweenPushingToioAndPushLocation) {
-          flag_pushDone = true;
+          phase_pushDone = true;
         }
       }
-    } else if (flag_pushDone == true && flag_findTangentPoints == false && global_scaledX != global_ball_x && global_scaledY != global_ball_y) { //TODO: why do we need global_scaledX != global_ball_x && global_scaledY != global_ball_y again?
+    } else if (phase_pushDone == true && phase_findTangentPoints == false && global_scaledX != global_ball_x && global_scaledY != global_ball_y) { //TODO: why do we need global_scaledX != global_ball_x && global_scaledY != global_ball_y again?
 
       //Phase 7. Calculate prep location for both toios to travel
       println("Phase 7. Calculate prep location for both toios to travel");
@@ -1430,7 +1423,7 @@ void draw() {
 
         if (findLocation() == true) {
           //If we find the prep location, we move on to the next phase
-          flag_findTangentPoints = true;
+          phase_findTangentPoints = true;
         } else {
           //If we can't find the prep locations, that means that at least one toio is too close the ball, so we need to move them out
           flag_needBackout = true;
@@ -1460,7 +1453,7 @@ void draw() {
           }
         }
       }
-    } else if (flag_findTangentPoints == true && flag_toioTravelToPrepLocation == false) {
+    } else if (phase_findTangentPoints == true && phase_toioTravelToPrepLocation == false) {
       
       //Phase 8. Both toios travel to prep locations
       println("toios are travelling to prep locations");
@@ -1471,10 +1464,10 @@ void draw() {
         aimCubeSpeed(1, global_xprime, global_yprime);
         if (abs(cubes[0].x - global_finalx) < 15 && abs(cubes[0].y - global_finaly) < 15 && abs(cubes[1].x - global_xprime) < 15 && abs(cubes[1].y - global_yprime) < 15 ) {
           
-          flag_toioTravelToPrepLocation = true;
+          phase_toioTravelToPrepLocation = true;
           
-          //flag_nextBall controls when the next ball in the vertical screen shoould appear
-          flag_nextBall = true;
+          //second_flag_nextBall controls when the next ball in the vertical screen shoould appear
+          second_flag_nextBall = true;
          
         }
       } else {
@@ -1484,15 +1477,15 @@ void draw() {
         aimCubeSpeed(0, global_xprime, global_yprime);
         if (abs(cubes[1].x - global_finalx) < 15 && abs(cubes[1].y - global_finaly) < 15 && abs(cubes[0].x - global_xprime) < 15 && abs(cubes[0].y - global_yprime) < 15) {
           
-          flag_toioTravelToPrepLocation = true;
+          phase_toioTravelToPrepLocation = true;
           
 
-          //flag_nextBall controls when the next ball in the vertical screen shoould appear
-          flag_nextBall = true;
+          //second_flag_nextBall controls when the next ball in the vertical screen shoould appear
+          second_flag_nextBall = true;
         }
       }
       
-    } else if (flag_toioTravelToPrepLocation == true && flag_rotateToDrop == false) {
+    } else if (phase_toioTravelToPrepLocation == true && phase_rotateToDrop == false) {
 
       //Phase 9. One toio rotates to use the prong side to and the other rotates to use the wedge side for drop operation
       println("Phase 9. One toio rotates to use the prong side to and the other rotates to use the wedge side for drop operation");
@@ -1535,12 +1528,12 @@ void draw() {
         //once both toios finish rotating, we move on to the next phase
         if (flag_rotate0 && flag_rotate1) {
 
-          flag_rotateToDrop = true;
+          phase_rotateToDrop = true;
         }
         
       }
       
-    } else if (flag_rotateToDrop == true && flag_dropSucceed == false) {
+    } else if (phase_rotateToDrop == true && phase_dropSucceed == false) {
       
       //Phase 10. Toio converge to drop the object
       println("Phase 10. Toio converge to drop the object");
@@ -1563,11 +1556,11 @@ void draw() {
       if (abs(cubes[0].x - global_scaledX) < convergeDistance && abs(cubes[1].x - global_scaledX) < convergeDistance &&
         abs(cubes[0].y - global_scaledY) < convergeDistance &&  abs(cubes[1].y - global_scaledY) < convergeDistance) {
           
-        flag_dropSucceed = true;
+        phase_dropSucceed = true;
         startTime = false;
       }
       
-    } else if (flag_dropSucceed == true) {
+    } else if (phase_dropSucceed == true) {
         
       //Phase 11. Reset all of the flags so that we can start the algorithm again
 
@@ -1583,36 +1576,40 @@ void draw() {
 
           if (abs(cubes[0].x - 100) < 15 && abs(cubes[1].x - 600) < 15 &&
             abs(cubes[0].y - 100) < 15 &&  abs(cubes[1].y - 250) < 15) {
-            flag_seeBall = false;
-            flag_ballSticks = false;
-            flag_findTangentPoints = false;
-            flag_toioTravelToPrepLocation = false;
-            flag_rotateToDrop = false;
+              
+            //reset phase flags to false
+            phase_seeBall = false; //phase 1               
+            phase_ballSticks = false; //phase 2
+            phase_facePushLocation = false; //phase 3
+            phase_travelToBallToPush = false; //phase 4
+            phase_rotateBallToPushLocation = false; //phase 5
+            phase_pushDone = false; //phase 6
+            phase_findTangentPoints = false; //phase 7
+            phase_toioTravelToPrepLocation = false; //phase 8
+            phase_rotateToDrop = false; //phase 9
+            phase_dropSucceed = false; //phase 10
+            
+            //reset flags
             flag_rotate0 = false;
             flag_rotate1 = false;
             flag_recordToioAndBallAngle = false;
             flag_recordPushingToioAndBallAngle = false;
-            flag_dropSucceed = false;
             flag_prepareBackout = false;
+            flag_findPushedBallLocation = false;
+            
 
             xHist = new float[] {};
             yHist = new float[] {};
             dHist = new float[] {};
-
-            flag_travelToBallToPush = false;
-            flag_rotateBallToPushLocation = false;
-            flag_pushDone = false;
-            flag_facePushLocation = false;
-
             turnDegree1 = 0;
             turnDegree0 = 0;
 
-
-            addParticle = false;
-            global_hitTarget = false;
-            flag_findPushedBallLocation = false;
-            flag_nextBall = false;
-            killUFO = false;
+            //reset flags in SecondApplet
+            second_flag_addParticle = false;
+            second_flag_nextBall = false;
+            second_flag_hitTarget = false;
+            second_flag_killUFO = false;
+           
             instruction = "Throw ball! Hit UFO!";
           }
         }
