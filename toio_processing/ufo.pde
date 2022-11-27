@@ -106,6 +106,7 @@ boolean flag_prepareBackout = false;
 
 boolean second_flag_killUFO = false;
 boolean second_flag_bombSound = false;
+boolean second_flag_kill_particle = false;
 
 float[] xHist = {};
 float[] yHist = {};
@@ -139,14 +140,14 @@ float pushy = 240; //300
 boolean flag_findPushedBallLocation = false;
 int pushToio = 0;
 boolean second_flag_nextBall = false;
-boolean startSprinkle = false;
+boolean second_flag_startSprinkle = false;
 boolean ballDidNotStick = false;
 int scoreCount = 0;
 boolean flag_needBackout = false;
 
 SoundFile file;
-boolean startCrash = false;
-boolean startSelfCrash = false;
+boolean second_flag_startCrash = false;
+boolean second_flag_startSelfCrash = false;
 String instruction = "Throw ball! Hit UFO!";
 
 void captureEvent(Capture video) {
@@ -291,6 +292,7 @@ public class SecondApplet extends PApplet {
 
     // Is the particle ready for deletion?
     boolean done() {
+      println("checkcheckcheckcheck");
       // Let's find the screen position of the particle
       Vec2 pos = box2d.getBodyPixelCoord(body);
       // Is it off the bottom of the screen?
@@ -300,7 +302,7 @@ public class SecondApplet extends PApplet {
       } else if (pos.y < 200) {
 
         //this is when you did not hit the UFO
-        startSelfCrash = true;
+        second_flag_startSelfCrash = true;
         bulletx = pos.x;
         bullety = pos.y;
         killBody();
@@ -311,12 +313,12 @@ public class SecondApplet extends PApplet {
         instruction = "Good job! Next ball!";
         second_flag_bombSound = true;
         second_flag_killUFO = true;
-        startCrash = true;
+        second_flag_startCrash = true;
         scoreCount+=1;
 
         killBody();
         return true;
-      }
+      } 
 
       return false;
     }
@@ -651,7 +653,7 @@ public class SecondApplet extends PApplet {
 
 
 
-    if (startSprinkle == false) {
+    if (second_flag_startSprinkle == false) {
 
       //this is the list of particles add into the world
       //particles.add(new Particle(570, 200, 40, 0, 0));
@@ -660,10 +662,10 @@ public class SecondApplet extends PApplet {
       //particles.add(new Particle(700, 300, 40, 0, 0));
       //particles.add(new Particle(600, 350, 40, 0, 0));
 
-      startSprinkle = true;
+      second_flag_startSprinkle = true;
     }
 
-    if (startCrash == true) {
+    if (second_flag_startCrash == true) {
       smallParticles.add(new smallParticle(xcoord, ycoord, random(2, 20), color(0)));
       smallParticles.add(new smallParticle(xcoord, ycoord, random(2, 20), color(0)));
       smallParticles.add(new smallParticle(xcoord, ycoord, random(2, 20), color(0)));
@@ -676,10 +678,10 @@ public class SecondApplet extends PApplet {
       smallParticles.add(new smallParticle(xcoord, ycoord, random(2, 20), color(0)));
       smallParticles.add(new smallParticle(xcoord, ycoord, random(2, 20), color(0)));
 
-      startCrash = false;
+      second_flag_startCrash = false;
     }
 
-    if (startSelfCrash == true) {
+    if (second_flag_startSelfCrash == true) {
 
       smallSelfParticles.add(new smallSelfParticle(bulletx, bullety, random(2, 10), color(204, 102, 0)));
       smallSelfParticles.add(new smallSelfParticle(bulletx, bullety, random(2, 10), color(204, 102, 0)));
@@ -690,7 +692,7 @@ public class SecondApplet extends PApplet {
       smallSelfParticles.add(new smallSelfParticle(bulletx, bullety, random(2, 10), color(204, 102, 0)));
       smallSelfParticles.add(new smallSelfParticle(bulletx, bullety, random(2, 10), color(204, 102, 0)));
 
-      startSelfCrash = false;
+      second_flag_startSelfCrash = false;
     }
 
     // Display all the boundaries
@@ -1186,7 +1188,7 @@ void draw() {
 
     if (phase_seeBall == false) {
       //Phase 1. Check if the camera sees a ball
-      println("System starts to detect the ball");
+      println("Phase 1. Check if the camera sees a ball");
 
       //call detectBall function
       if (detectBall(false)) {
@@ -1197,7 +1199,7 @@ void draw() {
     } else if (phase_seeBall == true && phase_ballSticks == false) {
 
       //Phase 2. Check if ball sticks
-      println("Seen ball, check if it sticks");
+      println("Phase 2. Check if ball sticks");
 
       if (startTime == false) {
         time = millis();
@@ -1286,7 +1288,7 @@ void draw() {
       //Phase 3. Let toio prong side face the ball
       //This is an important step because we want the prong side to face the ball or else toio might use the wedge side to approach the object
 
-      println("toio rotates to the correct angle");
+      println("Phase 3. Let toio prong side face the ball");
       //we need to record the angle between the pushing toio and the ball location
       if (flag_recordPushingToioAndBallAngle == false) {
 
@@ -1333,7 +1335,7 @@ void draw() {
     } else if (phase_facePushLocation == true && phase_travelToBallToPush == false) {
 
       //Phase 4. Let pushing toio travel to ball (preparing to push)
-      println("one toio travels to ball, preparing to push");
+      println("Phase 4. Let pushing toio travel to ball (preparing to push)");
 
       if (pushToio == 0) {
         //cube 0 is pushing so it travels to the ball location
@@ -1357,7 +1359,7 @@ void draw() {
     } else if (phase_travelToBallToPush == true && phase_rotateBallToPushLocation == false) {
 
       //Phase 5. Pushing toio rotates the ball such that they face the push location
-      println("toio rotates with the ball to face push location");
+      println("Phase 5. Pushing toio rotates the ball such that they face the push location");
 
       if (pushToio == 0) {
         //cube0 is the pushing toio and rotates itself with the ball facing push location
@@ -1408,10 +1410,17 @@ void draw() {
           stroke(0);
           ellipse(global_avgX, global_avgY, 20, 20);
         } else {
-          //TODO: still need to fix this part: maybe we need to kill the particle and reset the flags (by jumping to the end) and make the robot go back.
+          println("Special case: ball actually did not stick");
+          
           //this would happen if we let the ball reached similar height to the ceiling but didn't stick
-          println("something is wrong here, you should see the ball");
-          exit();
+          //so we just to the last phase
+          
+          //TODO: after adjusting the speed according to the monitor, we need to kill the particle that falsely show up in the monitor
+          
+          phase_dropSucceed = true; //we jump to the last phase
+
+          
+          
         }
 
         flag_findPushedBallLocation = true;
@@ -1456,7 +1465,7 @@ void draw() {
     } else if (phase_findTangentPoints == true && phase_toioTravelToPrepLocation == false) {
       
       //Phase 8. Both toios travel to prep locations
-      println("toios are travelling to prep locations");
+      println("Phase 8. Both toios travel to prep locations");
       
       if (global_closer_toio_id == 0) {
         //If closer toio is cube0, we let it travel to global_finalx, global_finaly and let cube1 travel to global_xprime, global_yprime.
