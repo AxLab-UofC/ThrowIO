@@ -281,7 +281,7 @@ boolean findLocation() {
     println("global_xprime: ", global_xprime);
     println("global_yprime: ", global_yprime);
 
-    //phase_findTangentPoints = true;
+    
   } else {
     //case when the ball is in the radius of the circle
     println("toio is within radius, which is bad");

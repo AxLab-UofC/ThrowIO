@@ -116,7 +116,12 @@ public class SecondApplet extends PApplet {
         killBody();
         
         return true;
-      } 
+      } else if (second_flag_killBall == true){
+        
+        killBody();
+        return true;
+        
+      }
 
       return false;
     }
@@ -536,6 +541,10 @@ public class SecondApplet extends PApplet {
         particles.remove(i);
         second_flag_hitTarget = false;
         second_flag_addParticle = false;
+        
+        if(second_flag_killBall == true){
+            second_flag_killBall = false;
+        }
       }
       //if (p.goal()) {
       //  scoreCount += 1;
