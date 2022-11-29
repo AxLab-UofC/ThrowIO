@@ -126,12 +126,12 @@ float monitorAdjustment = 130;
 
 // A reference to our box2d world
 Box2DProcessing box2d;
-float monitorWidth = 0;
-float monitorHeight = 0;
+float monitorWidth = displayWidth;
+float monitorHeight = displayHeight;
 float ySpeed = 1;
 float xSpeed = 1;
 float ycoord = 300;
-float xcoord = 400;
+float xcoord = 600;
 boolean second_flag_hitTarget = false;
 float hitX = 720;
 float pushx = 360; //400
@@ -197,15 +197,7 @@ void setup() {
   file = new SoundFile(this, "explosion.wav");
 
   loadCalibration();
-
-  //local saved data
-  //mouseXLocationList[0] = 66;
-  //mouseYLocationList[0] = 2;
-  //mouseXLocationList[1] = 564;
-  //mouseYLocationList[1] = 353;
 }
-
-
 
 
 void draw() {
@@ -216,43 +208,11 @@ void draw() {
 
   //draw the "mat"
   drawDebugWindow();
+  
+  println("monitorWidth: ", monitorWidth); //1920
+  println("monitorHeight: ", monitorHeight); //1080
 
-  //fill(255);
-  //rect(45, 45, 415, 410);
-
-  //image(kinect.getVideoImage(), 0, 0);
-  //image(kinect.getDepthImage(), 640, 0);
-
-  if (calibrationMode>0) {// if (clickCount < 4) { //draw circle during the calibration
-
-    //move toio to standby positions while calibrating
-    aimCubeSpeed(0, 100, 100);
-    aimCubeSpeed(1, 600, 250);
-  }
-
-  //if (clickCount < 4) {
-
-  //  if (clickCount == 1 || clickCount == 2) {
-
-  //    //draw dot on the corners
-  //    fill(color(255, 0, 0));
-  //    strokeWeight(1.0);
-  //    stroke(255, 255, 255);
-  //    ellipse(mouseXLocation, mouseYLocation, 10, 10);
-  //  }
-
-  //  if (clickCount == 3) {
-
-  //    //We use the information here to check the depth information of the ball
-  //    detectBall(false);
-  //  }
-
-  //  //robots travel to the starting position
-  //  aimCubeSpeed(0, 100, 100);
-  //  aimCubeSpeed(1, 600, 250);
-  //}
-
-  if (calibrationMode>0) {
+  if (calibrationMode > 0) {
 
     //move toio to standby positions while calibrating
     aimCubeSpeed(0, 100, 100);
@@ -319,9 +279,12 @@ void draw() {
             stroke(0);
             ellipse(global_avgX, global_avgY, 20, 20);
 
-            hitX = map(global_scaledX, 32, 614+32, 0, displayWidth); //store the position of hitX
+            hitX = map(global_scaledX, 32, 614+32, 0, monitorWidth); //store the position of hitX
 
+            println("global_scaledX: ", global_scaledX);
             println("hitX: ", hitX);
+            
+            
 
             //find ball velocity and angle
             //depthDiff  = global_dHist[global_dHist.length-1]-global_dHist[int(global_dHist.length/2)]; // this value should be positive
@@ -355,10 +318,12 @@ void draw() {
         }
       }
 
+    } else if (phase_ballSticks == true && phase_facePushLocation == false) {
+      
       //this flag is used to tell the second window that the ball hits and sticks on the ceilling
       //so that the vertical screen can show the trajectory of the ball
       second_flag_hitTarget = true;
-    } else if (phase_ballSticks == true && phase_facePushLocation == false) {
+      
 
       //Phase 3. Let toio prong side face the ball
       //This is an important step because we want the prong side to face the ball or else toio might use the wedge side to approach the object
@@ -620,7 +585,7 @@ void draw() {
         startTime = true;
       } else {
 
-        if (millis() > time + 2000) { //wait for virtual ball to drop
+        if (millis() > time + 3000) { //wait for virtual ball to drop
 
           //both toios travel to the ball's location
           aimCubeSpeed(0, global_scaledX, global_scaledY);

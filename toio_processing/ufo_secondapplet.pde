@@ -88,14 +88,14 @@ public class SecondApplet extends PApplet {
 
     // Is the particle ready for deletion?
     boolean done() {
-      println("checkcheckcheckcheck");
+
       // Let's find the screen position of the particle
       Vec2 pos = box2d.getBodyPixelCoord(body);
       // Is it off the bottom of the screen?
       if (pos.y > height+r*2) {
         killBody();
         return true;
-      } else if (pos.y < 200) {
+      } else if (pos.y < monitorHeight/5) {
 
         //this is when you did not hit the UFO
         second_flag_startSelfCrash = true;
@@ -103,6 +103,7 @@ public class SecondApplet extends PApplet {
         bullety = pos.y;
         killBody();
         return true;
+        
       } else if (abs(pos.x - xcoord) < 80 && abs(pos.y - ycoord) < 80 && !second_flag_killUFO) {
 
         //this is when you hit the UFO
@@ -113,6 +114,7 @@ public class SecondApplet extends PApplet {
         scoreCount+=1;
 
         killBody();
+        
         return true;
       } 
 
@@ -205,7 +207,7 @@ public class SecondApplet extends PApplet {
       Vec2 pos = box2d.getBodyPixelCoord(body2);
       // Is it off the bottom of the screen?
 
-      if (pos.y > 350) {
+      if (pos.y > monitorHeight/3) {
         killBody();
         return true;
       }
@@ -284,7 +286,7 @@ public class SecondApplet extends PApplet {
       Vec2 pos = box2d.getBodyPixelCoord(body3);
       // Is it off the bottom of the screen?
 
-      if (pos.y > 250) {
+      if (pos.y > monitorHeight/4) {
         killBody();
         return true;
       }
@@ -352,14 +354,8 @@ public class SecondApplet extends PApplet {
     smallSelfParticles = new ArrayList<smallSelfParticle>();
 
     //this is the boundaries I made in the box2D world
-
-    boundaries.add(new Boundary(displayWidth-20, displayHeight-100, 20, 200, 9.8));
-    boundaries.add(new Boundary(displayWidth-140, displayHeight-50, 20, 200, 9.8));
-    //boundaries.add(new Boundary(750, 460, 20, 200, 0));
-    //boundaries.add(new Boundary(450, 460, 20, 200, 0));
-    //boundaries.add(new Boundary(600, 550, 300, 20, 0));
-    //boundaries.add(new Boundary(750, 0, 20, 200, 0));
-    //boundaries.add(new Boundary(950, 0, 20, 200, 0));
+    boundaries.add(new Boundary(monitorWidth-20, monitorHeight-100, 20, 200, 9.8));
+    boundaries.add(new Boundary(monitorWidth-140, monitorHeight-50, 20, 200, 9.8));
   }
 
   public void draw() {
@@ -396,25 +392,14 @@ public class SecondApplet extends PApplet {
     ellipse (1510-1400, 385+100, 50, 40);
     ellipse (1490-1400, 380+100, 50, 40);
 
-    //message board
-    //stroke(0);
-    //strokeWeight(5);
-
-    //line(750, 400, 800, 350);
-    //line(750, 400, 700, 350);
-    //rect(600+monitorAdjustment, 100, 300, 200);
-    //line(650, 600, 650, 650);
-    //line(850, 600, 850, 650);
 
     textSize(75);
     fill(0);
     text(instruction, 40, 150);
 
-
-
     xcoord += xSpeed;
 
-    if ((xcoord > 500) || (xcoord < 200)) {
+    if ((xcoord > 1000) || (xcoord < 500)) {
       xSpeed *=-1;
     }
 
@@ -498,7 +483,7 @@ public class SecondApplet extends PApplet {
 
     //we add a new ball when second_flag_nextBall flag is true
     if (second_flag_nextBall == true) {
-      particles.add(new Particle(width-50, height, 40, -30, 65)); //this is the ball that drops from the tube
+      particles.add(new Particle(monitorWidth-50, monitorHeight, 40, -25, 65)); //this is the ball that drops from the tube
       second_flag_nextBall = false;
     }
 
@@ -510,12 +495,14 @@ public class SecondApplet extends PApplet {
 
         //particles.add(new Particle(random(330, 360), 720, 40, random(10, 11), random(120, 140))); //this is where we currently define the ball speed and velocity
 
-        if (avgXVelocity > 0) {
-          particles.add(new Particle(hitX, 720, 40, random(10, 11), random(65, 70))); //this is where we currently define the ball speed and velocity //random(120, 140)
-        } else {
-          particles.add(new Particle(hitX, 720, 40, -random(10, 11), random(65, 70))); //this is where we currently define the ball speed and velocity //random(120, 140)
-        }
+        //if (avgXVelocity > 0) {
+        //  particles.add(new Particle(hitX, monitorHeight, 40, random(10, 11), random(65, 70))); //this is where we currently define the ball speed and velocity //random(120, 140)
+        //} else {
+        //  particles.add(new Particle(hitX, monitorHeight, 40, -random(10, 11), random(65, 70))); //this is where we currently define the ball speed and velocity //random(120, 140)
+        //}
 
+        particles.add(new Particle(hitX, monitorHeight, 40, -random(10, 11), 95));
+        
         second_flag_addParticle = true;
       }
     }
