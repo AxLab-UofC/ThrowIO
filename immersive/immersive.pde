@@ -9,6 +9,9 @@ PImage bird1;
 PImage bird2;
 float orangeXLocation = 500;
 float orangeYLocation = 200;
+
+
+
 boolean startTime = false;
 int time = millis();
 boolean startTime2 = false;
@@ -42,19 +45,20 @@ CornerPinSurface surface;
 Table table;
 PGraphics offscreen;
 boolean dropOrange = false;
+int flytoOrange = 0;
 
-void saveOrangePosition(float orangex, float orangey) {
-  table = new Table();
+//void saveOrangePosition(float orangex, float orangey) {
+//  table = new Table();
 
-  table.addColumn("OrangeX");
-  table.addColumn("OrangeY");
+//  table.addColumn("OrangeX");
+//  table.addColumn("OrangeY");
 
-  TableRow newRow = table.addRow();
-  newRow.setFloat("OrangeX", orangex);
-  newRow.setFloat("OrangeY", orangey);
+//  TableRow newRow = table.addRow();
+//  newRow.setFloat("OrangeX", orangex);
+//  newRow.setFloat("OrangeY", orangey);
 
-  saveTable(table, "../data/position.csv");
-}
+//  saveTable(table, "../data/position.csv");
+//}
 
 void loadOrangePosition() {
   table = loadTable("../data/position.csv", "header");
@@ -63,8 +67,14 @@ void loadOrangePosition() {
 
   float x_ = table.getFloat(0, "OrangeX");
   float y_ = table.getFloat(0, "OrangeY");
+  int flytoOrange_ = table.getInt(0, "flytoOrange");
+  
 
-  println("x_:", x_, "y_:", y_);
+  println("x_:", x_, "y_:", y_, "flytoOrange_: ", flytoOrange_);
+  
+  orangeXLocation = x_;
+  orangeYLocation = y_;
+  flytoOrange = flytoOrange_;
 }
 
 void setSpeed(float targetX, float targetY, float bx, float by) {
@@ -141,6 +151,7 @@ void setup() {
   birdY = birdNestY;
 
   loadOrangePosition();
+  
 }
 
 
@@ -213,8 +224,14 @@ void draw() {
     //record quadrant and change speed
     setSpeed(orangeXLocation, orangeYLocation, birdX, birdY);
 
-
-    stage1_flytoOrange = true;
+    if(flytoOrange == 1){
+      
+      stage1_flytoOrange = true;
+    
+    }else{
+      loadOrangePosition();
+    }
+    
   } else if (stage1_flytoOrange == true && stage2_poking == false) {
 
     if (abs(birdX - (orangeXLocation)) < 3 && abs(birdY -(orangeYLocation)) < 3) {

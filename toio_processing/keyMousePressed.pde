@@ -27,7 +27,7 @@ void keyPressed() {
     //call immersive storytelling application
     println("immersive storytelling application!");
     applicationMode = "story";
-    
+
 
     break;
   default:
@@ -70,10 +70,26 @@ void mousePressed() {
     mousePressedforPosCalibration();
   }
 
+
+
   if (calibrationMode == 2 && mouseX < kinect.getVideoImage().width && mouseY < kinect.getVideoImage().height) {// for color
     mousePressedforColorCalibration();
   }
+
+  if (applicationMode == "story" && calibrationMode == 0 && phase2_ballSticks == true && phase3_facePushLocation == false) {
+
+    //when the experimentor needs to wizard of Oz to track where the ball sticks
+    mousePressedforTrackStuckBall();
+  }
+
+  if (applicationMode == "story" && calibrationMode == 0 && phase6_pushDone == true && phase7_findTangentPoints == false) {
+
+    //when the experimentor needs to wizard of Oz to track where the ball sticks
+    mousePressedforTrackPushedBall();
+  }
 }
+
+
 
 void mouseDragged() {
   if (calibrationMode == 1 && mouseX < kinect.getVideoImage().width && mouseY < kinect.getVideoImage().height) {

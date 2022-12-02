@@ -195,7 +195,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = env::args().collect();
     let program = args[0].clone();
 
-    //example: cargo run -- -a 33,90
+    //example: cargo run -- -a 90,91
     //example: cargo run -- -n f3K,L6T
     //example: cargon run -- -a 33,90 -n D2F
     let mut opts = Options::new();

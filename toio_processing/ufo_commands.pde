@@ -88,22 +88,22 @@ boolean setTangentPoint(float theta1, float theta2, float theta3, float d2, Stri
 
   if ((global_ball_x - tempx) > 0 && (global_ball_y - tempy) < 0) { //we already convert quadrant coordinates to toio mat coordinates
 
-    println("ball in quadrant 1");
+    //println("ball in quadrant 1");
     x = tempx+d2 * cos(theta3);
     y = tempy-d2 * sin(theta3);
   } else if ((global_ball_x - tempx) < 0 && (global_ball_y - tempy) < 0) {
 
-    println("ball in quadrant 2");
+    //println("ball in quadrant 2");
     x = tempx-d2*cos(theta3);
     y = tempy-d2*sin (theta3);
   } else if ((global_ball_x - tempx) < 0 && (global_ball_y - tempy) > 0) {
 
-    println("ball in quadrant 3");
+    //println("ball in quadrant 3");
     x = tempx-d2*cos(theta3);
     y = tempy+d2*sin (theta3);
   } else if ((global_ball_x - tempx) > 0 && (global_ball_y - tempy) > 0) {
 
-    println("ball in quadrant 4");
+    //println("ball in quadrant 4");
 
     x = tempx+d2*cos(theta3);
     y = tempy+d2*sin (theta3);
@@ -124,22 +124,22 @@ boolean setTangentPoint(float theta1, float theta2, float theta3, float d2, Stri
 
     if ((global_ball_x - tempx) == 0 && (global_ball_y - tempy) > 0) {
 
-      println("ball in between 3 and 4 quadrants");
+      //println("ball in between 3 and 4 quadrants");
       x = tempx+d2*sin(theta3);
       y = tempy+d2*cos(theta3);
     } else if ((global_ball_x - tempx) > 0 && (global_ball_y - tempy) == 0) {
 
-      println("ball in between 1 and 4 quadrants");
+      //println("ball in between 1 and 4 quadrants");
       x = tempx+d2*cos(theta3);
       y = tempy-d2*sin(theta3);
     } else if ((global_ball_x - tempx) == 0 && (global_ball_y - tempy) < 0) {
 
-      println("ball in between 1 and 2 quadrants");
+      //println("ball in between 1 and 2 quadrants");
       x = tempx+d2*sin(theta3);
       y = tempy-d2*cos(theta3);
     } else if ((global_ball_x - tempx) < 0 && (global_ball_y - tempy) == 0) {
 
-      println("ball in between 2 and 3 quadrants");
+      //println("ball in between 2 and 3 quadrants");
       x = tempx-d2*cos(theta3);
       y = tempy-d2*sin(theta3);
     } else {
@@ -179,8 +179,8 @@ boolean findLocation() {
   c0_dist = cubes[0].distance(global_scaledX, global_scaledY);
   c1_dist = cubes[1].distance(global_scaledX, global_scaledY);
 
-  println("c0_dist: ", c0_dist);
-  println("c1_dist: ", c1_dist);
+  //println("c0_dist: ", c0_dist);
+  //println("c1_dist: ", c1_dist);
 
   //set toio center x and y using closer toio x and y
   if (c0_dist < c1_dist) {
@@ -269,17 +269,17 @@ boolean findLocation() {
 
     setTangentPoint(0, 0, theta4, 2*global_radius, "findOppositePoint");
 
-    println("global_ball_x: ", global_ball_x);
-    println("global_ball_y: ", global_ball_y);
-    println("global_x: ", global_x);
-    println("global_y: ", global_y);
-    println("global_x2: ", global_x2);
-    println("global_y2: ", global_y2);
-    println("global_furtherTangentPoint: ", global_furtherTangentPoint);
-    println("global_finalx: ", global_finalx);
-    println("global_finaly: ", global_finaly);
-    println("global_xprime: ", global_xprime);
-    println("global_yprime: ", global_yprime);
+    //println("global_ball_x: ", global_ball_x);
+    //println("global_ball_y: ", global_ball_y);
+    //println("global_x: ", global_x);
+    //println("global_y: ", global_y);
+    //println("global_x2: ", global_x2);
+    //println("global_y2: ", global_y2);
+    //println("global_furtherTangentPoint: ", global_furtherTangentPoint);
+    //println("global_finalx: ", global_finalx);
+    //println("global_finaly: ", global_finaly);
+    //println("global_xprime: ", global_xprime);
+    //println("global_yprime: ", global_yprime);
 
     
   } else {
@@ -321,22 +321,22 @@ boolean findbackoutLocation(int toio_number) {
 
   if ((global_scaledX - tempx)> 0 & (global_scaledY - tempy) < 0) { //we already convert quadrant coordinates to toio mat coordinates
 
-    println("ball in quadrant 1");
+    //println("ball in quadrant 1");
     x = global_scaledX-ratio*tempDist*cos(theta5);
     y = global_scaledY+ratio*tempDist*sin(theta5);
   } else if ((global_scaledX - tempx) < 0 & (global_scaledY - tempy) < 0) {
 
-    println("ball in quadrant 2");
+    //println("ball in quadrant 2");
     x = global_scaledX+ratio*tempDist*cos(theta5);
     y = global_scaledY+ratio*tempDist*sin(theta5);
   } else if ((global_scaledX - tempx) < 0 & (global_scaledY - tempy) > 0) {
 
-    println("ball in quadrant 3");
+    //println("ball in quadrant 3");
     x = global_scaledX+ratio*tempDist*cos(theta5);
     y = global_scaledY-ratio*tempDist*sin(theta5);
   } else if ((global_scaledX - tempx) > 0 & (global_scaledY - tempy) > 0) {
 
-    println("ball in quadrant 4");
+    //println("ball in quadrant 4");
 
     x = global_scaledX-ratio*tempDist*cos(theta5);
     y = global_scaledY-ratio*tempDist*sin(theta5);
@@ -346,27 +346,27 @@ boolean findbackoutLocation(int toio_number) {
 
     if ((global_scaledX - tempx) == 0 & (global_scaledY - tempy) > 0) {
 
-      println("ball in between 3 and 4 quadrants");
+      //println("ball in between 3 and 4 quadrants");
       x = global_scaledX-ratio*tempDist*sin(theta5);
       y = global_scaledY-ratio*tempDist*cos(theta5);
     } else if ((global_scaledX - tempx) > 0 & (global_scaledY - tempy) == 0) {
 
-      println("ball in between 1 and 4 quadrants");
+      //println("ball in between 1 and 4 quadrants");
       x = global_scaledX-ratio*tempDist*cos(theta5);
       y = global_scaledY+ratio*tempDist*sin(theta5);
     } else if ((global_scaledX - tempx) == 0 & (global_scaledY - tempy) < 0) {
 
-      println("ball in between 1 and 2 quadrants");
+      //println("ball in between 1 and 2 quadrants");
       x = global_scaledX-ratio*tempDist*sin(theta5);
       y = global_scaledY+ratio*tempDist*cos(theta5);
     } else if ((global_scaledX - tempx) < 0 & (global_scaledY - tempy) == 0) {
 
-      println("ball in between 2 and 3 quadrants");
+      //println("ball in between 2 and 3 quadrants");
       x = global_scaledX+ratio*tempDist*cos(theta5);
       y = global_scaledY+ratio*tempDist*sin(theta5);
     } else {
 
-      println("Something is wrong here!!");
+      //println("Something is wrong here!!");
     }
   }
 
@@ -377,13 +377,13 @@ boolean findbackoutLocation(int toio_number) {
     global_backoutx1 = x;
     global_backouty1 = y;
   }
-  println("x: ", x);
-  println("y: ", y);
-  println("global_scaledX: ", global_scaledX);
-  println("global_scaledY: ", global_scaledY);
-  println("global_backoutx0: ", global_backoutx0);
-  println("global_backouty0: ", global_backouty0);
-  println("global_backoutx1: ", global_backoutx1);
-  println("global_backouty1: ", global_backouty1);
+  //println("x: ", x);
+  //println("y: ", y);
+  //println("global_scaledX: ", global_scaledX);
+  //println("global_scaledY: ", global_scaledY);
+  //println("global_backoutx0: ", global_backoutx0);
+  //println("global_backouty0: ", global_backouty0);
+  //println("global_backoutx1: ", global_backoutx1);
+  //println("global_backouty1: ", global_backouty1);
   return true;
 }

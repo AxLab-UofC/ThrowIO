@@ -98,7 +98,7 @@ public class SecondApplet extends PApplet {
       } else if (pos.y < monitorHeight/5) {
 
         //this is when you did not hit the UFO
-        second_flag_startSelfCrash = true;
+        ufo_flag_startSelfCrash = true;
         bulletx = pos.x;
         bullety = pos.y;
         killBody();
@@ -110,7 +110,7 @@ public class SecondApplet extends PApplet {
         ufo_instruction = "Good job! Next ball!";
         ufo_flag_bombSound = true;
         ufo_flag_killUFO = true;
-        second_flag_startCrash = true;
+        ufo_flag_startCrash = true;
         scoreCount+=1;
 
         killBody();
@@ -427,7 +427,7 @@ public class SecondApplet extends PApplet {
 
     if (ufo_flag_bombSound == true) {
 
-      file.play();
+      ufo_file.play();
       ufo_flag_bombSound = false;
     }
 
@@ -439,7 +439,7 @@ public class SecondApplet extends PApplet {
 
 
 
-    if (second_flag_startSprinkle == false) {
+    if (ufo_flag_startSprinkle == false) {
 
       //this is the list of particles add into the world
       //particles.add(new Particle(570, 200, 40, 0, 0));
@@ -448,10 +448,10 @@ public class SecondApplet extends PApplet {
       //particles.add(new Particle(700, 300, 40, 0, 0));
       //particles.add(new Particle(600, 350, 40, 0, 0));
 
-      second_flag_startSprinkle = true;
+      ufo_flag_startSprinkle = true;
     }
 
-    if (second_flag_startCrash == true) {
+    if (ufo_flag_startCrash == true) {
       smallParticles.add(new smallParticle(xcoord, ycoord, random(2, 20), color(0)));
       smallParticles.add(new smallParticle(xcoord, ycoord, random(2, 20), color(0)));
       smallParticles.add(new smallParticle(xcoord, ycoord, random(2, 20), color(0)));
@@ -464,10 +464,10 @@ public class SecondApplet extends PApplet {
       smallParticles.add(new smallParticle(xcoord, ycoord, random(2, 20), color(0)));
       smallParticles.add(new smallParticle(xcoord, ycoord, random(2, 20), color(0)));
 
-      second_flag_startCrash = false;
+      ufo_flag_startCrash = false;
     }
 
-    if (second_flag_startSelfCrash == true) {
+    if (ufo_flag_startSelfCrash == true) {
 
       smallSelfParticles.add(new smallSelfParticle(bulletx, bullety, random(2, 10), color(204, 102, 0)));
       smallSelfParticles.add(new smallSelfParticle(bulletx, bullety, random(2, 10), color(204, 102, 0)));
@@ -478,7 +478,7 @@ public class SecondApplet extends PApplet {
       smallSelfParticles.add(new smallSelfParticle(bulletx, bullety, random(2, 10), color(204, 102, 0)));
       smallSelfParticles.add(new smallSelfParticle(bulletx, bullety, random(2, 10), color(204, 102, 0)));
 
-      second_flag_startSelfCrash = false;
+      ufo_flag_startSelfCrash = false;
     }
 
     // Display all the boundaries
