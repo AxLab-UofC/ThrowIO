@@ -693,6 +693,8 @@ void draw() {
             second_flag_killUFO = false;
 
             instruction = "Throw ball! Hit UFO!";
+            
+            startTime = false; //newly added
           }
         }
       }
