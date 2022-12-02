@@ -1,5 +1,5 @@
-//UFO application
-//This is the code for demo for dropping
+//This is the main ThrowIO code
+
 import oscP5.*;
 import netP5.*;
 import processing.serial.*;
@@ -104,10 +104,10 @@ boolean flag_recordPushingToioAndBallAngle = false;
 boolean flag_prepareBackout = false;
 
 
-boolean second_flag_killUFO = false;
-boolean second_flag_bombSound = false;
-boolean second_flag_kill_particle = false;
-boolean second_flag_killBall = false;
+boolean ufo_flag_killUFO = false;
+boolean ufo_flag_bombSound = false;
+boolean ufo_flag_kill_particle = false;
+boolean ufo_flag_killBall = false;
 
 float[] xHist = {};
 float[] yHist = {};
@@ -118,7 +118,7 @@ float xDiff;
 float throwDegree;
 float avgZVelocity = 0.0;
 float avgXVelocity = 0.0;
-boolean second_flag_addParticle = false;
+boolean ufo_flag_addParticle = false;
 int time2 = millis();
 boolean startTime2 = false;
 float bulletx = 0;
@@ -133,14 +133,14 @@ float ySpeed = 1;
 float xSpeed = 1;
 float ycoord = 300;
 float xcoord = 600;
-boolean second_flag_hitTarget = false;
+boolean ufo_flag_hitTarget = false;
 float hitX = 720;
 float pushx = 360; //400
 float pushy = 240; //300
 
 boolean flag_findPushedBallLocation = false;
 int pushToio = 0;
-boolean second_flag_nextBall = false;
+boolean ufo_flag_nextBall = false;
 boolean second_flag_startSprinkle = false;
 boolean ballDidNotStick = false;
 int scoreCount = 0;
@@ -149,7 +149,7 @@ boolean flag_needBackout = false;
 SoundFile file;
 boolean second_flag_startCrash = false;
 boolean second_flag_startSelfCrash = false;
-String instruction = "Throw ball! Hit UFO!";
+String ufo_instruction = "Throw ball! Hit UFO!";
 
 void captureEvent(Capture video) {
   video.read();
@@ -215,13 +215,19 @@ void setup() {
   box2d.createWorld();
   box2d.setGravity(0, -50); //we can change the gravity in box2D world here, currently using -120
 
-  //allow two windows showing up at the same time
-  //one for camera, the other for monitor screen
-  String[] args = {"TwoFrameTest"};
-  SecondApplet sa = new SecondApplet();
-  PApplet.runSketch(args, sa);
 
-  file = new SoundFile(this, "explosion.wav");
+  if (applicationMode == "ufo") {
+    //allow two windows showing up at the same time
+    //one for camera, the other for monitor screen
+    String[] args = {"TwoFrameTest"};
+    SecondApplet sa = new SecondApplet();
+    PApplet.runSketch(args, sa);
+
+    file = new SoundFile(this, "explosion.wav");
+  } else if (applicationMode == "story") {
+    println("launching immersive storytelling application");
+    exit();
+  }
 
   loadCalibration();
 }
@@ -298,7 +304,7 @@ void draw() {
 
               phase2_ballSticks = false;
               phase1_seeBall = false;
-              instruction = "Nice try! Throw carefully!" ;
+              ufo_instruction = "Nice try! Throw carefully!" ;
             }
 
             //draw a circle at the tracked pixel
@@ -333,7 +339,7 @@ void draw() {
               //in this case, a user needs to manually grab the ball and re-throw it again
               phase2_ballSticks = false;
               phase1_seeBall = false;
-              instruction = "Nice try! Throw carefully!" ;
+              ufo_instruction = "Nice try! Throw carefully!" ;
             }
           } else {
 
@@ -341,7 +347,7 @@ void draw() {
             //it is most likely causes by a user throwing to hard or too soft
             phase2_ballSticks = false;
             phase1_seeBall = false;
-            instruction = "Nice try! Throw carefully!" ;
+            ufo_instruction = "Nice try! Throw carefully!" ;
           }
         }
       }
@@ -355,15 +361,15 @@ void draw() {
       //this flag is used to tell the second window that the ball hits and sticks on the ceilling
       //so that the vertical screen can show the trajectory of the ball
       if (detectBall(false)) {
-        second_flag_hitTarget = true;
+        ufo_flag_hitTarget = true;
       } else {
         println("Ball did not stick check point in Phase 3");
-        instruction = "Nice try! Throw carefully!" ;
-        second_flag_killBall = true;
+        ufo_instruction = "Nice try! Throw carefully!" ;
+        ufo_flag_killBall = true;
         jumpToPhase1();
       }
 
-      if (second_flag_killBall == false) {
+      if (ufo_flag_killBall == false) {
         //we need to record the angle between the pushing toio and the ball location
         if (flag_recordPushingToioAndBallAngle == false) {
 
@@ -495,7 +501,7 @@ void draw() {
           //so we just to the last phase
 
           //we need to kill the particle that falsely show up in the monitor, and jump to phase 10 for reset
-          second_flag_killBall = true;
+          ufo_flag_killBall = true;
           //jump to phase 10
           jumpToPhase10();
         }
@@ -504,7 +510,7 @@ void draw() {
       }
 
       //If we are not killBall due to it not sticking, we can should run the following block of code
-      if (second_flag_killBall == false) {
+      if (ufo_flag_killBall == false) {
         //After finding the ball's new position (which should be close to the push location), we find the prep location for both toios to travel
         if (flag_needBackout == false) {
           //If toios don't need to backout, we call findLocation() to find the prep location
@@ -555,8 +561,8 @@ void draw() {
 
           phase8_toioTravelToPrepLocation = true;
 
-          //second_flag_nextBall controls when the next ball in the vertical screen shoould appear
-          second_flag_nextBall = true;
+          //ufo_flag_nextBall controls when the next ball in the vertical screen shoould appear
+          ufo_flag_nextBall = true;
         }
       } else {
 
@@ -568,8 +574,8 @@ void draw() {
           phase8_toioTravelToPrepLocation = true;
 
 
-          //second_flag_nextBall controls when the next ball in the vertical screen shoould appear
-          second_flag_nextBall = true;
+          //ufo_flag_nextBall controls when the next ball in the vertical screen shoould appear
+          ufo_flag_nextBall = true;
         }
       }
     } else if (phase8_toioTravelToPrepLocation == true && phase9_rotateToDrop == false) {
@@ -687,13 +693,13 @@ void draw() {
             turnDegree0 = 0;
 
             //reset flags in SecondApplet
-            second_flag_addParticle = false;
-            second_flag_nextBall = false;
-            second_flag_hitTarget = false;
-            second_flag_killUFO = false;
+            ufo_flag_addParticle = false;
+            ufo_flag_nextBall = false;
+            ufo_flag_hitTarget = false;
+            ufo_flag_killUFO = false;
 
-            instruction = "Throw ball! Hit UFO!";
-            
+            ufo_instruction = "Throw ball! Hit UFO!";
+
             startTime = false; //newly added
           }
         }

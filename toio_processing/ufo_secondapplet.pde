@@ -1,4 +1,4 @@
-//visual displays in the monitor window
+//visual display for ufo application TODO: consider how to intergrate basketball here as well
 public class SecondApplet extends PApplet {
 
   //an ArrayList of particles that will fall on the surface
@@ -104,19 +104,19 @@ public class SecondApplet extends PApplet {
         killBody();
         return true;
         
-      } else if (abs(pos.x - xcoord) < 80 && abs(pos.y - ycoord) < 80 && !second_flag_killUFO) {
+      } else if (abs(pos.x - xcoord) < 80 && abs(pos.y - ycoord) < 80 && !ufo_flag_killUFO) {
 
         //this is when you hit the UFO
-        instruction = "Good job! Next ball!";
-        second_flag_bombSound = true;
-        second_flag_killUFO = true;
+        ufo_instruction = "Good job! Next ball!";
+        ufo_flag_bombSound = true;
+        ufo_flag_killUFO = true;
         second_flag_startCrash = true;
         scoreCount+=1;
 
         killBody();
         
         return true;
-      } else if (second_flag_killBall == true){
+      } else if (ufo_flag_killBall == true){
         
         killBody();
         return true;
@@ -400,7 +400,7 @@ public class SecondApplet extends PApplet {
 
     textSize(75);
     fill(0);
-    text(instruction, 40, 150);
+    text(ufo_instruction, 40, 150);
 
     xcoord += xSpeed;
 
@@ -409,7 +409,7 @@ public class SecondApplet extends PApplet {
     }
 
     //UFO
-    if (second_flag_killUFO == false) {
+    if (ufo_flag_killUFO == false) {
 
       stroke(0);
       strokeWeight(1);
@@ -425,10 +425,10 @@ public class SecondApplet extends PApplet {
       ellipse(xcoord, ycoord-23, 80, 15);
     }
 
-    if (second_flag_bombSound == true) {
+    if (ufo_flag_bombSound == true) {
 
       file.play();
-      second_flag_bombSound = false;
+      ufo_flag_bombSound = false;
     }
 
 
@@ -486,17 +486,17 @@ public class SecondApplet extends PApplet {
       wall.display();
     }
 
-    //we add a new ball when second_flag_nextBall flag is true
-    if (second_flag_nextBall == true) {
+    //we add a new ball when ufo_flag_nextBall flag is true
+    if (ufo_flag_nextBall == true) {
       particles.add(new Particle(monitorWidth-50, monitorHeight, 40, -25, 65)); //this is the ball that drops from the tube
-      second_flag_nextBall = false;
+      ufo_flag_nextBall = false;
     }
 
 
     //display ball
-    if (second_flag_hitTarget == true) {
+    if (ufo_flag_hitTarget == true) {
 
-      if (second_flag_addParticle == false) {
+      if (ufo_flag_addParticle == false) {
 
         //particles.add(new Particle(random(330, 360), 720, 40, random(10, 11), random(120, 140))); //this is where we currently define the ball speed and velocity
 
@@ -508,7 +508,7 @@ public class SecondApplet extends PApplet {
 
         particles.add(new Particle(hitX, monitorHeight, 40, -random(10, 11), 95));
         
-        second_flag_addParticle = true;
+        ufo_flag_addParticle = true;
       }
     }
 
@@ -539,11 +539,11 @@ public class SecondApplet extends PApplet {
       // (note they have to be deleted from both the box2d world and our list
       if (p.done()) {
         particles.remove(i);
-        second_flag_hitTarget = false;
-        second_flag_addParticle = false;
+        ufo_flag_hitTarget = false;
+        ufo_flag_addParticle = false;
         
-        if(second_flag_killBall == true){
-            second_flag_killBall = false;
+        if(ufo_flag_killBall == true){
+            ufo_flag_killBall = false;
         }
       }
       //if (p.goal()) {
