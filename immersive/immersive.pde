@@ -43,26 +43,26 @@ Table table;
 PGraphics offscreen;
 boolean dropOrange = false;
 
-void saveOrangePosition(int orangex, int orangey) {
+void saveOrangePosition(float orangex, float orangey) {
   table = new Table();
 
   table.addColumn("OrangeX");
   table.addColumn("OrangeY");
 
   TableRow newRow = table.addRow();
-  newRow.setInt("OrangeX", orangex);
-  newRow.setInt("OrangeY", orangey);
+  newRow.setFloat("OrangeX", orangex);
+  newRow.setFloat("OrangeY", orangey);
 
-  saveTable(table, "data/position.csv");
+  saveTable(table, "../data/position.csv");
 }
 
 void loadOrangePosition() {
-  table = loadTable("data/position.csv", "header");
+  table = loadTable("../data/position.csv", "header");
 
   println(table.getRowCount() + " total rows in table");
 
-  int x_ = table.getInt(0, "OrangeX");
-  int y_ = table.getInt(0, "OrangeY");
+  float x_ = table.getFloat(0, "OrangeX");
+  float y_ = table.getFloat(0, "OrangeY");
 
   println("x_:", x_, "y_:", y_);
 }
@@ -140,7 +140,7 @@ void setup() {
   birdX = birdNestX;
   birdY = birdNestY;
 
-  //loadOrangePosition();
+  loadOrangePosition();
 }
 
 
@@ -216,8 +216,6 @@ void draw() {
 
     stage1_flytoOrange = true;
   } else if (stage1_flytoOrange == true && stage2_poking == false) {
-
-    println("ahahah");
 
     if (abs(birdX - (orangeXLocation)) < 3 && abs(birdY -(orangeYLocation)) < 3) {
       stage2_poking = true;
