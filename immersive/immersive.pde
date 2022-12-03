@@ -151,9 +151,9 @@ void setup() {
 
   // Keystone will only work with P3D or OPENGL renderers,
   // since it relies on texture mapping to deform
-  //size(2500, 1500, P3D);
+  size(displayWidth, displayHeight, P3D);
 
-  size(614, 433, P3D);
+  //size(614, 433, P3D);
 
 
 

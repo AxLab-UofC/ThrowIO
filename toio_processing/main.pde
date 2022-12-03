@@ -274,7 +274,7 @@ void setup() {
     println("launching immersive storytelling application");
 
     //save orange positions
-    story_saveOrangePosition(story_orangex1, story_orangey1, story_orangex2, story_orangey2, 0, 0, 0);
+    story_saveOrangePosition(story_orangex1, story_orangey1, story_orangex2, story_orangey2, 0, 0, story_orangeCount);
 
     //this is where the robot will push the ball to
     pushx = story_orangex1;
@@ -487,7 +487,7 @@ void draw() {
 
           if (story_orangeCount == 1) {
             println("story_orangeCount: ", story_orangeCount);
-            story_saveOrangePosition(story_orangex1, story_orangey1, story_orangex2, story_orangey2, 0, 0, 1); //tell the immersive screen to start drop orange
+            story_saveOrangePosition(story_orangex1, story_orangey1, story_orangex2, story_orangey2, 0, 0, story_orangeCount); //tell the immersive screen to start drop orange
 
             //update new pushx and pushy using the next orange location
             pushx = story_orangex2;
@@ -496,7 +496,7 @@ void draw() {
 
 
           //we tell the bird to move to the orange
-          story_saveOrangePosition(story_orangex1, story_orangey1, story_orangex2, story_orangey2, 1, 0, 0);
+          story_saveOrangePosition(story_orangex1, story_orangey1, story_orangex2, story_orangey2, 1, 0, story_orangeCount);
 
           //we need to record the angle between the pushing toio and the ball location
           if (flag_recordPushingToioAndBallAngle == false) {
@@ -845,7 +845,7 @@ void draw() {
 
           phase10_dropSucceed = true;
           startTime = false;
-          story_saveOrangePosition(story_orangex1, story_orangey1, story_orangex2, story_orangey2, 1, 1, 0);
+          story_saveOrangePosition(story_orangex1, story_orangey1, story_orangex2, story_orangey2, 1, 1, story_orangeCount);
         }
       }
     } else if (phase10_dropSucceed == true) {
