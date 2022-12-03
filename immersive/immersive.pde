@@ -7,6 +7,7 @@ PImage orange3;
 PImage orange4;
 PImage bird1;
 PImage bird2;
+PImage bird3;
 float orangeXLocation = 500;
 float orangeYLocation = 200;
 
@@ -31,10 +32,11 @@ float xSpeed = 1.0;
 float ratio = (orangeXLocation/orangeYLocation);
 float ySpeed = 1.0*ratio;
 
-boolean stage1_flytoOrange = false;
+boolean stage1_flyToOrange = false;
 boolean stage2_poking = false;
 boolean stage3_flyBack = false;
 boolean stage4_sleep = false;
+boolean birdRest = false;
 
 String quadrant = "";
 
@@ -45,36 +47,48 @@ CornerPinSurface surface;
 Table table;
 PGraphics offscreen;
 boolean dropOrange = false;
-int flytoOrange = 0;
+int flyToOrange = 0;
+int dropFruit = 0;
+int nextOrange = 0;
+float OrangeX1 = 0;
+float OrangeY1 = 0;
+float OrangeX2 = 0;
+float OrangeY2 = 0;
+int orangeCount = 0;
 
-//void saveOrangePosition(float orangex, float orangey) {
-//  table = new Table();
-
-//  table.addColumn("OrangeX");
-//  table.addColumn("OrangeY");
-
-//  TableRow newRow = table.addRow();
-//  newRow.setFloat("OrangeX", orangex);
-//  newRow.setFloat("OrangeY", orangey);
-
-//  saveTable(table, "../data/position.csv");
-//}
 
 void loadOrangePosition() {
   table = loadTable("../data/position.csv", "header");
 
-  println(table.getRowCount() + " total rows in table");
+  //println(table.getRowCount() + " total rows in table");
 
-  float x_ = table.getFloat(0, "OrangeX");
-  float y_ = table.getFloat(0, "OrangeY");
-  int flytoOrange_ = table.getInt(0, "flytoOrange");
-  
+  float OrangeX1_ = table.getFloat(0, "OrangeX1");
+  float OrangeY1_ = table.getFloat(0, "OrangeY1");
+  float OrangeX2_ = table.getFloat(0, "OrangeX2");
+  float OrangeY2_ = table.getFloat(0, "OrangeY2");
+  int flyToOrange_ = table.getInt(0, "flyToOrange");
+  int dropFruit_ = table.getInt(0, "dropFruit");
+  int nextOrange_ = table.getInt(0, "nextOrange");
 
-  println("x_:", x_, "y_:", y_, "flytoOrange_: ", flytoOrange_);
-  
-  orangeXLocation = x_;
-  orangeYLocation = y_;
-  flytoOrange = flytoOrange_;
+
+  //println("x_:", x_, "y_:", y_, "flyToOrange_:", flyToOrange_, "dropFruit_:", dropFruit);
+
+  OrangeX1 = OrangeX1_;
+  OrangeY1 = OrangeY1_;
+  OrangeX2 = OrangeX2_;
+  OrangeY2 = OrangeY2_;
+
+  //if (orangeCount == 0) {
+  //  orangeXLocation = OrangeX1;
+  //  orangeYLocation = OrangeY1;
+  //} else {
+  //  orangeXLocation = OrangeX2;
+  //  orangeYLocation = OrangeY2;
+  //}
+
+  flyToOrange = flyToOrange_;
+  dropFruit = dropFruit_;
+  nextOrange = nextOrange_;
 }
 
 void setSpeed(float targetX, float targetY, float bx, float by) {
@@ -133,10 +147,15 @@ void setup() {
 
   bird1 = loadImage("birdFly1.png");
   bird2 = loadImage("birdFly2.png");
+  bird3 = loadImage("birdRest.png");
 
   // Keystone will only work with P3D or OPENGL renderers,
   // since it relies on texture mapping to deform
-  size(2500, 1500, P3D);
+  //size(2500, 1500, P3D);
+
+  size(614, 433, P3D);
+
+
 
   ks = new Keystone(this);
   surface = ks.createCornerPinSurface(614, 433, 20); //614, 433, 20
@@ -151,7 +170,6 @@ void setup() {
   birdY = birdNestY;
 
   loadOrangePosition();
-  
 }
 
 
@@ -172,9 +190,17 @@ void draw() {
 
 
 
-  if (dropOrange == false) {
+  if (dropOrange == false && orangeCount == 0) {
     offscreen.imageMode(CENTER);
-    offscreen.image(orange2, orangeXLocation, orangeYLocation, 40, 40);
+    offscreen.image(orange2, OrangeX1, OrangeY1, 40, 40);
+    offscreen.imageMode(CENTER);
+    offscreen.image(orange2, OrangeX2, OrangeY2, 40, 40);
+  } else if (dropOrange == true && orangeCount == 0) {
+    offscreen.imageMode(CENTER);
+    offscreen.image(orange2, OrangeX2, OrangeY2, 40, 40);
+  } else if (dropOrange == false && orangeCount == 1) {
+    offscreen.imageMode(CENTER);
+    offscreen.image(orange2, OrangeX2, OrangeY2, 40, 40);
   }
 
   offscreen.pushMatrix();
@@ -185,23 +211,29 @@ void draw() {
 
 
   offscreen.imageMode(CORNER);
-  if (state=='B') {
-    offscreen.image(bird1, -745/8, 0, 745/4, 355/4);
+  if (birdRest == true) {
 
-    if (millis()-m>HowLongIsItWaiting1) {
-      m = millis();
-      state='A';
-    } // if
-  } else if (state=='A') {
     offscreen.image(bird2, -745/8, 0, 745/4, 293/4);
+  } else {
+    if (state=='B') {
+      offscreen.image(bird1, -745/8, 0, 745/4, 355/4);
+
+      if (millis()-m>HowLongIsItWaiting1) {
+        m = millis();
+        state='A';
+      } // if
+    } else if (state=='A') {
+      offscreen.image(bird2, -745/8, 0, 745/4, 293/4);
 
 
 
-    if (millis()-m>HowLongIsItWaiting2) {
-      m = millis();
-      state='B';
-    } // if
-  } // if
+      if (millis()-m>HowLongIsItWaiting2) {
+        m = millis();
+        state='B';
+      }
+    }
+  }
+
 
 
   //translated origin / red cross
@@ -212,7 +244,18 @@ void draw() {
   offscreen.popMatrix();
 
   //println("quadrant: ", quadrant);
-  if (stage1_flytoOrange == false) {
+  if (stage1_flyToOrange == false) {
+    println("Stage 0 preparing ");
+    println("orangeYLocation: ", orangeYLocation);
+
+    if (orangeCount == 0) {
+      orangeXLocation = OrangeX1;
+      orangeYLocation = OrangeY1;
+    } else {
+      orangeXLocation = OrangeX2;
+      orangeYLocation = OrangeY2;
+    }
+    
     //record the state of the bird before flying to the orange
 
     //record angle from bird's original position to the target orange
@@ -224,16 +267,14 @@ void draw() {
     //record quadrant and change speed
     setSpeed(orangeXLocation, orangeYLocation, birdX, birdY);
 
-    if(flytoOrange == 1){
-      
-      stage1_flytoOrange = true;
-    
-    }else{
+    if (flyToOrange == 1) {
+
+      stage1_flyToOrange = true;
+    } else {
       loadOrangePosition();
     }
-    
-  } else if (stage1_flytoOrange == true && stage2_poking == false) {
-
+  } else if (stage1_flyToOrange == true && stage2_poking == false) {
+    println("Stage 1 fly to orange ");
     if (abs(birdX - (orangeXLocation)) < 3 && abs(birdY -(orangeYLocation)) < 3) {
       stage2_poking = true;
 
@@ -246,7 +287,7 @@ void draw() {
       birdY += ySpeed;
     }
   } else if (stage2_poking == true && stage3_flyBack == false) {
-
+    println("Stage 2 Poking ");
     //start poking the orange
 
     if (startTime == false) {
@@ -256,7 +297,7 @@ void draw() {
       birdX += xSpeed;
       birdY += ySpeed;
 
-      if (millis() > time + 250) {
+      if (millis() > time + 100) {
 
         startTime = false;
         ySpeed *=-1;
@@ -266,46 +307,61 @@ void draw() {
 
     //call robot push and drop the orange
     //here we will just wait for some time
-    if (startTime2 == false) {
-      time2 = millis();
-      startTime2 = true;
+
+
+    if (dropFruit == 1) {
+
+      dropOrange = true;
+      stage3_flyBack = true;
     } else {
 
-      if (millis() > time2 + 1000) {
-
-
-
-        startTime2 = false;
-        dropOrange = true;
-        stage3_flyBack = true;
-
-        //record go back angles
-        angle = atan2(birdNestY - birdY, birdNestX-birdX) + PI/2;
-
-        ratio = (abs(birdNestY-birdX)/abs(birdNestX-birdY));
-
-        //record quadrant and change speed
-        setSpeed(birdNestX, birdNestY, birdX, birdY);
-
-      }
+      loadOrangePosition();
     }
-  } else if (stage3_flyBack == true && stage4_sleep == false) {
 
-    //bird fly back now
-    if (abs(birdX - (birdNestX)) < 3 && abs(birdY -(birdNestY)) < 3) {
-      stage4_sleep = true;
-    } else {
+    //record go back angles
+    //angle = atan2(birdNestY - birdY, birdNestX-birdX) + PI/2;
 
-      birdX += xSpeed;
-      birdY += ySpeed;
-    }
-  } else if (stage4_sleep == true) {
+    //ratio = (abs(birdNestY-birdX)/abs(birdNestX-birdY));
 
+    ////record quadrant and change speed
+    //setSpeed(birdNestX, birdNestY, birdX, birdY);
+  } else if (stage3_flyBack == true) {
+
+    println("Stage3 Fly Back");
     //bird go to sleep
+    birdRest = true;
     offscreen.textSize(25);
     offscreen.fill(0);
-    offscreen.text("ZZZZ", 150, 100);
+    offscreen.text("ZZZZ", birdX+10, birdY+10);
+
+    if (nextOrange == 0) {
+      loadOrangePosition();
+    } else if(nextOrange == 1 && orangeCount == 0){
+      //set the orange position to the second orange position
+      orangeCount+=1;
+      stage1_flyToOrange = false;
+      stage2_poking = false;
+      stage3_flyBack = false;
+      //stage4_sleep = false;
+      dropOrange = false;
+    }
   }
+
+
+
+
+  //else if (stage3_flyBack == true && stage4_sleep == false) {
+
+  //  //bird fly back now
+  //  if (abs(birdX - (birdNestX)) < 3 && abs(birdY -(birdNestY)) < 3) {
+  //    stage4_sleep = true;
+  //  } else {
+
+  //    birdX += xSpeed;
+  //    birdY += ySpeed;
+  //  }
+  //}
+
 
   //offscreen.image(orange1, 50, 50, 40, 40);
   //offscreen.image(orange2, 200, 200, 40, 40);
@@ -353,10 +409,29 @@ void keyPressed() {
     // saves the layout
     ks.save();
     break;
-  case 'd':
-    dropOrange = true;
+  case 'b':
+    if (flyToOrange == 0) {
+      flyToOrange = 1;
+    } else {
+      flyToOrange = 0;
+    }
     break;
-  case 'r':
+  case 'n':
+    if (dropFruit == 0) {
+      dropFruit = 1;
+    } else {
+      dropFruit = 0;
+    }
+    break;
+  case 'm':
+    orangeCount+=1;
+    nextOrange = orangeCount;
+    dropFruit = 0;
+    flyToOrange = 0;
+    stage1_flyToOrange = false;
+    stage2_poking = false;
+    stage3_flyBack = false;
+    stage4_sleep = false;
     dropOrange = false;
     break;
   }

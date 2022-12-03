@@ -139,6 +139,7 @@ boolean ballDidNotStick = false;
 int scoreCount = 0;
 boolean flag_needBackout = false;
 
+
 SoundFile ufo_file;
 boolean ufo_flag_killUFO = false;
 boolean ufo_flag_bombSound = false;
@@ -151,8 +152,11 @@ boolean ufo_flag_nextBall = false;
 boolean ufo_flag_startSprinkle = false;
 boolean ufo_flag_addParticle = false;
 
-float story_orangex1 = 300;
+float story_orangex1 = 250;
 float story_orangey1 = 200;
+float story_orangex2 = 400;
+float story_orangey2 = 220;
+int story_orangeCount = 0;
 
 boolean story_flag_trackedStuckBall = false;
 boolean story_flag_trackedPushedBall = false;
@@ -200,17 +204,25 @@ void jumpToPhase10() {
   phase10_dropSucceed = false; //phase 10
 }
 
-void story_saveOrangePosition(float orangex, float orangey, int flyToOrange) {
+void story_saveOrangePosition(float orangex1, float orangey1, float orangex2, float orangey2, int flyToOrange, int dropFruit, int nextOrange) {
   table = new Table();
 
-  table.addColumn("OrangeX");
-  table.addColumn("OrangeY");
+  table.addColumn("OrangeX1");
+  table.addColumn("OrangeY1");
+  table.addColumn("OrangeX2");
+  table.addColumn("OrangeY2");
   table.addColumn("flyToOrange");
+  table.addColumn("dropFruit");
+  table.addColumn("nextOrange");
 
   TableRow newRow = table.addRow();
-  newRow.setFloat("OrangeX", orangex);
-  newRow.setFloat("OrangeY", orangey);
+  newRow.setFloat("OrangeX1", orangex1);
+  newRow.setFloat("OrangeY1", orangey1);
+  newRow.setFloat("OrangeX2", orangex2);
+  newRow.setFloat("OrangeY2", orangey2);
   newRow.setInt("flyToOrange", flyToOrange);
+  newRow.setInt("dropFruit", dropFruit);
+  newRow.setInt("nextOrange", nextOrange);
 
   saveTable(table, "../data/position.csv");
 }
@@ -262,7 +274,7 @@ void setup() {
     println("launching immersive storytelling application");
 
     //save orange positions
-    story_saveOrangePosition(story_orangex1, story_orangey1, 0);
+    story_saveOrangePosition(story_orangex1, story_orangey1, story_orangex2, story_orangey2, 0, 0, 0);
 
     //this is where the robot will push the ball to
     pushx = story_orangex1;
@@ -274,7 +286,7 @@ void setup() {
 
 
 void draw() {
-
+  println("story_orangeCount: ", story_orangeCount);
   background(255);
   stroke(0);
   long now = System.currentTimeMillis();
@@ -473,9 +485,18 @@ void draw() {
         println("Story: waiting the experimentor click on stuck ball in the camera...");
         if (story_flag_trackedStuckBall == true) {
 
+          if (story_orangeCount == 1) {
+            println("story_orangeCount: ", story_orangeCount);
+            story_saveOrangePosition(story_orangex1, story_orangey1, story_orangex2, story_orangey2, 0, 0, 1); //tell the immersive screen to start drop orange
+
+            //update new pushx and pushy using the next orange location
+            pushx = story_orangex2;
+            pushy = story_orangey2;
+          }
+
 
           //we tell the bird to move to the orange
-          story_saveOrangePosition(story_orangex1, story_orangey1, 1);
+          story_saveOrangePosition(story_orangex1, story_orangey1, story_orangex2, story_orangey2, 1, 0, 0);
 
           //we need to record the angle between the pushing toio and the ball location
           if (flag_recordPushingToioAndBallAngle == false) {
@@ -781,26 +802,51 @@ void draw() {
 
       //Phase 10. Toio converge to drop the object
       println("Phase 10. Toio converge to drop the object");
+      if (applicationMode == "ufo") {
 
-      if (startTime == false) {
-        time = millis();
-        startTime = true;
-      } else {
+        if (startTime == false) {
+          time = millis();
+          startTime = true;
+        } else {
 
-        if (millis() > time + 3000) { //wait for virtual ball to drop
+          if (millis() > time + 3000) { //wait for virtual ball to drop
 
-          //both toios travel to the ball's location
-          aimCubeSpeed(0, global_scaledX, global_scaledY);
-          aimCubeSpeed(1, global_scaledX, global_scaledY);
+            //both toios travel to the ball's location
+            aimCubeSpeed(0, global_scaledX, global_scaledY);
+            aimCubeSpeed(1, global_scaledX, global_scaledY);
+          }
         }
-      }
 
-      //we are finally done with all the phases after the toios drop the ball
-      if (abs(cubes[0].x - global_scaledX) < convergeDistance && abs(cubes[1].x - global_scaledX) < convergeDistance &&
-        abs(cubes[0].y - global_scaledY) < convergeDistance &&  abs(cubes[1].y - global_scaledY) < convergeDistance) {
+        //we are finally done with all the phases after the toios drop the ball
+        if (abs(cubes[0].x - global_scaledX) < convergeDistance && abs(cubes[1].x - global_scaledX) < convergeDistance &&
+          abs(cubes[0].y - global_scaledY) < convergeDistance &&  abs(cubes[1].y - global_scaledY) < convergeDistance) {
 
-        phase10_dropSucceed = true;
-        startTime = false;
+          phase10_dropSucceed = true;
+          startTime = false;
+        }
+      } else if (applicationMode == "story") {
+
+        if (startTime == false) {
+          time = millis();
+          startTime = true;
+        } else {
+
+          if (millis() > time + 500) { //wait for virtual ball to drop
+
+            //both toios travel to the ball's location
+            aimCubeSpeed(0, global_scaledX, global_scaledY);
+            aimCubeSpeed(1, global_scaledX, global_scaledY);
+          }
+        }
+
+        //we are finally done with all the phases after the toios drop the ball
+        if (abs(cubes[0].x - global_scaledX) < convergeDistance && abs(cubes[1].x - global_scaledX) < convergeDistance &&
+          abs(cubes[0].y - global_scaledY) < convergeDistance &&  abs(cubes[1].y - global_scaledY) < convergeDistance) {
+
+          phase10_dropSucceed = true;
+          startTime = false;
+          story_saveOrangePosition(story_orangex1, story_orangey1, story_orangex2, story_orangey2, 1, 1, 0);
+        }
       }
     } else if (phase10_dropSucceed == true) {
 
@@ -857,6 +903,8 @@ void draw() {
 
             story_flag_trackedStuckBall = false;
             story_flag_trackedPushedBall = false;
+
+            story_orangeCount+=1;
 
             startTime = false; //newly added
           }
