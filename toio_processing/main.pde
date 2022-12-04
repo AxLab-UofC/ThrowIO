@@ -161,6 +161,19 @@ int story_orangeCount = 0;
 boolean story_flag_trackedStuckBall = false;
 boolean story_flag_trackedPushedBall = false;
 
+//this is where we want to ball to be stored
+float storage_shelfX = 240;
+float storage_shelfY = 270;
+String storage_status = "store"; //can be "store" or "retrieve"
+
+float storage_dropLocationX = 400;
+float storage_dropLocationY = 270;
+
+float startPositionX1 = 100;
+float startPositionY1 = 100;
+float startPositionX2 = 600;
+float startPositionY2 = 250;
+
 void captureEvent(Capture video) {
   video.read();
 }
@@ -204,6 +217,18 @@ void jumpToPhase10() {
   phase10_dropSucceed = false; //phase 10
 }
 
+void jumpToPhase11() {
+  phase1_seeBall = true; //phase 1
+  phase2_ballSticks = true; //phase 2
+  phase3_facePushLocation = true; //phase 3
+  phase4_travelToBallToPush = true; //phase 4
+  phase5_rotateBallToPushLocation = true; //phase 5
+  phase6_pushDone = true; //phase 6
+  phase7_findTangentPoints = true; //phase 7
+  phase8_toioTravelToPrepLocation = true; //phase 8
+  phase9_rotateToDrop = true; //phase 9
+  phase10_dropSucceed = true; //phase 10
+}
 void story_saveOrangePosition(float orangex1, float orangey1, float orangex2, float orangey2, int flyToOrange, int dropFruit, int nextOrange) {
   table = new Table();
 
@@ -270,6 +295,12 @@ void setup() {
     PApplet.runSketch(args, sa);
 
     ufo_file = new SoundFile(this, "explosion.wav");
+
+    //set starting position for the robots
+    startPositionX1 = 100;
+    startPositionY1 = 100;
+    startPositionX2 = 600;
+    startPositionY2 = 250;
   } else if (applicationMode == "story") {
     println("launching immersive storytelling application");
 
@@ -279,6 +310,24 @@ void setup() {
     //this is where the robot will push the ball to
     pushx = story_orangex1;
     pushy = story_orangey1;
+
+    //set starting position for the robots
+    startPositionX1 = 100;
+    startPositionY1 = 100;
+    startPositionX2 = 600;
+    startPositionY2 = 250;
+  } else if (applicationMode == "storage") {
+
+    //set the position for storing
+    pushx = storage_shelfX;
+    pushy = storage_shelfY;
+
+
+    //set starting position for the robots
+    startPositionX1 = 100;
+    startPositionY1 = 245;
+    startPositionX2 = 600;
+    startPositionY2 = 250;
   }
 
   loadCalibration();
@@ -286,7 +335,7 @@ void setup() {
 
 
 void draw() {
-  println("story_orangeCount: ", story_orangeCount);
+
   background(255);
   stroke(0);
   long now = System.currentTimeMillis();
@@ -300,8 +349,10 @@ void draw() {
   if (calibrationMode > 0) {
 
     //move toio to standby positions while calibrating
-    aimCubeSpeed(0, 100, 100);
-    aimCubeSpeed(1, 600, 250);
+    aimCubeSpeed(0, startPositionX1, startPositionY1);
+    aimCubeSpeed(1, startPositionX2, startPositionY2);
+
+
     detectBall(false);
   } else {
 
@@ -315,6 +366,7 @@ void draw() {
         //since the experimentor will just click on where the ball sticks, we will just skip to phase3
         jumpToPhase3();
       } else {
+        //applicationMode == "ufo" and "storage"
 
         //call detectBall function
         if (detectBall(false)) {
@@ -326,7 +378,7 @@ void draw() {
     } else if (phase1_seeBall == true && phase2_ballSticks == false) {
 
       //Phase 2. Check if ball sticks
-      //as of now, only ufo will use this phase
+      //applicationMode == "ufo" and "storage" use this phase
       println("Phase 2. Check if ball sticks");
       println("We may need to adjust global_avgDepth > 710 depending on the environment");
 
@@ -542,10 +594,66 @@ void draw() {
             }
           }
         }
+      } else if (applicationMode == "storage") {
+
+        if (storage_status == "store") {
+          //set the position for storing
+          pushx = storage_shelfX;
+          pushy = storage_shelfY;
+        } else {
+          //set the pushed position for dropping
+          pushx = storage_dropLocationX;
+          pushy = storage_dropLocationY;
+        }
+
+        //we need to record the angle between the pushing toio and the ball location
+        if (flag_recordPushingToioAndBallAngle == false) {
+
+          //here we always assume that the ball sticks in between the spaces between the toio robots
+          //TODO: please check the algorithm here!!
+
+          if (global_scaledX < pushx) {
+            //record that cube 0 will push
+            pushToio = 0;
+
+            //turnDegree0 is to what degrees that toio0 needs to spin to so that it will face its front (wedge) side to ball location
+            turnDegree0 = degrees(atan2(global_scaledY-cubes[0].y, global_scaledX-cubes[0].x));
+            if (turnDegree0 < 0) {
+              turnDegree0+=360;
+            }
+          } else {
+            //record that cube 1 will push
+            pushToio = 1;
+
+            //turnDegree1 is to what degrees that toio1 needs to spin to so that it will face its front (wedge) side to ball location
+            turnDegree1 = degrees(atan2(global_scaledY-cubes[1].y, global_scaledX-cubes[1].x));
+
+            if (turnDegree1 < 0) {
+              turnDegree1+=360;
+            }
+          }
+
+          flag_recordPushingToioAndBallAngle = true;
+        } else {
+
+
+          if (pushToio == 0) {
+            // we rotate the cube0 180 degress so that now its back (prong) side is facing toward the ball location
+            if (rotateCube(0, turnDegree0-180)) {
+              phase3_facePushLocation = true;
+            }
+          } else {
+            // we rotate the cube1 180 degress so that now its back (prong) side is facing toward the ball location
+            if (rotateCube(1, turnDegree1-180)) {
+              phase3_facePushLocation = true;
+            }
+          }
+        }
       }
     } else if (phase3_facePushLocation == true && phase4_travelToBallToPush == false) {
 
-      //Phase 4. Let pushing toio travel to ball (preparing to push) //as of now ufo and story both use this phase
+      //Phase 4. Let pushing toio travel to ball (preparing to push)
+      //applicationMode == "ufo" and "story" "storage" use this phase
       println("Phase 4. Let pushing toio travel to ball (preparing to push)");
 
 
@@ -570,7 +678,8 @@ void draw() {
       }
     } else if (phase4_travelToBallToPush == true && phase5_rotateBallToPushLocation == false) {
 
-      //Phase 5. Pushing toio rotates the ball such that they face the push location //as of now ufo and story both use this phase
+      //Phase 5. Pushing toio rotates the ball such that they face the push location
+      //applicationMode == "ufo" "story" "storage" use this phase
       println("Phase 5. Pushing toio rotates the ball such that they face the push location");
 
       if (pushToio == 0) {
@@ -587,7 +696,8 @@ void draw() {
       }
     } else if (phase5_rotateBallToPushLocation == true && phase6_pushDone == false) {
 
-      //Phase 6. Pushing toio pushes the ball to the push location //as of now ufo and story both use this phase
+      //Phase 6. Pushing toio pushes the ball to the push location
+      //applicationMode == "ufo" "story" "storage" use this phase
       println("Phase 6. Pushing toio pushes the ball to the push location");
 
       if (pushToio == 0) {
@@ -710,6 +820,79 @@ void draw() {
               findbackoutLocation(0);
               findbackoutLocation(1);
               flag_prepareBackout = true;
+            } else {
+
+              aimCubeSpeed(0, global_backoutx0, global_backouty0);
+              aimCubeSpeed(1, global_backoutx1, global_backouty1);
+
+              if (abs(cubes[0].x - global_backoutx0) < 15 && abs(cubes[0].y - global_backouty0) < 15 && abs(cubes[1].x - global_backoutx1) < 15 && abs(cubes[1].y - global_backouty1) < 15 ) {
+                //when toios finally backout, we set flag_needBackout to false so that we can once again call findLocation() to find the prep locaiton
+                flag_needBackout = false;
+              }
+            }
+          }
+        }
+      } else if (applicationMode == "storage") {
+        if (storage_status == "store") {
+          //storing
+          //it is fine if pushing toio did not backout precisely
+          jumpToPhase11();
+        } else {
+          //retrieving
+
+          //TODO: we need to update to another algorithm, but now we just use the normal dropping
+          if (flag_findPushedBallLocation == false) {
+
+            //we must find a ball because we just push the ball to its pushed location
+            if (detectBall(false)) {
+              global_scaledX = map(global_avgX, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);
+              global_scaledY = map(global_avgY, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);
+
+              //draw a circle at the tracked pixel
+              fill(255);
+              strokeWeight(4.0);
+              stroke(0);
+              ellipse(global_avgX, global_avgY, 20, 20);
+            } else {
+              println("Special case: ball actually did not stick in Phase 7");
+
+              //this would happen if we let the ball reached similar height to the ceiling but didn't stick
+              //so we just to the last phase
+
+              //we need to kill the particle that falsely show up in the monitor, and jump to phase 10 for reset
+              ufo_flag_killBall = true;
+              //jump to phase 10
+              jumpToPhase10();
+            }
+
+            flag_findPushedBallLocation = true;
+          }
+
+          //After finding the ball's new position (which should be close to the push location), we find the prep location for both toios to travel
+          if (flag_needBackout == false) {
+            //If toios don't need to backout, we call findLocation() to find the prep location
+
+            if (findLocation() == true) {
+              //If we find the prep location, we move on to the next phase
+              phase7_findTangentPoints = true;
+            } else {
+              //If we can't find the prep locations, that means that at least one toio is too close the ball, so we need to move them out
+              flag_needBackout = true;
+            }
+          } else {
+
+            //By calling findbackoutLocation(), we can move toio back (on the line formed by toio and the ball)
+            println("Back out toio because they are within radius");
+
+            if (flag_prepareBackout == false) {
+              if (detectBall(false)) {
+                global_scaledX = map(global_avgX, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);  //615
+                global_scaledY = map(global_avgY, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);  //382
+                findbackoutLocation(0);
+                findbackoutLocation(1);
+
+                flag_prepareBackout = true;
+              }
             } else {
 
               aimCubeSpeed(0, global_backoutx0, global_backouty0);
@@ -847,11 +1030,35 @@ void draw() {
           startTime = false;
           story_saveOrangePosition(story_orangex1, story_orangey1, story_orangex2, story_orangey2, 1, 1, story_orangeCount);
         }
+      } else if (applicationMode == "storage") {
+
+        //TODO: need to update to new algorithm
+        if (startTime == false) {
+          time = millis();
+          startTime = true;
+        } else {
+
+          if (millis() > time + 500) { //wait for virtual ball to drop
+
+            //both toios travel to the ball's location
+            aimCubeSpeed(0, global_scaledX, global_scaledY);
+            aimCubeSpeed(1, global_scaledX, global_scaledY);
+          }
+        }
+
+        //we are finally done with all the phases after the toios drop the ball
+        if (abs(cubes[0].x - global_scaledX) < convergeDistance && abs(cubes[1].x - global_scaledX) < convergeDistance &&
+          abs(cubes[0].y - global_scaledY) < convergeDistance &&  abs(cubes[1].y - global_scaledY) < convergeDistance) {
+
+          phase10_dropSucceed = true;
+          startTime = false;
+          story_saveOrangePosition(story_orangex1, story_orangey1, story_orangex2, story_orangey2, 1, 1, story_orangeCount);
+        }
       }
     } else if (phase10_dropSucceed == true) {
 
       //Phase 11. Reset all of the flags so that we can start the algorithm again
-
+      println("Phase 11. Reset all of the flags so that we can start the algorithm again");
       if (startTime == false) {
         time = millis();
         startTime = true;
@@ -859,11 +1066,11 @@ void draw() {
 
         if (millis() > time + 1000) {
 
-          aimCubeSpeed(0, 100, 100);
-          aimCubeSpeed(1, 600, 250);
+          aimCubeSpeed(0, startPositionX1, startPositionY1);
+          aimCubeSpeed(1, startPositionX2, startPositionY2);
 
-          if (abs(cubes[0].x - 100) < 15 && abs(cubes[1].x - 600) < 15 &&
-            abs(cubes[0].y - 100) < 15 &&  abs(cubes[1].y - 250) < 15) {
+          if (abs(cubes[0].x - startPositionX1) < 15 && abs(cubes[1].x - startPositionX2) < 15 &&
+            abs(cubes[0].y - startPositionY1) < 15 &&  abs(cubes[1].y - startPositionY2) < 15) {
 
             //reset phase flags to false
             phase1_seeBall = false; //phase 1
@@ -907,6 +1114,12 @@ void draw() {
             story_orangeCount+=1;
 
             startTime = false; //newly added
+
+            if (storage_status == "store") {
+              storage_status = "retrieve";
+            } else {
+              storage_status = "store";
+            }
           }
         }
       }
