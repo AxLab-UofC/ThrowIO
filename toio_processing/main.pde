@@ -176,6 +176,21 @@ float startPositionX1 = 100;
 float startPositionY1 = 100;
 float startPositionX2 = 600;
 float startPositionY2 = 250;
+float handPositionX = -50;
+float handPositionY = -50;
+
+// Raw location
+PVector storage_loc = new PVector(0, 0);
+// Interpolated location
+PVector  storage_lerpedLoc = new PVector(0, 0);
+
+float smallBox_w = (mouseXLocationList[1] - mouseXLocationList[0])/2.5;
+float smallBox_h = (mouseYLocationList[1] - mouseYLocationList[0])/2;
+float handDetectStartAreaX = mouseXLocationList[0]+(mouseXLocationList[1] - mouseXLocationList[0])/2;
+float handDetectStartAreaY = mouseYLocationList[0]+smallBox_h/2;
+float handDetectEndAreaX = handDetectStartAreaX+smallBox_w;
+float handDetectEndAreaY = handDetectStartAreaY+smallBox_h;
+
 
 void captureEvent(Capture video) {
   video.read();
@@ -370,7 +385,7 @@ void draw() {
       if (applicationMode == "story") {
         //since the experimentor will just click on where the ball sticks, we will just skip to phase3
         jumpToPhase3();
-      } else if (applicationMode == "ufo" || applicationMode == "storage") {
+      } else if (applicationMode == "ufo" || (applicationMode == "storage" && storage_status == "store")) {
         //applicationMode == "ufo" and "storage"
 
         //call detectBall function
@@ -379,10 +394,66 @@ void draw() {
         } else {
           phase1_seeBall = false;
         }
+      } else if ((applicationMode == "storage" && storage_status == "retrieve")) {
+
+        smallBox_w = (mouseXLocationList[1] - mouseXLocationList[0])/2.5;
+        smallBox_h = (mouseYLocationList[1] - mouseYLocationList[0])/2;
+        handDetectStartAreaX = mouseXLocationList[0]+(mouseXLocationList[1] - mouseXLocationList[0])/2;
+        handDetectStartAreaY = mouseYLocationList[0]+smallBox_h/2;
+        handDetectEndAreaX = handDetectStartAreaX+smallBox_w;
+        handDetectEndAreaY = handDetectStartAreaY+smallBox_h;
+
+        noFill();
+        stroke(255, 0, 0);
+        rect(handDetectStartAreaX, handDetectStartAreaY, smallBox_w, smallBox_h);
+
+        findHand(handDetectStartAreaX, handDetectStartAreaY, handDetectEndAreaX, handDetectEndAreaY);
+
+        // Let's draw the raw location
+        PVector v1 = storage_loc;
+
+        //draw on main camera
+        fill(50, 100, 250, 200);
+        noStroke();
+        ellipse(v1.x, v1.y, 20, 20);
+
+        //draw on depth camera
+        noStroke();
+        ellipse(v1.x+640, v1.y, 20, 20);
+
+        // Let's draw the "lerped" location
+        PVector v2 = storage_lerpedLoc;
+        fill(100, 250, 50, 200);
+        noStroke();
+        ellipse(v2.x, v2.y, 20, 20);
+
+        //draw on depth camera
+        noStroke();
+        ellipse(v2.x+640, v2.y, 20, 20);
+
+        if (v2.x > handDetectStartAreaX &&  v2.x < handDetectEndAreaX && v2.y > handDetectStartAreaY && v2.y < handDetectEndAreaY) {
+          //record hand position
+          handPositionX = v2.x;
+          handPositionY = v2.y;
+
+          //translate it to toio location as push location
+          pushx = map(handPositionX, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);  //615
+          pushy = map(handPositionY, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);  //382
+
+
+          println("handPositionX: ", handPositionX);
+          println("handPositionY: ", handPositionY);
+          println("pushx: ", pushx);
+          println("pushy: ", pushy);
+
+          //phase1 complete (it is technically see hand instead of see ball)
+          phase1_seeBall = true;
+        }
       } else {
         //quick debug area (set applicationMode to "debug")
-
         //print anything you want here!
+
+        //as long as you don't make phase 1 flag true, then we can debug here!
       }
     } else if (phase1_seeBall == true && phase2_ballSticks == false) {
 
@@ -390,87 +461,162 @@ void draw() {
       //applicationMode == "ufo" and "storage" use this phase
       println("Phase 2. Check if ball sticks");
       println("We may need to adjust global_avgDepth > 710 depending on the environment");
-
-      if (startTime == false) {
-        time = millis();
-        startTime = true;
-      } else {
-
-        if (startTime2 == false) {
-          time2 = millis();
-          startTime2 = true;
+      if (applicationMode == "ufo") {
+        if (startTime == false) {
+          time = millis();
+          startTime = true;
         } else {
 
-          if (millis() > time2 + 50) { //every 50 millisecond record a point
-            startTime2 = false;
-
-            //detect ball with true flag will also record the ball's travel history
-            detectBall(true);
-          }
-        }
-
-        if (millis() > time + 500) { //time waited for the ball to stick properly
-          startTime = false;
-
-          //detect the location of the ball
-          if (detectBall(false)) {
-            global_scaledX = map(global_avgX, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);  //615
-            global_scaledY = map(global_avgY, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);  //382
-
-            //use depth information of the ball to check if a ball sticks or not
-
-            println("global_avgDepth: ", global_avgDepth);
-
-            if (global_avgDepth > 710) { //we may need to adjust this number depending on the environment
-
-              phase2_ballSticks = false;
-              phase1_seeBall = false;
-              ufo_instruction = "Nice try! Throw carefully!" ;
-            }
-
-            //draw a circle at the tracked pixel
-            fill(255);
-            strokeWeight(4.0);
-            stroke(0);
-            ellipse(global_avgX, global_avgY, 20, 20);
-
-            hitX = map(global_scaledX, 32, 614+32, 0, monitorWidth); //store the position of hitX
-
-            println("global_scaledX: ", global_scaledX);
-            println("hitX: ", hitX);
-
-
-
-            //find ball velocity and angle
-            //depthDiff  = global_dHist[global_dHist.length-1]-global_dHist[int(global_dHist.length/2)]; // this value should be positive
-            //xDiff  = global_xHist[global_xHist.length-1]-global_xHist[int(global_xHist.length/2)];
-
-            //throwDegree = degrees(atan2(depthDiff, xDiff));
-            throwDegree = degrees(atan2(3, 4));
-
-            //caculate velocity, we can just find the velocty of the five points after mid point
-            avgZVelocity = ((global_dHist[int(global_dHist.length/2)] - global_dHist[0]))/3;
-            avgXVelocity = ((global_xHist[int(global_xHist.length/2)] - global_xHist[0]))/3;
-
-            phase2_ballSticks = true;
-
-            //upper left corber coordinate is (32, 32) and lower right corver is (646, 465)
-            if (global_scaledX > 596 || global_scaledY > 415 || global_scaledY < 82 || global_scaledX < 82) {
-              //this is the case when ball sticks on the edge of the ceiling so that robot can't travel to drop it
-              //in this case, a user needs to manually grab the ball and re-throw it again
-              phase2_ballSticks = false;
-              phase1_seeBall = false;
-              ufo_instruction = "Nice try! Throw carefully!" ;
-            }
+          if (startTime2 == false) {
+            time2 = millis();
+            startTime2 = true;
           } else {
 
-            //this is the case when ball enters the camera but didn't stick
-            //it is most likely causes by a user throwing to hard or too soft
-            phase2_ballSticks = false;
-            phase1_seeBall = false;
-            ufo_instruction = "Nice try! Throw carefully!" ;
+            if (millis() > time2 + 50) { //every 50 millisecond record a point
+              startTime2 = false;
+
+              //detect ball with true flag will also record the ball's travel history
+              detectBall(true);
+            }
+          }
+
+          if (millis() > time + 500) { //time waited for the ball to stick properly
+            startTime = false;
+
+            //detect the location of the ball
+            if (detectBall(false)) {
+              global_scaledX = map(global_avgX, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);  //615
+              global_scaledY = map(global_avgY, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);  //382
+
+              //use depth information of the ball to check if a ball sticks or not
+
+              println("global_avgDepth: ", global_avgDepth);
+
+              if (global_avgDepth > 710) { //we may need to adjust this number depending on the environment
+
+                phase2_ballSticks = false;
+                phase1_seeBall = false;
+                ufo_instruction = "Nice try! Throw carefully!" ;
+              }
+
+              //draw a circle at the tracked pixel
+              fill(255);
+              strokeWeight(4.0);
+              stroke(0);
+              ellipse(global_avgX, global_avgY, 20, 20);
+
+              hitX = map(global_scaledX, 32, 614+32, 0, monitorWidth); //store the position of hitX
+
+              println("global_scaledX: ", global_scaledX);
+              println("hitX: ", hitX);
+
+
+
+              //find ball velocity and angle
+              //depthDiff  = global_dHist[global_dHist.length-1]-global_dHist[int(global_dHist.length/2)]; // this value should be positive
+              //xDiff  = global_xHist[global_xHist.length-1]-global_xHist[int(global_xHist.length/2)];
+
+              //throwDegree = degrees(atan2(depthDiff, xDiff));
+              throwDegree = degrees(atan2(3, 4));
+
+              //caculate velocity, we can just find the velocty of the five points after mid point
+              avgZVelocity = ((global_dHist[int(global_dHist.length/2)] - global_dHist[0]))/3;
+              avgXVelocity = ((global_xHist[int(global_xHist.length/2)] - global_xHist[0]))/3;
+
+              phase2_ballSticks = true;
+
+              //upper left corber coordinate is (32, 32) and lower right corver is (646, 465)
+              if (global_scaledX > 596 || global_scaledY > 415 || global_scaledY < 82 || global_scaledX < 82) {
+                //this is the case when ball sticks on the edge of the ceiling so that robot can't travel to drop it
+                //in this case, a user needs to manually grab the ball and re-throw it again
+                phase2_ballSticks = false;
+                phase1_seeBall = false;
+                ufo_instruction = "Nice try! Throw carefully!" ;
+              }
+            } else {
+
+              //this is the case when ball enters the camera but didn't stick
+              //it is most likely causes by a user throwing to hard or too soft
+              phase2_ballSticks = false;
+              phase1_seeBall = false;
+              ufo_instruction = "Nice try! Throw carefully!" ;
+            }
           }
         }
+      }else if(applicationMode == "storage"){
+        
+      if (startTime == false) {
+          time = millis();
+          startTime = true;
+        } else {
+
+          if (startTime2 == false) {
+            time2 = millis();
+            startTime2 = true;
+          } else {
+
+            if (millis() > time2 + 50) { //every 50 millisecond record a point
+              startTime2 = false;
+
+              //detect ball with true flag will also record the ball's travel history
+              detectBall(true);
+            }
+          }
+
+          if (millis() > time + 2000) { //time waited for the ball to stick properly
+            startTime = false;
+
+            //detect the location of the ball
+            if (detectBall(false)) {
+              global_scaledX = map(global_avgX, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);  //615
+              global_scaledY = map(global_avgY, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);  //382
+
+
+              //draw a circle at the tracked pixel
+              fill(255);
+              strokeWeight(4.0);
+              stroke(0);
+              ellipse(global_avgX, global_avgY, 20, 20);
+
+              hitX = map(global_scaledX, 32, 614+32, 0, monitorWidth); //store the position of hitX
+
+              println("global_scaledX: ", global_scaledX);
+              println("hitX: ", hitX);
+
+
+
+              //find ball velocity and angle
+              //depthDiff  = global_dHist[global_dHist.length-1]-global_dHist[int(global_dHist.length/2)]; // this value should be positive
+              //xDiff  = global_xHist[global_xHist.length-1]-global_xHist[int(global_xHist.length/2)];
+
+              //throwDegree = degrees(atan2(depthDiff, xDiff));
+              throwDegree = degrees(atan2(3, 4));
+
+              //caculate velocity, we can just find the velocty of the five points after mid point
+              avgZVelocity = ((global_dHist[int(global_dHist.length/2)] - global_dHist[0]))/3;
+              avgXVelocity = ((global_xHist[int(global_xHist.length/2)] - global_xHist[0]))/3;
+
+              phase2_ballSticks = true;
+
+              //upper left corber coordinate is (32, 32) and lower right corver is (646, 465)
+              if (global_scaledX > 596 || global_scaledY > 415 || global_scaledY < 82 || global_scaledX < 82) {
+                //this is the case when ball sticks on the edge of the ceiling so that robot can't travel to drop it
+                //in this case, a user needs to manually grab the ball and re-throw it again
+                phase2_ballSticks = false;
+                phase1_seeBall = false;
+
+              }
+            } else {
+
+              //this is the case when ball enters the camera but didn't stick
+              //it is most likely causes by a user throwing to hard or too soft
+              phase2_ballSticks = false;
+              phase1_seeBall = false;
+   
+            }
+          }
+        }
+      
       }
     } else if (phase2_ballSticks == true && phase3_facePushLocation == false) {
 
@@ -971,14 +1117,14 @@ void draw() {
         //we should just ask pushing toio turn to face 0 degrees, and other toio turn to face 180 degrees
 
         //rotate cube0 first
-        if (abs(cubes[0].deg - 180) < 10) {
+        if (abs(cubes[0].deg - 180) < 5) {
           flag_rotate0 = true;
         } else {
           rotateCube(0, 180);
         }
 
         //based on cube0 degree, we rotate cube1
-        if (abs(cubes[1].deg - 180) < 10) {
+        if (abs(cubes[1].deg - 180) < 5) {
 
           flag_rotate1 = true;
         } else {
@@ -1044,7 +1190,7 @@ void draw() {
       } else if (applicationMode == "storage") {
 
         if (startTime == false) {
-          println("checkpoint 1");
+
           time = millis();
           startTime = true;
           storage_recordPushingX = cubes[0].x;
@@ -1052,20 +1198,20 @@ void draw() {
         } else {
 
           if (millis() > time + 500) { //wait for the ball with key to drop
-            println("checkpoint 2");
+
             //only other toio (cube1) travel toward the pushing toio
             aimCubeSpeed(1, storage_recordPushingX+convergeDistance, storage_recordPushingY);
 
-            //the pushing toio apply forces to remain at the same location
-            aimCubeSpeed(0, storage_recordPushingX, storage_recordPushingY);
+            //the pushing toio apply forces to remain at the same location (we secret increase the speed)
+            aimCubeSpeed(0, storage_recordPushingX+5, storage_recordPushingY);
           }
         }
 
-        println("checkpoint 3");
+
         //we are finally done with all the phases after the toios drop the ball
-        if (abs(storage_recordPushingX+convergeDistance - cubes[1].x) < 10 &&
-          abs(storage_recordPushingY - cubes[1].y) < 10) {
-          println("checkpoint 4");
+        if (abs(storage_recordPushingX+convergeDistance - cubes[1].x) < 15 &&
+          abs(storage_recordPushingY - cubes[1].y) < 15) {
+
           phase10_dropSucceed = true;
           startTime = false;
         }
@@ -1132,6 +1278,12 @@ void draw() {
 
             if (storage_status == "store") {
               storage_status = "retrieve";
+              pushx = storage_shelfX;
+              pushy = storage_shelfY;
+              storage_loc.x = 0;
+              storage_loc.x = 0;
+              storage_lerpedLoc.x = 0;
+              storage_lerpedLoc.y = 0;
             } else {
               storage_status = "store";
             }

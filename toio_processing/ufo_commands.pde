@@ -5,6 +5,46 @@ float distSq(float x1, float y1, float z1, float x2, float y2, float z2) {
   return d;
 }
 
+
+boolean findHand(float handDetectStartAreaX, float handDetectStartAreaY, float handDetectEndAreaX, float handDetectEndAreaY) {
+  int threshold = 500;
+  float sumX = 0;
+  float sumY = 0;
+  float count = 0;
+
+
+  for (int x = int(handDetectStartAreaX); x < handDetectEndAreaX; x++) {
+    for (int y = int(handDetectStartAreaY); y < handDetectEndAreaY; y++) {
+
+      int offset =  x + y*kinect.width;
+      // Grabbing the raw depth
+      int rawDepth = kinect.getRawDepth()[offset];
+
+      //if (x == int(kinect.width/2) && y == int(kinect.height/2)) {
+      //  //println("rawDepth: ", rawDepth);
+      //}
+      // Testing against threshold
+      if (rawDepth < threshold) {
+        sumX += x;
+        sumY += y;
+        count++;
+      }
+    }
+  }
+  // As long as we found something
+  if (count > 100) {
+    storage_loc = new PVector(sumX/count, sumY/count);
+  }
+
+  // Interpolating the location, doing it arbitrarily for now
+  storage_lerpedLoc.x = PApplet.lerp(storage_lerpedLoc.x, storage_loc.x, 0.3f);
+  storage_lerpedLoc.y = PApplet.lerp(storage_lerpedLoc.y, storage_loc.y, 0.3f);
+  
+  return true;
+}
+
+
+
 boolean detectBall(boolean recordHistory) {
 
   global_avgX = 0;
