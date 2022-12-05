@@ -169,6 +169,9 @@ String storage_status = "store"; //can be "store" or "retrieve"
 float storage_dropLocationX = 400;
 float storage_dropLocationY = 270;
 
+float storage_recordPushingX = 0;
+float storage_recordPushingY = 0;
+
 float startPositionX1 = 100;
 float startPositionY1 = 100;
 float startPositionX2 = 600;
@@ -602,58 +605,65 @@ void draw() {
         }
       } else if (applicationMode == "storage") {
 
-        if (storage_status == "store") {
-          //set the position for storing
-          pushx = storage_shelfX;
-          pushy = storage_shelfY;
-        } else {
-          //set the pushed position for dropping
-          pushx = storage_dropLocationX;
-          pushy = storage_dropLocationY;
-        }
-
-        //we need to record the angle between the pushing toio and the ball location
-        if (flag_recordPushingToioAndBallAngle == false) {
-
-          //here we always assume that the ball sticks in between the spaces between the toio robots
-          //TODO: please check the algorithm here!!
-
-          if (global_scaledX < pushx) {
-            //record that cube 0 will push
-            pushToio = 0;
-
-            //turnDegree0 is to what degrees that toio0 needs to spin to so that it will face its front (wedge) side to ball location
-            turnDegree0 = degrees(atan2(global_scaledY-cubes[0].y, global_scaledX-cubes[0].x));
-            if (turnDegree0 < 0) {
-              turnDegree0+=360;
-            }
+        //this flag is used to tell the second window that the ball hits and sticks on the ceilling
+        //so that the vertical screen can show the trajectory of the ball
+        if (detectBall(false)) {
+          if (storage_status == "store") {
+            //set the position for storing
+            pushx = storage_shelfX;
+            pushy = storage_shelfY;
           } else {
-            //record that cube 1 will push
-            pushToio = 1;
-
-            //turnDegree1 is to what degrees that toio1 needs to spin to so that it will face its front (wedge) side to ball location
-            turnDegree1 = degrees(atan2(global_scaledY-cubes[1].y, global_scaledX-cubes[1].x));
-
-            if (turnDegree1 < 0) {
-              turnDegree1+=360;
-            }
+            //set the pushed position for dropping
+            pushx = storage_dropLocationX;
+            pushy = storage_dropLocationY;
           }
 
-          flag_recordPushingToioAndBallAngle = true;
-        } else {
+          //we need to record the angle between the pushing toio and the ball location
+          if (flag_recordPushingToioAndBallAngle == false) {
 
+            //here we always assume that the ball sticks in between the spaces between the toio robots
+            //TODO: please check the algorithm here!!
 
-          if (pushToio == 0) {
-            // we rotate the cube0 180 degress so that now its back (prong) side is facing toward the ball location
-            if (rotateCube(0, turnDegree0-180)) {
-              phase3_facePushLocation = true;
+            if (global_scaledX < pushx) {
+              //record that cube 0 will push
+              pushToio = 0;
+
+              //turnDegree0 is to what degrees that toio0 needs to spin to so that it will face its front (wedge) side to ball location
+              turnDegree0 = degrees(atan2(global_scaledY-cubes[0].y, global_scaledX-cubes[0].x));
+              if (turnDegree0 < 0) {
+                turnDegree0+=360;
+              }
+            } else {
+              //record that cube 1 will push
+              pushToio = 1;
+
+              //turnDegree1 is to what degrees that toio1 needs to spin to so that it will face its front (wedge) side to ball location
+              turnDegree1 = degrees(atan2(global_scaledY-cubes[1].y, global_scaledX-cubes[1].x));
+
+              if (turnDegree1 < 0) {
+                turnDegree1+=360;
+              }
             }
+
+            flag_recordPushingToioAndBallAngle = true;
           } else {
-            // we rotate the cube1 180 degress so that now its back (prong) side is facing toward the ball location
-            if (rotateCube(1, turnDegree1-180)) {
-              phase3_facePushLocation = true;
+
+
+            if (pushToio == 0) {
+              // we rotate the cube0 180 degress so that now its back (prong) side is facing toward the ball location
+              if (rotateCube(0, turnDegree0-180)) {
+                phase3_facePushLocation = true;
+              }
+            } else {
+              // we rotate the cube1 180 degress so that now its back (prong) side is facing toward the ball location
+              if (rotateCube(1, turnDegree1-180)) {
+                phase3_facePushLocation = true;
+              }
             }
           }
+        } else {
+          println("Ball did not stick check point in Phase 3");
+          jumpToPhase1();
         }
       }
     } else if (phase3_facePushLocation == true && phase4_travelToBallToPush == false) {
@@ -851,11 +861,11 @@ void draw() {
           //set prep location for pushing toio (which will be 0)
           global_finalx = cubes[0].x;
           global_finaly = cubes[0].y;
-          
+
           //set prep location for the other toio (which will be 1)
           global_xprime = cubes[1].x;
           global_yprime = cubes[0].y;
-          
+
           phase7_findTangentPoints = true;
 
 
@@ -959,31 +969,31 @@ void draw() {
         //Step2. Other toio record angle between pushing toio and itself
 
         //we should just ask pushing toio turn to face 0 degrees, and other toio turn to face 180 degrees
-        
+
         //rotate cube0 first
-          if (abs(cubes[0].deg - 180) < 10) {
-            flag_rotate0 = true;
-          } else {
-            rotateCube(0, 180);
-          }
+        if (abs(cubes[0].deg - 180) < 10) {
+          flag_rotate0 = true;
+        } else {
+          rotateCube(0, 180);
+        }
 
-          //based on cube0 degree, we rotate cube1
-          if (abs(cubes[1].deg - 180) < 10) {
+        //based on cube0 degree, we rotate cube1
+        if (abs(cubes[1].deg - 180) < 10) {
 
-            flag_rotate1 = true;
-          } else {
+          flag_rotate1 = true;
+        } else {
 
-            rotateCube(1, 180); //cube 1 use chopstick side
-          }
+          rotateCube(1, 180); //cube 1 use chopstick side
+        }
 
-          //once both toios finish rotating, we move on to the next phase
-          if (flag_rotate0 && flag_rotate1) {
+        //once both toios finish rotating, we move on to the next phase
+        if (flag_rotate0 && flag_rotate1) {
 
-            phase9_rotateToDrop = true;
-          }
+          phase9_rotateToDrop = true;
+        }
       }
     } else if (phase9_rotateToDrop == true && phase10_dropSucceed == false) {
-      
+
       //Phase 10. Toio converge to drop the object
       println("Phase 10. Toio converge to drop the object");
       if (applicationMode == "ufo") {
@@ -1034,24 +1044,30 @@ void draw() {
       } else if (applicationMode == "storage") {
 
         if (startTime == false) {
+          println("checkpoint 1");
           time = millis();
           startTime = true;
+          storage_recordPushingX = cubes[0].x;
+          storage_recordPushingY = cubes[0].y;
         } else {
 
           if (millis() > time + 500) { //wait for the ball with key to drop
-
+            println("checkpoint 2");
             //only other toio (cube1) travel toward the pushing toio
-            aimCubeSpeed(1, cubes[0].x+convergeDistance, cubes[0].y);
+            aimCubeSpeed(1, storage_recordPushingX+convergeDistance, storage_recordPushingY);
+
+            //the pushing toio apply forces to remain at the same location
+            aimCubeSpeed(0, storage_recordPushingX, storage_recordPushingY);
           }
         }
 
+        println("checkpoint 3");
         //we are finally done with all the phases after the toios drop the ball
-        if (abs(cubes[0].x - cubes[1].x) < convergeDistance && 
-          abs(cubes[0].y - cubes[1].y) < convergeDistance) {
-
+        if (abs(storage_recordPushingX+convergeDistance - cubes[1].x) < 10 &&
+          abs(storage_recordPushingY - cubes[1].y) < 10) {
+          println("checkpoint 4");
           phase10_dropSucceed = true;
           startTime = false;
-         
         }
       }
     } else if (phase10_dropSucceed == true) {
