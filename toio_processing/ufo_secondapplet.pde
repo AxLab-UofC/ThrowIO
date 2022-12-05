@@ -107,7 +107,7 @@ public class SecondApplet extends PApplet {
       } else if (abs(pos.x - xcoord) < 80 && abs(pos.y - ycoord) < 80 && !ufo_flag_killUFO) {
 
         //this is when you hit the UFO
-        ufo_instruction = "Good job! Next ball!";
+        ufo_instruction = "Good job! Catch the next ball!";
         ufo_flag_bombSound = true;
         ufo_flag_killUFO = true;
         ufo_flag_startCrash = true;
@@ -366,6 +366,7 @@ public class SecondApplet extends PApplet {
   public void draw() {
     box2d.step(); //step through time in box2d
     background(203, 235, 255);
+    noCursor();
 
     noStroke();
     fill(255);

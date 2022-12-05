@@ -287,7 +287,7 @@ void setup() {
   box2d.setGravity(0, -50); //we can change the gravity in box2D world here, currently using -120
 
 
-  if (applicationMode == "ufo") { //TODO: check if now ufo still works
+  if (applicationMode == "ufo") {
     //allow two windows showing up at the same time
     //one for camera, the other for monitor screen
     String[] args = {"TwoFrameTest"};
@@ -359,13 +359,15 @@ void draw() {
 
     if (phase1_seeBall == false) {
 
+
+
       //Phase 1. Check if the camera sees a ball
       println("Phase 1. Check if the camera sees a ball");
 
       if (applicationMode == "story") {
         //since the experimentor will just click on where the ball sticks, we will just skip to phase3
         jumpToPhase3();
-      } else {
+      } else if (applicationMode == "ufo" || applicationMode == "storage") {
         //applicationMode == "ufo" and "storage"
 
         //call detectBall function
@@ -374,6 +376,10 @@ void draw() {
         } else {
           phase1_seeBall = false;
         }
+      } else {
+        //quick debug area (set applicationMode to "debug")
+
+        //print anything you want here!
       }
     } else if (phase1_seeBall == true && phase2_ballSticks == false) {
 
@@ -840,70 +846,22 @@ void draw() {
         } else {
           //retrieving
 
-          //TODO: we need to update to another algorithm, but now we just use the normal dropping
-          if (flag_findPushedBallLocation == false) {
+          //Note: in our application, the ball is pushed from left to right, once it is done pushing, the other toio should still be at the right of the ball
 
-            //we must find a ball because we just push the ball to its pushed location
-            if (detectBall(false)) {
-              global_scaledX = map(global_avgX, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);
-              global_scaledY = map(global_avgY, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);
+          //set prep location for pushing toio (which will be 0)
+          global_finalx = cubes[0].x;
+          global_finaly = cubes[0].y;
+          
+          //set prep location for the other toio (which will be 1)
+          global_xprime = cubes[1].x;
+          global_yprime = cubes[0].y;
+          
+          phase7_findTangentPoints = true;
 
-              //draw a circle at the tracked pixel
-              fill(255);
-              strokeWeight(4.0);
-              stroke(0);
-              ellipse(global_avgX, global_avgY, 20, 20);
-            } else {
-              println("Special case: ball actually did not stick in Phase 7");
 
-              //this would happen if we let the ball reached similar height to the ceiling but didn't stick
-              //so we just to the last phase
+          //Step3. Other toio rotates such that the wedge side faces to the pushing toio
 
-              //we need to kill the particle that falsely show up in the monitor, and jump to phase 10 for reset
-              ufo_flag_killBall = true;
-              //jump to phase 10
-              jumpToPhase10();
-            }
-
-            flag_findPushedBallLocation = true;
-          }
-
-          //After finding the ball's new position (which should be close to the push location), we find the prep location for both toios to travel
-          if (flag_needBackout == false) {
-            //If toios don't need to backout, we call findLocation() to find the prep location
-
-            if (findLocation() == true) {
-              //If we find the prep location, we move on to the next phase
-              phase7_findTangentPoints = true;
-            } else {
-              //If we can't find the prep locations, that means that at least one toio is too close the ball, so we need to move them out
-              flag_needBackout = true;
-            }
-          } else {
-
-            //By calling findbackoutLocation(), we can move toio back (on the line formed by toio and the ball)
-            println("Back out toio because they are within radius");
-
-            if (flag_prepareBackout == false) {
-              if (detectBall(false)) {
-                global_scaledX = map(global_avgX, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32);  //615
-                global_scaledY = map(global_avgY, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32);  //382
-                findbackoutLocation(0);
-                findbackoutLocation(1);
-
-                flag_prepareBackout = true;
-              }
-            } else {
-
-              aimCubeSpeed(0, global_backoutx0, global_backouty0);
-              aimCubeSpeed(1, global_backoutx1, global_backouty1);
-
-              if (abs(cubes[0].x - global_backoutx0) < 15 && abs(cubes[0].y - global_backouty0) < 15 && abs(cubes[1].x - global_backoutx1) < 15 && abs(cubes[1].y - global_backouty1) < 15 ) {
-                //when toios finally backout, we set flag_needBackout to false so that we can once again call findLocation() to find the prep locaiton
-                flag_needBackout = false;
-              }
-            }
-          }
+          //Step4. Other toio approaches the pushing toio to drop the object
         }
       }
     } else if (phase7_findTangentPoints == true && phase8_toioTravelToPrepLocation == false) {
@@ -911,29 +869,43 @@ void draw() {
       //Phase 8. Both toios travel to prep locations
       println("Phase 8. Both toios travel to prep locations");
 
-      if (global_closer_toio_id == 0) {
-        //If closer toio is cube0, we let it travel to global_finalx, global_finaly and let cube1 travel to global_xprime, global_yprime.
+
+      if (applicationMode == "ufo" || applicationMode == "story") {
+        if (global_closer_toio_id == 0) {
+          //If closer toio is cube0, we let it travel to global_finalx, global_finaly and let cube1 travel to global_xprime, global_yprime.
+          aimCubeSpeed(0, global_finalx, global_finaly);
+          aimCubeSpeed(1, global_xprime, global_yprime);
+          if (abs(cubes[0].x - global_finalx) < 15 && abs(cubes[0].y - global_finaly) < 15 && abs(cubes[1].x - global_xprime) < 15 && abs(cubes[1].y - global_yprime) < 15 ) {
+
+            phase8_toioTravelToPrepLocation = true;
+
+            //ufo_flag_nextBall controls when the next ball in the vertical screen shoould appear
+            ufo_flag_nextBall = true;
+          }
+        } else {
+
+          //If closer toio is cube1, we let it travel to global_finalx, global_finaly and let cube0 travel to global_xprime, global_yprime.
+          aimCubeSpeed(1, global_finalx, global_finaly);
+          aimCubeSpeed(0, global_xprime, global_yprime);
+          if (abs(cubes[1].x - global_finalx) < 15 && abs(cubes[1].y - global_finaly) < 15 && abs(cubes[0].x - global_xprime) < 15 && abs(cubes[0].y - global_yprime) < 15) {
+
+            phase8_toioTravelToPrepLocation = true;
+
+
+            //ufo_flag_nextBall controls when the next ball in the vertical screen shoould appear
+            ufo_flag_nextBall = true;
+          }
+        }
+      } else if (applicationMode == "storage" ) {
+        //pushing toio is 0, and other toio is 1
+        //Step1. Other toio travel to the pushing toio y location
         aimCubeSpeed(0, global_finalx, global_finaly);
         aimCubeSpeed(1, global_xprime, global_yprime);
+
+
         if (abs(cubes[0].x - global_finalx) < 15 && abs(cubes[0].y - global_finaly) < 15 && abs(cubes[1].x - global_xprime) < 15 && abs(cubes[1].y - global_yprime) < 15 ) {
 
           phase8_toioTravelToPrepLocation = true;
-
-          //ufo_flag_nextBall controls when the next ball in the vertical screen shoould appear
-          ufo_flag_nextBall = true;
-        }
-      } else {
-
-        //If closer toio is cube1, we let it travel to global_finalx, global_finaly and let cube0 travel to global_xprime, global_yprime.
-        aimCubeSpeed(1, global_finalx, global_finaly);
-        aimCubeSpeed(0, global_xprime, global_yprime);
-        if (abs(cubes[1].x - global_finalx) < 15 && abs(cubes[1].y - global_finaly) < 15 && abs(cubes[0].x - global_xprime) < 15 && abs(cubes[0].y - global_yprime) < 15) {
-
-          phase8_toioTravelToPrepLocation = true;
-
-
-          //ufo_flag_nextBall controls when the next ball in the vertical screen shoould appear
-          ufo_flag_nextBall = true;
         }
       }
     } else if (phase8_toioTravelToPrepLocation == true && phase9_rotateToDrop == false) {
@@ -941,48 +913,77 @@ void draw() {
       //Phase 9. One toio rotates to use the prong side to and the other rotates to use the wedge side for drop operation
       println("Phase 9. One toio rotates to use the prong side to and the other rotates to use the wedge side for drop operation");
 
-      //We arbitrarily let 0 use the front (wedge) and let 1 use the back (prong)
+      if (applicationMode == "ufo" || applicationMode == "story") {
+        //We arbitrarily let 0 use the front (wedge) and let 1 use the back (prong)
 
-      if (flag_recordToioAndBallAngle == false) {
-        turnDegree0 = degrees(atan2(global_scaledY-cubes[0].y, global_scaledX-cubes[0].x));
+        if (flag_recordToioAndBallAngle == false) {
+          turnDegree0 = degrees(atan2(global_scaledY-cubes[0].y, global_scaledX-cubes[0].x));
 
-        if (turnDegree0 < 0) {
-          turnDegree0+=360;
+          if (turnDegree0 < 0) {
+            turnDegree0+=360;
+          }
+
+          turnDegree1 = degrees(atan2(global_scaledY-cubes[1].y, global_scaledX-cubes[1].x));
+
+          if (turnDegree1 < 0) {
+            turnDegree1+=360;
+          }
+
+          flag_recordToioAndBallAngle = true;
+        } else {
+
+          //rotate cube0 first
+          if (abs(cubes[0].deg - turnDegree0) < 10) {
+            flag_rotate0 = true;
+          } else {
+            rotateCube(0, turnDegree0);
+          }
+
+          //based on cube0 degree, we rotate cube1
+          if (abs(cubes[1].deg - (turnDegree1-180)) < 10 || abs(cubes[1].deg - (turnDegree1-180+360)) < 10) {
+
+            flag_rotate1 = true;
+          } else {
+
+            rotateCube(1, turnDegree1-180); //cube 1 use chopstick side
+          }
+
+          //once both toios finish rotating, we move on to the next phase
+          if (flag_rotate0 && flag_rotate1) {
+
+            phase9_rotateToDrop = true;
+          }
         }
+      } else if (applicationMode == "storage") {
 
-        turnDegree1 = degrees(atan2(global_scaledY-cubes[1].y, global_scaledX-cubes[1].x));
+        //Step2. Other toio record angle between pushing toio and itself
 
-        if (turnDegree1 < 0) {
-          turnDegree1+=360;
-        }
-
-        flag_recordToioAndBallAngle = true;
-      } else {
-
+        //we should just ask pushing toio turn to face 0 degrees, and other toio turn to face 180 degrees
+        
         //rotate cube0 first
-        if (abs(cubes[0].deg - turnDegree0) < 10) {
-          flag_rotate0 = true;
-        } else {
-          rotateCube(0, turnDegree0);
-        }
+          if (abs(cubes[0].deg - 180) < 10) {
+            flag_rotate0 = true;
+          } else {
+            rotateCube(0, 180);
+          }
 
-        //based on cube0 degree, we rotate cube1
-        if (abs(cubes[1].deg - (turnDegree1-180)) < 10 || abs(cubes[1].deg - (turnDegree1-180+360)) < 10) {
+          //based on cube0 degree, we rotate cube1
+          if (abs(cubes[1].deg - 180) < 10) {
 
-          flag_rotate1 = true;
-        } else {
+            flag_rotate1 = true;
+          } else {
 
-          rotateCube(1, turnDegree1-180); //cube 1 use chopstick side
-        }
+            rotateCube(1, 180); //cube 1 use chopstick side
+          }
 
-        //once both toios finish rotating, we move on to the next phase
-        if (flag_rotate0 && flag_rotate1) {
+          //once both toios finish rotating, we move on to the next phase
+          if (flag_rotate0 && flag_rotate1) {
 
-          phase9_rotateToDrop = true;
-        }
+            phase9_rotateToDrop = true;
+          }
       }
     } else if (phase9_rotateToDrop == true && phase10_dropSucceed == false) {
-
+      
       //Phase 10. Toio converge to drop the object
       println("Phase 10. Toio converge to drop the object");
       if (applicationMode == "ufo") {
@@ -1032,27 +1033,25 @@ void draw() {
         }
       } else if (applicationMode == "storage") {
 
-        //TODO: need to update to new algorithm
         if (startTime == false) {
           time = millis();
           startTime = true;
         } else {
 
-          if (millis() > time + 500) { //wait for virtual ball to drop
+          if (millis() > time + 500) { //wait for the ball with key to drop
 
-            //both toios travel to the ball's location
-            aimCubeSpeed(0, global_scaledX, global_scaledY);
-            aimCubeSpeed(1, global_scaledX, global_scaledY);
+            //only other toio (cube1) travel toward the pushing toio
+            aimCubeSpeed(1, cubes[0].x+convergeDistance, cubes[0].y);
           }
         }
 
         //we are finally done with all the phases after the toios drop the ball
-        if (abs(cubes[0].x - global_scaledX) < convergeDistance && abs(cubes[1].x - global_scaledX) < convergeDistance &&
-          abs(cubes[0].y - global_scaledY) < convergeDistance &&  abs(cubes[1].y - global_scaledY) < convergeDistance) {
+        if (abs(cubes[0].x - cubes[1].x) < convergeDistance && 
+          abs(cubes[0].y - cubes[1].y) < convergeDistance) {
 
           phase10_dropSucceed = true;
           startTime = false;
-          story_saveOrangePosition(story_orangex1, story_orangey1, story_orangex2, story_orangey2, 1, 1, story_orangeCount);
+         
         }
       }
     } else if (phase10_dropSucceed == true) {
