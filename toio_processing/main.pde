@@ -152,10 +152,10 @@ boolean ufo_flag_nextBall = false;
 boolean ufo_flag_startSprinkle = false;
 boolean ufo_flag_addParticle = false;
 
-float story_orangex1 = 250;
+float story_orangex1 = 150;
 float story_orangey1 = 200;
 float story_orangex2 = 400;
-float story_orangey2 = 220;
+float story_orangey2 = 150;
 int story_orangeCount = 0;
 
 boolean story_flag_trackedStuckBall = false;

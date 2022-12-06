@@ -8,6 +8,7 @@ PImage orange4;
 PImage bird1;
 PImage bird2;
 PImage bird3;
+PImage speechBubble;
 float orangeXLocation = 500;
 float orangeYLocation = 200;
 
@@ -24,8 +25,8 @@ float m = millis(); // sores millis()
 char state='A';  // A or B
 float birdX = 0;
 float birdY = 0;
-float birdNestX = 50;
-float birdNestY = 50;
+float birdNestX = 450;
+float birdNestY = 250;
 float angle = 0.0;
 
 float xSpeed = 1.0;
@@ -145,9 +146,11 @@ void setup() {
   orange4 = loadImage("orange4.png");
 
 
-  bird1 = loadImage("birdFly1.png");
-  bird2 = loadImage("birdFly2.png");
-  bird3 = loadImage("birdRest.png");
+  bird1 = loadImage("whiteBird1.png");
+  bird2 = loadImage("whiteBird2.png");
+  bird3 = loadImage("whiteBird3.png");
+
+  speechBubble = loadImage("speechBubble.png");
 
   // Keystone will only work with P3D or OPENGL renderers,
   // since it relies on texture mapping to deform
@@ -192,15 +195,15 @@ void draw() {
 
   if (dropOrange == false && orangeCount == 0) {
     offscreen.imageMode(CENTER);
-    offscreen.image(orange2, OrangeX1, OrangeY1, 40, 40);
+    offscreen.image(orange4, OrangeX1, OrangeY1, 60, 60);
     offscreen.imageMode(CENTER);
-    offscreen.image(orange2, OrangeX2, OrangeY2, 40, 40);
+    offscreen.image(orange2, OrangeX2, OrangeY2, 50, 50);
   } else if (dropOrange == true && orangeCount == 0) {
     offscreen.imageMode(CENTER);
-    offscreen.image(orange2, OrangeX2, OrangeY2, 40, 40);
+    offscreen.image(orange2, OrangeX2, OrangeY2, 50, 50);
   } else if (dropOrange == false && orangeCount == 1) {
     offscreen.imageMode(CENTER);
-    offscreen.image(orange2, OrangeX2, OrangeY2, 40, 40);
+    offscreen.image(orange2, OrangeX2, OrangeY2, 50, 50);
   }
 
   offscreen.pushMatrix();
@@ -213,7 +216,8 @@ void draw() {
   offscreen.imageMode(CORNER);
   if (birdRest == true) {
 
-    offscreen.image(bird2, -745/8, 0, 745/4, 293/4);
+
+    offscreen.image(bird3, -745/8, 0, 745/4, 293/4);
   } else {
     if (state=='B') {
       offscreen.image(bird1, -745/8, 0, 745/4, 355/4);
@@ -237,9 +241,9 @@ void draw() {
 
 
   //translated origin / red cross
-  offscreen.stroke(200, 0, 0);
-  offscreen.line(-10, 0, 10, 0);
-  offscreen.line(0, -10, 0, 10);
+  //offscreen.stroke(200, 0, 0);
+  //offscreen.line(-10, 0, 10, 0);
+  //offscreen.line(0, -10, 0, 10);
 
   offscreen.popMatrix();
 
@@ -255,7 +259,7 @@ void draw() {
       orangeXLocation = OrangeX2;
       orangeYLocation = OrangeY2;
     }
-    
+
     //record the state of the bird before flying to the orange
 
     //record angle from bird's original position to the target orange
@@ -279,8 +283,11 @@ void draw() {
       stage2_poking = true;
 
       //making speed the opposite direction so that bird would go backwards first when start poking
-      ySpeed *=-1;
-      xSpeed *=-1;
+      if (orangeCount == 0) {
+        //only the first orange needs to be changed direction
+        ySpeed *=-1;
+        xSpeed *=-1;
+      }
     } else {
 
       birdX += xSpeed;
@@ -329,14 +336,31 @@ void draw() {
 
     println("Stage3 Fly Back");
     //bird go to sleep
+
+    if (orangeCount == 0) {
+
+      offscreen.image(speechBubble, birdX+40, birdY-80, 80, 80);
+
+
+      offscreen.textSize(25);
+      offscreen.fill(0);
+      offscreen.text("ZZZZ", birdX+50, birdY-40);
+    } else {
+      //for the second orange
+
+      offscreen.image(speechBubble, birdX, birdY-80, 80, 80);
+      offscreen.textSize(25);
+      offscreen.fill(0);
+      offscreen.text("ZZZZ", birdX+10, birdY-40);
+    }
+
+
     birdRest = true;
-    offscreen.textSize(25);
-    offscreen.fill(0);
-    offscreen.text("ZZZZ", birdX+10, birdY+10);
+
 
     if (nextOrange == 0) {
       loadOrangePosition();
-    } else if(nextOrange == 1 && orangeCount == 0){
+    } else if (nextOrange == 1 && orangeCount == 0) {
       //set the orange position to the second orange position
       orangeCount+=1;
       stage1_flyToOrange = false;
@@ -344,6 +368,7 @@ void draw() {
       stage3_flyBack = false;
       //stage4_sleep = false;
       dropOrange = false;
+      birdRest = false;
     }
   }
 
@@ -425,14 +450,12 @@ void keyPressed() {
     break;
   case 'm':
     orangeCount+=1;
-    nextOrange = orangeCount;
-    dropFruit = 0;
-    flyToOrange = 0;
     stage1_flyToOrange = false;
     stage2_poking = false;
     stage3_flyBack = false;
-    stage4_sleep = false;
+    //stage4_sleep = false;
     dropOrange = false;
+    birdRest = false;
     break;
   }
 }
