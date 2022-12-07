@@ -154,8 +154,8 @@ void setup() {
 
   // Keystone will only work with P3D or OPENGL renderers,
   // since it relies on texture mapping to deform
-  size(displayWidth, displayHeight, P3D);
-
+  //size(displayWidth, displayHeight, P3D);
+  size(1600, 900, P3D); //the size of the external monitor 
   //size(614, 433, P3D);
 
 

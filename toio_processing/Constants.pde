@@ -160,6 +160,7 @@ String  ufo_instruction = "Throw ball! Hit UFO!";
 boolean ufo_flag_nextBall = false;
 boolean ufo_flag_startSprinkle = false;
 boolean ufo_flag_addParticle = false;
+int ufo_ballCount = 0;
 
 float story_orangex1 = 150;
 float story_orangey1 = 200;

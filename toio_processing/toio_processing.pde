@@ -1182,7 +1182,7 @@ void draw() {
           startTime = true;
         } else {
 
-          if (millis() > time + 3000) { //wait for virtual ball to drop
+          if (millis() > time + 3300) { //wait for virtual ball to drop
 
             //both toios travel to the ball's location
             aimCubeSpeed(0, global_scaledX, global_scaledY);

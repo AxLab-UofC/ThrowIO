@@ -105,7 +105,6 @@ public class SecondApplet extends PApplet {
         bullety = pos.y;
         killBody();
         return true;
-        
       } else if (abs(pos.x - xcoord) < 80 && abs(pos.y - ycoord) < 80 && !ufo_flag_killUFO) {
 
         //this is when you hit the UFO
@@ -116,13 +115,12 @@ public class SecondApplet extends PApplet {
         scoreCount+=1;
 
         killBody();
-        
+
         return true;
-      } else if (ufo_flag_killBall == true){
-        
+      } else if (ufo_flag_killBall == true) {
+
         killBody();
         return true;
-        
       }
 
       return false;
@@ -405,6 +403,22 @@ public class SecondApplet extends PApplet {
     fill(0);
     text(ufo_instruction, 40, 150);
 
+    if (ufo_ballCount >= 6) {
+      textSize(200);
+      fill(255, 0, 0);
+      text("Game Over", 500, 500);
+
+      if (scoreCount > 0) {
+        textSize(200);
+        fill(255, 0, 0);
+        text("You won!", 600, 700);
+      } else {
+        textSize(200);
+        fill(255, 0, 0);
+        text("You lost!", 600, 700);
+      }
+    }
+
     xcoord += xSpeed;
 
     if ((xcoord > 1000) || (xcoord < 500)) {
@@ -433,12 +447,11 @@ public class SecondApplet extends PApplet {
       ufo_file.play();
       ufo_flag_bombSound = false;
     }
-    
-    if(ufo_flag_cannonSound == true){
-    
+
+    if (ufo_flag_cannonSound == true) {
+
       cannon_file.play();
       ufo_flag_cannonSound = false;
-    
     }
 
 
@@ -510,15 +523,15 @@ public class SecondApplet extends PApplet {
       if (ufo_flag_addParticle == false) {
 
         //particles.add(new Particle(random(330, 360), 720, 40, random(10, 11), random(120, 140))); //this is where we currently define the ball speed and velocity
+        ufo_ballCount+=1;
+        if (avgXVelocity > 0) {
+          particles.add(new Particle(hitX, monitorHeight, 40, random(10, 11), 95)); //this is where we currently define the ball speed and velocity //random(120, 140)
+        } else {
+          particles.add(new Particle(hitX, monitorHeight, 40, -random(10, 11), 95)); //this is where we currently define the ball speed and velocity //random(120, 140)
+        }
 
-        //if (avgXVelocity > 0) {
-        //  particles.add(new Particle(hitX, monitorHeight, 40, random(10, 11), random(65, 70))); //this is where we currently define the ball speed and velocity //random(120, 140)
-        //} else {
-        //  particles.add(new Particle(hitX, monitorHeight, 40, -random(10, 11), random(65, 70))); //this is where we currently define the ball speed and velocity //random(120, 140)
-        //}
+        //particles.add(new Particle(hitX, monitorHeight, 40, -random(10, 11), 95));
 
-        particles.add(new Particle(hitX, monitorHeight, 40, -random(10, 11), 95));
-        
         ufo_flag_addParticle = true;
       }
     }
@@ -552,9 +565,9 @@ public class SecondApplet extends PApplet {
         particles.remove(i);
         ufo_flag_hitTarget = false;
         ufo_flag_addParticle = false;
-        
-        if(ufo_flag_killBall == true){
-            ufo_flag_killBall = false;
+
+        if (ufo_flag_killBall == true) {
+          ufo_flag_killBall = false;
         }
       }
       //if (p.goal()) {
