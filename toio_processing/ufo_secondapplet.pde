@@ -98,7 +98,9 @@ public class SecondApplet extends PApplet {
       } else if (pos.y < monitorHeight/5) {
 
         //this is when you did not hit the UFO
+        ufo_flag_cannonSound = true;
         ufo_flag_startSelfCrash = true;
+        ufo_instruction = "Almost there! Aim carefully!";
         bulletx = pos.x;
         bullety = pos.y;
         killBody();
@@ -431,11 +433,19 @@ public class SecondApplet extends PApplet {
       ufo_file.play();
       ufo_flag_bombSound = false;
     }
+    
+    if(ufo_flag_cannonSound == true){
+    
+      cannon_file.play();
+      ufo_flag_cannonSound = false;
+    
+    }
 
 
     //the text for score
-    textSize(75);
+    textSize(50);
     fill(0);
+    strokeWeight(10);
     text("Score: "+str(scoreCount), 40, 60);
 
 
