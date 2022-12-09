@@ -192,7 +192,6 @@ void draw() {
 
 
 
-
   if (dropOrange == false && orangeCount == 0) {
     offscreen.imageMode(CENTER);
     offscreen.image(orange4, OrangeX1, OrangeY1, 60, 60);

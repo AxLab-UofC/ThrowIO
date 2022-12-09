@@ -149,9 +149,11 @@ void setup() {
     //save orange positions
     story_saveOrangePosition(story_orangex1, story_orangey1, story_orangex2, story_orangey2, 0, 0, story_orangeCount);
 
-    //this is where the robot will push the ball to
-    pushx = story_orangex1+50;
-    pushy = story_orangey1+30; //TODO: needs to figure out a way to find where the robot should move so that the pushed ball in on top of the orange
+    //this is where the robot will go to push the ball
+    //findPushedLocation will set pushx and pushy directly (a way to find where the robot should move so that the pushed ball in on top of the orange)
+    findPushedLocation(1, story_orangex1+32, story_orangey1+32);
+    //pushx = story_orangex1+50;
+    //pushy = story_orangey1+30;
 
     //set starting position for the robots
     startPositionX1 = 100;
@@ -184,6 +186,10 @@ void setup() {
 
 
 void draw() {
+  println("cube 1 pos x: ", cubes[1].x);
+  println("cube 1 pos y: ", cubes[1].y);
+  println("pushx: ", pushx);
+  println("pushy: ", pushy);
 
   background(255);
   stroke(0);
@@ -204,6 +210,8 @@ void draw() {
 
     detectBall(false);
   } else {
+
+
 
 
     if (phase1_seeBall == false) {
@@ -293,6 +301,14 @@ void draw() {
         //print anything you want here!
 
         //as long as you don't make phase 1 flag true, then we can debug here!
+        println("cube 0 pos x: ", cubes[0].x);
+        println("cube 0 pos y: ", cubes[0].y);
+        println("cube 1 pos x: ", cubes[1].x);
+        println("cube 1 pos y: ", cubes[1].y);
+
+        findPushedLocation(1, 182, 232);
+        println("pushx: ", pushx);
+        println("pushy: ", pushy);
       }
     } else if (phase1_seeBall == true && phase2_ballSticks == false) {
 
@@ -359,8 +375,8 @@ void draw() {
               throwDegree = degrees(atan2(3, 4));
 
               //caculate velocity, we can just find the velocty of the five points after mid point
-              avgZVelocity = ((global_dHist[int(global_dHist.length/2)] - global_dHist[0]))/3;
-              avgXVelocity = ((global_xHist[int(global_xHist.length/2)] - global_xHist[0]))/3;
+              avgZVelocity = ((global_dHist[int(global_dHist.length/2)] - global_dHist[int(global_xHist.length/4)]));
+              avgXVelocity = ((global_xHist[int(global_xHist.length/2)] - global_xHist[int(global_xHist.length/4)]));
 
               phase2_ballSticks = true;
 
@@ -606,9 +622,10 @@ void draw() {
             println("story_orangeCount: ", story_orangeCount);
             story_saveOrangePosition(story_orangex1, story_orangey1, story_orangex2, story_orangey2, 0, 0, story_orangeCount); //tell the immersive screen to start drop orange
 
-            //update new pushx and pushy using the next orange location
-            pushx = story_orangex2;
-            pushy = story_orangey2+30; //TODO: need to know the position for robot to travel such that it will pushed the ball to the orange
+            //update new pushx and pushy using the next orange location 
+            findPushedLocation(pushToio, story_orangex2+32, story_orangey2+32); 
+            //pushx = story_orangex2;
+            //pushy = story_orangey2+30;
           }
 
 

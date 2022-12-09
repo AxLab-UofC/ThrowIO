@@ -525,6 +525,8 @@ public class SecondApplet extends PApplet {
         //particles.add(new Particle(random(330, 360), 720, 40, random(10, 11), random(120, 140))); //this is where we currently define the ball speed and velocity
         ufo_ballCount+=1;
         if (avgXVelocity > 0) {
+
+          
           particles.add(new Particle(hitX, monitorHeight, 40, random(10, 11), 95)); //this is where we currently define the ball speed and velocity //random(120, 140)
         } else {
           particles.add(new Particle(hitX, monitorHeight, 40, -random(10, 11), 95)); //this is where we currently define the ball speed and velocity //random(120, 140)

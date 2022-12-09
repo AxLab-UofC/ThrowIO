@@ -425,3 +425,99 @@ boolean findbackoutLocation(int toio_number) {
   //println("global_backouty1: ", global_backouty1);
   return true;
 }
+
+//find the pushx and pushy for the pushing toio such that the ball will land in an orange for example
+boolean findPushedLocation(int toio_number, float ballLandingX, float ballLandingY) {
+  float x = 0.0;
+  float y = 0.0;
+  PVector v5, v6;
+  float theta5 = 0.0;
+
+  float tempx = 0.0;
+  float tempy = 0.0;
+
+  if (toio_number == 0) {
+    //change this to cube[0].x for example
+    tempx = cubes[0].x;
+    tempy = cubes[0].y;
+  } else {
+    tempx = cubes[1].x;
+    tempy = cubes[1].y;
+  }
+
+
+  float tempDist = sqrt ( pow ( ballLandingX - tempx, 2 ) + pow (ballLandingY - tempy, 2 ));
+  //the distance between the ball and toio robot shell is 40
+  float ratio = 40/tempDist;
+  
+
+  v5 = new PVector(ballLandingX-tempx, ballLandingY-tempy); //final x and final y to ball
+  v6 = new PVector(ballLandingX-tempx, tempy-tempy); //final x and final y horizontal extension
+
+  theta5 = acos(v5.dot(v6)/(v5.mag()*v6.mag()));
+
+
+  if ((ballLandingX - tempx)> 0 & (ballLandingY - tempy) < 0) { //we already convert quadrant coordinates to toio mat coordinates
+
+    //println("ball in quadrant 1");
+    x = ballLandingX-ratio*tempDist*cos(theta5);
+    y = ballLandingY+ratio*tempDist*sin(theta5);
+  } else if ((ballLandingX - tempx) < 0 & (ballLandingY - tempy) < 0) {
+
+    //println("ball in quadrant 2");
+    x = ballLandingX+ratio*tempDist*cos(theta5);
+    y = ballLandingY+ratio*tempDist*sin(theta5);
+  } else if ((ballLandingX - tempx) < 0 & (ballLandingY - tempy) > 0) {
+
+    //println("ball in quadrant 3");
+    x = ballLandingX+ratio*tempDist*cos(theta5);
+    y = ballLandingY-ratio*tempDist*sin(theta5);
+  } else if ((ballLandingX - tempx) > 0 & (ballLandingY - tempy) > 0) {
+
+    //println("ball in quadrant 4");
+
+    x = ballLandingX-ratio*tempDist*cos(theta5);
+    y = ballLandingY-ratio*tempDist*sin(theta5);
+  } else {
+
+    theta5 = 0;
+
+    if ((ballLandingX - tempx) == 0 & (ballLandingY - tempy) > 0) {
+
+      //println("ball in between 3 and 4 quadrants");
+      x = ballLandingX-ratio*tempDist*sin(theta5);
+      y = ballLandingY-ratio*tempDist*cos(theta5);
+    } else if ((ballLandingX - tempx) > 0 & (ballLandingY - tempy) == 0) {
+
+      //println("ball in between 1 and 4 quadrants");
+      x = ballLandingX-ratio*tempDist*cos(theta5);
+      y = ballLandingY+ratio*tempDist*sin(theta5);
+    } else if ((ballLandingX - tempx) == 0 & (ballLandingY - tempy) < 0) {
+
+      //println("ball in between 1 and 2 quadrants");
+      x = ballLandingX-ratio*tempDist*sin(theta5);
+      y = ballLandingY+ratio*tempDist*cos(theta5);
+    } else if ((ballLandingX - tempx) < 0 & (ballLandingY - tempy) == 0) {
+
+      //println("ball in between 2 and 3 quadrants");
+      x = ballLandingX+ratio*tempDist*cos(theta5);
+      y = ballLandingY+ratio*tempDist*sin(theta5);
+    } else {
+
+      //println("Something is wrong here!!");
+    }
+  }
+
+  //we directly assign where the new pushx and pushy location should be
+  pushx = x;
+  pushy = y;
+  //println("x: ", x);
+  //println("y: ", y);
+  //println("ballLandingX: ", ballLandingX);
+  //println("ballLandingY: ", ballLandingY);
+  //println("global_backoutx0: ", global_backoutx0);
+  //println("global_backouty0: ", global_backouty0);
+  //println("global_backoutx1: ", global_backoutx1);
+  //println("global_backouty1: ", global_backouty1);
+  return true;
+}

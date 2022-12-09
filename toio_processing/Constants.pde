@@ -25,7 +25,7 @@ int cubesPerHost = 12; // each BLE bridge can have up to 4 cubes
 int maxMotorSpeed = 100;
 int appFrameRate = 50;
 
-String applicationMode = "ufo"; //can be "ufo", "story", "storage", "practice"
+String applicationMode = "story"; //can be "ufo", "story", "storage", "practice"
 
 //camera
 Capture video;
