@@ -1,3 +1,5 @@
+//function that operate the robot
+
 // the most basic way to move a cube
 boolean aimCube(int id, float tx, float ty) {
   if (cubes[id].distance(tx, ty)<25) return true;
@@ -9,30 +11,24 @@ boolean aimCube(int id, float tx, float ty) {
   return false;
 }
 
-
-
+//move a cube to a location
 boolean aimCubeSpeed(int id, float tx, float ty) {
   float dd = cubes[id].distance(tx, ty)/100.0;
-  
-  //println("dd is:" + dd);
-  
+
   dd = min(dd, 1);
   if (dd <.15) return true;
 
   int[] lr = cubes[id].aim(tx, ty);
   float left = (lr[0])*dd;
   float right = (lr[1])*dd;
-  //println("left: "+ lr[0] + ";" + "right: " + lr[1]);
+
   int duration = (100);
   motorControl(id, left, right, duration);
-  
- // println()
+
   return false;
 }
 
-
-//helper functions to drive the cubes
-
+//helper functions to drive the cubes so that they can rotate
 boolean rotateCube(int id, float ta) {
   float diff = ta-cubes[id].deg;
   if (diff>180) diff-=360;

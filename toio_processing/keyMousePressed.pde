@@ -1,8 +1,9 @@
+//function that handle the case when a key is pressed
 void keyPressed() {
 
   switch(key) {
   case 'c':
-    //println("calibration mode!");
+    println("calibration mode!");
     calibrationMode++;
 
     if (calibrationMode > 2) {
@@ -23,11 +24,6 @@ void keyPressed() {
     loadCalibration();
     break;
 
-  case 'i':
-    //call immersive storytelling application
-    println("immersive storytelling application!");
-    applicationMode = "story";
-  
   case 't':
     travelToStartPosition = true;
     break;
@@ -36,41 +32,13 @@ void keyPressed() {
   }
 }
 
-//void mousePressed() {
-//  //chase = false;
-//  //spin = false;
-//  //mouseDrive=true;
-
-//  // Save color where the mouse is clicked in trackColor variable
-//  int loc = mouseX + mouseY*kinect.getVideoImage().width;
-//  mouseXLocation = mouseX;
-//  mouseYLocation = mouseY;
-
-
-//  mouseXLocationList[clickCount] = mouseX; //need to uncomment everything
-//  mouseYLocationList[clickCount] = mouseY; //need to uncomment everything
-
-
-
-//  //trackColor = kinect.getVideoImage().pixels[loc]; //need to uncomment this
-
-//  clickCount+=1;
-//  if(clickCount == 3){
-//    trackColor = kinect.getVideoImage().pixels[loc]; //need to uncomment this
-//  }
-//}
-
+//function that handle the case when the mouse is pressed
 void mousePressed() {
-  //chase = false;
-  //spin = false;
-  //mouseDrive=true;
 
   // Save color where the mouse is clicked in trackColor variable
-
   if (calibrationMode == 1 && mouseX < kinect.getVideoImage().width && mouseY < kinect.getVideoImage().height) { // for position
     mousePressedforPosCalibration();
   }
-
 
 
   if (calibrationMode == 2 && mouseX < kinect.getVideoImage().width && mouseY < kinect.getVideoImage().height) {// for color
@@ -90,27 +58,24 @@ void mousePressed() {
   }
   if (applicationMode == "push_eval" && calibrationMode == 0 && phase2_ballSticks == true && phase3_facePushLocation == false) {
 
-    //when the experimentor needs to wizard of Oz to track where the ball sticks
+    //when the experimentor needs to track where the ball sticks
     mousePressedforTrackStuckBall();
   }
   if (applicationMode == "push_eval" && calibrationMode == 0 && phase10_dropSucceed == true) {
 
-    //when the experimentor needs to wizard of Oz to track where the ball sticks
-    
-    println("toio X",map(mouseX, mouseXLocationList[0], mouseXLocationList[1], 32, 614+32));
-    println("toio Y",map(mouseY, mouseYLocationList[0], mouseYLocationList[1], 32, 433+32));
+    //when the experimentor needs to track where the ball sticks
     checkFinalPostion = true;
   }
 }
 
-
-
+//handle the case when mouse is dragged
 void mouseDragged() {
   if (calibrationMode == 1 && mouseX < kinect.getVideoImage().width && mouseY < kinect.getVideoImage().height) {
     mouseReleasedforPosCalibration();
   }
 }
 
+//handle the case when mouse is released after dragging
 void mouseReleased() {
   if (calibrationMode == 1 && mouseX < kinect.getVideoImage().width && mouseY < kinect.getVideoImage().height) {
     mouseReleasedforPosCalibration();

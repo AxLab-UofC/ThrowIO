@@ -1,19 +1,15 @@
-
-
+//showing images on the project to check robot pushing accuracy
+import deadpixel.keystone.*;
 PImage img;
 PImage orange1;
 float orangeXLocation = 500;
 float orangeYLocation = 200;
-
-import deadpixel.keystone.*;
-
 Keystone ks;
 CornerPinSurface surface;
 Table table;
 PGraphics offscreen;
 float OrangeX = 0;
 float OrangeY = 0;
-
 int orangeCount = 0;
 int rowCount = 0;
 
@@ -31,25 +27,16 @@ void loadOrangePosition() {
 
 
 void setup() {
-  //size(614,433);
   img = loadImage("whiteFrame.png");
   orange1 = loadImage("orange.png");
 
   // Keystone will only work with P3D or OPENGL renderers,
   // since it relies on texture mapping to deform
-  //size(displayWidth, displayHeight, P3D);
   size(1600, 900, P3D); //the size of the external monitor
-  //size(614, 433, P3D);
-
 
   ks = new Keystone(this);
   surface = ks.createCornerPinSurface(614, 433, 20); //614, 433, 20
 
-  // We need an offscreen buffer to draw the surface we
-  // want projected
-  // note that we're matching the resolution of the
-  // CornerPinSurface.
-  // (The offscreen buffer can be P2D or P3D)
   offscreen = createGraphics(614, 433, P3D);
 
   loadOrangePosition();
@@ -70,8 +57,8 @@ void draw() {
   offscreen.image(img, 0, 0, 614, 433); //tree image
 
   offscreen.imageMode(CENTER);
-  
-  offscreen.image(orange1, OrangeX-32, OrangeY-32, 40,40);
+
+  offscreen.image(orange1, OrangeX-32, OrangeY-32, 40, 40);
 
   offscreen.endDraw();
 
@@ -103,7 +90,7 @@ void keyPressed() {
 
   case 'n':
     //next orange
-        rowCount+=1;
+    rowCount+=1;
     loadOrangePosition();
     break;
   }

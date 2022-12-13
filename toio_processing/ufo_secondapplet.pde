@@ -1,4 +1,4 @@
-//visual display for ufo application TODO: consider how to intergrate basketball here as well
+//visual display for UFO task
 public class SecondApplet extends PApplet {
 
   //an ArrayList of particles that will fall on the surface
@@ -126,16 +126,6 @@ public class SecondApplet extends PApplet {
       return false;
     }
 
-    //check if a ball went into the hoop
-    boolean goal() {
-      // Let's find the screen position of the particle
-      Vec2 pos = box2d.getBodyPixelCoord(body);
-      if (pos.y > 350 && pos.y <= 550 && pos.x >= 450 && pos.x <= 750) { //this is the condition for scoring
-        return true;
-      }
-      return false;
-    }
-
     void display() {
       // We look at each body and get its screen position
       Vec2 pos = box2d.getBodyPixelCoord(body);
@@ -148,20 +138,16 @@ public class SecondApplet extends PApplet {
       stroke(0);
       strokeWeight(1);
       ellipse(0, 0, r*2, r*2);
-      // Let's add a line so we can see the rotation
-      //line(0, 0, r, 0);
       popMatrix();
     }
 
     // Here's our function that adds the particle to the Box2D world
-    // x is x position, y is y position, r is radius, l is linear velocity, v is vertical velocity
-    //x = 400, y = 720, r , l = 15, v = 95
     void makeBody(float x, float y, float r, float l, float v) {
       // Define a body
       BodyDef bd = new BodyDef();
       // Set its position
 
-      bd.position = box2d.coordPixelsToWorld(x, y); //monitor is 720 height and 1280 width
+      bd.position = box2d.coordPixelsToWorld(x, y);
       bd.type = BodyType.DYNAMIC;
       body = box2d.createBody(bd);
 
@@ -181,7 +167,6 @@ public class SecondApplet extends PApplet {
 
       MassData massData = new MassData();
       massData.mass = 1000;
-      //body.setAngularVelocity(random(-10, 10));
       body.setLinearVelocity(new Vec2(l, v));
       body.setMassData(massData);
     }
@@ -312,8 +297,6 @@ public class SecondApplet extends PApplet {
       stroke(0);
       strokeWeight(1);
       ellipse(0, 0, r*2, r*2);
-      // Let's add a line so we can see the rotation
-      //line(0,0,r,0);
       popMatrix();
     }
 
@@ -454,26 +437,11 @@ public class SecondApplet extends PApplet {
       ufo_flag_cannonSound = false;
     }
 
-
     //the text for score
     textSize(50);
     fill(0);
     strokeWeight(10);
     text("Score: "+str(scoreCount), 40, 60);
-
-
-
-    if (ufo_flag_startSprinkle == false) {
-
-      //this is the list of particles add into the world
-      //particles.add(new Particle(570, 200, 40, 0, 0));
-      //particles.add(new Particle(500, 250, 40, 0, 0));
-      //particles.add(new Particle(600, 100, 40, 0, 0));
-      //particles.add(new Particle(700, 300, 40, 0, 0));
-      //particles.add(new Particle(600, 350, 40, 0, 0));
-
-      ufo_flag_startSprinkle = true;
-    }
 
     if (ufo_flag_startCrash == true) {
       smallParticles.add(new smallParticle(xcoord, ycoord, random(2, 20), color(0)));
@@ -522,23 +490,15 @@ public class SecondApplet extends PApplet {
 
       if (ufo_flag_addParticle == false) {
 
-        //particles.add(new Particle(random(330, 360), 720, 40, random(10, 11), random(120, 140))); //this is where we currently define the ball speed and velocity
         ufo_ballCount+=1;
         if (avgXVelocity > 0) {
-
-          
-          particles.add(new Particle(hitX, monitorHeight, 40, random(10, 11), 95)); //this is where we currently define the ball speed and velocity //random(120, 140)
+          particles.add(new Particle(hitX, monitorHeight, 40, random(10, 11), 95)); //this is where we currently define the ball speed and velocity
         } else {
-          particles.add(new Particle(hitX, monitorHeight, 40, -random(10, 11), 95)); //this is where we currently define the ball speed and velocity //random(120, 140)
+          particles.add(new Particle(hitX, monitorHeight, 40, -random(10, 11), 95)); //this is where we currently define the ball speed and velocity
         }
-
-        //particles.add(new Particle(hitX, monitorHeight, 40, -random(10, 11), 95));
-
         ufo_flag_addParticle = true;
       }
     }
-
-    //scoreCount = 0;
 
     //display debris
     for (int i = smallParticles.size()-1; i >= 0; i--) {
@@ -562,7 +522,7 @@ public class SecondApplet extends PApplet {
       Particle p = particles.get(i);
       p.display();
       // Particles that leave the screen, we delete them
-      // (note they have to be deleted from both the box2d world and our list
+      // note they have to be deleted from both the box2d world and our list
       if (p.done()) {
         particles.remove(i);
         ufo_flag_hitTarget = false;
@@ -572,9 +532,6 @@ public class SecondApplet extends PApplet {
           ufo_flag_killBall = false;
         }
       }
-      //if (p.goal()) {
-      //  scoreCount += 1;
-      //}
     }
   };
 }

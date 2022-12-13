@@ -1,4 +1,7 @@
 //constants and libraries
+String applicationMode = "practice"; //can be "ufo", "story", "storage", "practice", "push_eval"
+
+//libraries and packages
 import oscP5.*;
 import netP5.*;
 import processing.serial.*;
@@ -19,17 +22,26 @@ import org.jbox2d.dynamics.*;
 import org.jbox2d.dynamics.contacts.*;
 import processing.sound.*;
 
+//camera
+Capture video;
+Kinect kinect;
+//for OSC
+OscP5 oscP5;
+//where to send the commands to
+NetAddress[] server;
+//we'll keep the cubes here
+Cube[] cubes;
+// A reference to our box2d world
+Box2DProcessing box2d;
+SoundFile ufo_file;
+SoundFile cannon_file;
+
+//global variables that helper functions would modify
 int nCubes =  4;
 int frameNum = 5;
 int cubesPerHost = 12; // each BLE bridge can have up to 4 cubes
 int maxMotorSpeed = 100;
 int appFrameRate = 50;
-
-String applicationMode = "practice"; //can be "ufo", "story", "storage", "practice", "push_eval"
-
-//camera
-Capture video;
-Kinect kinect;
 color trackColor;
 float threshold = 40; //150 for red
 int clickCount = 0;
@@ -40,24 +52,10 @@ int[] mouseXLocationList = new int[4];
 int[] mouseYLocationList = new int[4];
 int[] story_mouseXForOrange =  new int[1];
 int[] story_mouseYForOrange =  new int[1];
-//float scaledX = -1000;
-//float scaledY = -1000;
 int global_closer_toio_id = 0;
-//for OSC
-OscP5 oscP5;
-//where to send the commands to
-NetAddress[] server;
-//int cubesPerHost = 4; // each BLE bridge can have up to 4 cubes
-
-//we'll keep the cubes here
-Cube[] cubes;
-//int nCubes =  4;
-
 boolean mouseDrive = false;
 boolean chase = false;
 boolean spin = false;
-
-//global variables that helper functions would modify
 float global_radius = 120;
 float global_x = 0.0;
 float global_y = 0.0;
@@ -95,7 +93,6 @@ int time = millis();
 boolean startTime = false;
 float turnDegree1 = 0;
 float turnDegree0 = 0;
-
 boolean phase7_findTangentPoints = false;
 boolean phase8_toioTravelToPrepLocation = false;
 boolean phase10_dropSucceed = false;
@@ -105,13 +102,11 @@ boolean phase4_travelToBallToPush = false;
 boolean phase5_rotateBallToPushLocation = false;
 boolean phase6_pushDone = false;
 boolean phase3_facePushLocation = false;
-
 boolean flag_rotate0 = false;
 boolean flag_rotate1 = false;
 boolean flag_recordToioAndBallAngle = false;
 boolean flag_recordPushingToioAndBallAngle = false;
 boolean flag_prepareBackout = false;
-
 float[] xHist = {};
 float[] yHist = {};
 float[] dHist = {};
@@ -126,10 +121,6 @@ boolean startTime2 = false;
 float bulletx = 0;
 float bullety = 0;
 float monitorAdjustment = 130;
-
-// A reference to our box2d world
-Box2DProcessing box2d;
-
 float monitorWidth = displayWidth;
 float monitorHeight = displayHeight;
 float ySpeed = 1;
@@ -145,10 +136,6 @@ int pushToio = 0;
 boolean ballDidNotStick = false;
 int scoreCount = 0;
 boolean flag_needBackout = false;
-
-
-SoundFile ufo_file;
-SoundFile cannon_file;
 boolean ufo_flag_killUFO = false;
 boolean ufo_flag_bombSound = false;
 boolean ufo_flag_cannonSound = false;
@@ -161,35 +148,26 @@ boolean ufo_flag_nextBall = false;
 boolean ufo_flag_startSprinkle = false;
 boolean ufo_flag_addParticle = false;
 int ufo_ballCount = 0;
-
-
 float story_orangex1 = 150;
 float story_orangey1 = 200;
 float story_orangex2 = 400;
 float story_orangey2 = 150;
 int story_orangeCount = 0;
-
 float OrangeX = 0.0;
 float OrangeY = 0.0;
 float StartX = 0.0;
 float StartY = 0.0;
 int rowCount = 0;
 boolean travelToStartPosition = false;
-
 boolean story_flag_trackedStuckBall = false;
 boolean story_flag_trackedPushedBall = false;
-
-//this is where we want to ball to be stored
-float storage_shelfX = 240;
-float storage_shelfY = 270;
+float storage_shelfX = 240; //this is where we want to ball to be stored
+float storage_shelfY = 270; //this is where we want to ball to be stored
 String storage_status = "store"; //can be "store" or "retrieve"
-
 float storage_dropLocationX = 400;
 float storage_dropLocationY = 270;
-
 float storage_recordPushingX = 0;
 float storage_recordPushingY = 0;
-
 float startPositionX1 = 100;
 float startPositionY1 = 100;
 float startPositionX2 = 600;
@@ -197,12 +175,10 @@ float startPositionY2 = 250;
 float handPositionX = -50;
 float handPositionY = -50;
 boolean checkFinalPostion = false;
-
 // Raw location
 PVector storage_loc = new PVector(0, 0);
 // Interpolated location
 PVector  storage_lerpedLoc = new PVector(0, 0);
-
 float smallBox_w = (mouseXLocationList[1] - mouseXLocationList[0])/2.5;
 float smallBox_h = (mouseYLocationList[1] - mouseYLocationList[0])/2;
 float handDetectStartAreaX = mouseXLocationList[0]+(mouseXLocationList[1] - mouseXLocationList[0])/2;

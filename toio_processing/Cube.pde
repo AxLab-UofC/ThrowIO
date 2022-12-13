@@ -1,9 +1,10 @@
+//define class for the robot, each robot is a Cube
 class Cube {
   int x;
   int y;
   int battery;
 
-  
+
   int prex;
   int prey;
   float speedX;
@@ -12,7 +13,7 @@ class Cube {
   //int oidx;
   //int oidy;
   float targetx =-1;
-  float targety =-1;  
+  float targety =-1;
   boolean isLost;
   boolean p_isLost;
   int id;
@@ -32,7 +33,7 @@ class Cube {
     p_isLost = lost;
 
     lastUpdate = System.currentTimeMillis();
-    
+
     for (int j = 0; j< aveFrameNum; j++) {
       pre_speedX[j] = 0;
       pre_speedY[j] = 0;

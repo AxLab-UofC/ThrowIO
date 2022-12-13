@@ -1,5 +1,4 @@
-//OSC messages (send)
-
+//handle the sending communication between Processing and the robots
 void aimMotorControl(int cubeId, float x, float y) {
   int hostId = cubeId/cubesPerHost;
   int actualcubeid = cubeId % cubesPerHost;
@@ -21,7 +20,7 @@ void basicMotor(int cubeId, boolean leftforwards, int leftspeed, boolean rightfo
     msg.add(0x02);
   }
   msg.add(leftspeed);
-    if (rightforwards) {
+  if (rightforwards) {
     msg.add(0x01);
   } else {
     msg.add(0x02);
@@ -41,7 +40,7 @@ void motorControl(int cubeId, float left, float right, int duration) {
   oscP5.send(msg, server[hostId]);
 }
 
-void motorTarget(int cubeId, int mode, int x, int y, int theta){
+void motorTarget(int cubeId, int mode, int x, int y, int theta) {
   int hostId = cubeId/cubesPerHost;
   int actualcubeid = cubeId % cubesPerHost;
   OscMessage msg = new OscMessage("/motortarget");
@@ -53,7 +52,7 @@ void motorTarget(int cubeId, int mode, int x, int y, int theta){
   oscP5.send(msg, server[hostId]);
 }
 
-void motorTarget(int cubeId, int control, int timeout, int mode, int maxspeed, int speedchange,  int x, int y, int theta){
+void motorTarget(int cubeId, int control, int timeout, int mode, int maxspeed, int speedchange, int x, int y, int theta) {
   int hostId = cubeId/cubesPerHost;
   int actualcubeid = cubeId % cubesPerHost;
   OscMessage msg = new OscMessage("/motortarget");
@@ -69,7 +68,7 @@ void motorTarget(int cubeId, int control, int timeout, int mode, int maxspeed, i
   oscP5.send(msg, server[hostId]);
 }
 
-void motorAcceleration(int cubeId, int speed, int a, int rotateVelocity, int rotateDir, int dir, int priority, int duration){
+void motorAcceleration(int cubeId, int speed, int a, int rotateVelocity, int rotateDir, int dir, int priority, int duration) {
   OscMessage msg = new OscMessage("/motoracceleration");
   int hostId = cubeId/cubesPerHost;
   int actualcubeid = cubeId % cubesPerHost;
@@ -137,14 +136,14 @@ void magnetic(int cubeId) {
 }
 
 void posture(int cubeId, boolean euler) {
-    int hostId = cubeId/cubesPerHost;
-    int actualcubeid = cubeId % cubesPerHost;
-    OscMessage msg;
-    if (euler) {
-      msg = new OscMessage("/postureeuler");
-    } else {
-      msg = new OscMessage("/posturequaternion");
-    }
-     msg.add(actualcubeid);
-     oscP5.send(msg, server[hostId]);
+  int hostId = cubeId/cubesPerHost;
+  int actualcubeid = cubeId % cubesPerHost;
+  OscMessage msg;
+  if (euler) {
+    msg = new OscMessage("/postureeuler");
+  } else {
+    msg = new OscMessage("/posturequaternion");
+  }
+  msg.add(actualcubeid);
+  oscP5.send(msg, server[hostId]);
 }

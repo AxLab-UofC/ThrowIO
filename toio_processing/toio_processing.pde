@@ -1,4 +1,4 @@
-//This is the main ThrowIO code
+//Main ThrowIO code
 void setup() {
   // for OSC
   // receive messages on port 3333
@@ -49,14 +49,12 @@ void setup() {
     pushx = 360; //400
     pushy = 180; //300
   } else if (applicationMode == "story") {
-    println("launching immersive storytelling application");
 
     //save orange positions
     story_saveOrangePosition(story_orangex1, story_orangey1, story_orangex2, story_orangey2, 0, 0, story_orangeCount);
 
     //this is where the robot will go to push the ball
     //findPushedLocation will set pushx and pushy directly (a way to find where the robot should move so that the pushed ball in on top of the orange)
-    //findPushedLocation(1, story_orangex1+32, story_orangey1+32);
     findPushedLocation(1, story_orangex1, story_orangey1);
 
     //set starting position for the robots
@@ -93,20 +91,13 @@ void setup() {
     startPositionY2 = 210;
 
     loadOrangePosition(rowCount);
-
-    //findPushedLocation(0, OrangeX+32, OrangeY+32);
-
     findPushedLocation(0, OrangeX, OrangeY);
-    //println("cube 0 pos x: ", cubes[0].x);
-    //println("cube 0 pos y: ", cubes[0].y);
-    //println(pushx);
-    //println(pushy);
   }
 
   loadCalibration();
 }
 
-
+//start draw
 void draw() {
 
   background(255);
@@ -125,6 +116,8 @@ void draw() {
 
     detectBall(false);
   } else {
+
+    //this is just for pushing evaluation
     if (applicationMode == "push_eval" && travelToStartPosition == true) {
       //let toio 0 travel to the next starting position in applicationMode = push_eval"
       aimCubeSpeed(0, StartX, StartY);
@@ -134,6 +127,8 @@ void draw() {
         travelToStartPosition = false;
       }
     }
+
+    //phase starts here
     if (phase1_seeBall == false) {
 
       //Phase 1. Check if the camera sees a ball
@@ -153,6 +148,7 @@ void draw() {
         }
       } else if ((applicationMode == "storage" && storage_status == "retrieve")) {
 
+        //draw the area where users should put their hand
         smallBox_w = (mouseXLocationList[1] - mouseXLocationList[0])/2.5;
         smallBox_h = (mouseYLocationList[1] - mouseYLocationList[0])/2;
         handDetectStartAreaX = mouseXLocationList[0]+(mouseXLocationList[1] - mouseXLocationList[0])/2;
@@ -211,7 +207,6 @@ void draw() {
       } else {
         //quick debug area (set applicationMode to "debug")
         //print anything you want here!
-
         //as long as you don't make phase 1 flag true, then we can debug here!
       }
     } else if (phase1_seeBall == true && phase2_ballSticks == false) {
@@ -266,14 +261,11 @@ void draw() {
 
               hitX = map(global_scaledX, 32, 614+32, 0, monitorWidth); //store the position of hitX
 
-              println("global_scaledX: ", global_scaledX);
-              println("hitX: ", hitX);
-
-              //find ball velocity and angle
+              //if we need to find ball velocity and angle, use the following
               //depthDiff  = global_dHist[global_dHist.length-1]-global_dHist[int(global_dHist.length/2)]; // this value should be positive
               //xDiff  = global_xHist[global_xHist.length-1]-global_xHist[int(global_xHist.length/2)];
-
               //throwDegree = degrees(atan2(depthDiff, xDiff));
+
               throwDegree = degrees(atan2(3, 4));
 
               //caculate velocity, we can just find the velocty of the five points after mid point
@@ -337,16 +329,11 @@ void draw() {
 
               hitX = map(global_scaledX, 32, 614+32, 0, monitorWidth); //store the position of hitX
 
-              println("global_scaledX: ", global_scaledX);
-              println("hitX: ", hitX);
-
-
-
-              //find ball velocity and angle
+              //if we need to find ball velocity and angle, use the following
               //depthDiff  = global_dHist[global_dHist.length-1]-global_dHist[int(global_dHist.length/2)]; // this value should be positive
               //xDiff  = global_xHist[global_xHist.length-1]-global_xHist[int(global_xHist.length/2)];
-
               //throwDegree = degrees(atan2(depthDiff, xDiff));
+
               throwDegree = degrees(atan2(3, 4));
 
               //caculate velocity, we can just find the velocty of the five points after mid point
@@ -409,7 +396,7 @@ void draw() {
 
               hitX = map(global_scaledX, 32, 614+32, 0, monitorWidth); //store the position of hitX
 
-              //find ball velocity and angle
+              //if we need to find ball velocity and angle, use the following
               //depthDiff  = global_dHist[global_dHist.length-1]-global_dHist[int(global_dHist.length/2)]; // this value should be positive
               //xDiff  = global_xHist[global_xHist.length-1]-global_xHist[int(global_xHist.length/2)];
 
@@ -466,8 +453,7 @@ void draw() {
           //we need to record the angle between the pushing toio and the ball location
           if (flag_recordPushingToioAndBallAngle == false) {
 
-            //here we always assume that the ball sticks in between the spaces between the toio robots
-            //TODO: please check the algorithm here!!
+            //the ball sticks in between the spaces between the toio robots
 
             if (global_scaledX < pushx) {
               //record that cube 0 will push
@@ -530,8 +516,7 @@ void draw() {
           //we need to record the angle between the pushing toio and the ball location
           if (flag_recordPushingToioAndBallAngle == false) {
 
-            //here we always assume that the ball sticks in between the spaces between the toio robots
-            //TODO: please check the algorithm here!!
+            //the ball sticks in between the spaces between the toio robots
 
             if (global_scaledX < pushx) {
               //record that cube 0 will push
@@ -556,8 +541,6 @@ void draw() {
 
             flag_recordPushingToioAndBallAngle = true;
           } else {
-
-
             if (pushToio == 0) {
               // we rotate the cube0 180 degress so that now its back (prong) side is facing toward the ball location
               if (rotateCube(0, turnDegree0-180)) {
@@ -589,8 +572,7 @@ void draw() {
           //we need to record the angle between the pushing toio and the ball location
           if (flag_recordPushingToioAndBallAngle == false) {
 
-            //here we always assume that the ball sticks in between the spaces between the toio robots
-            //TODO: please check the algorithm here!!
+            //the ball sticks in between the spaces between the toio robots
 
             if (global_scaledX < pushx) {
               //record that cube 0 will push
@@ -636,7 +618,7 @@ void draw() {
       } else if (applicationMode == "push_eval") {
 
         //if the experimentor sees that the ball thrown by the user is stuck, he will use the mouse to click on the ball's location in the camera window
-        
+
         println("Push Eval: waiting the experimentor click on stuck ball in the camera...");
         if (story_flag_trackedStuckBall == true) {
 
@@ -712,6 +694,7 @@ void draw() {
           }
         }
       } else if (applicationMode == "push_eval") {
+        //we only use one robot in push evaluation
         if (rotateCubeMax(0, turnDegree0-180)) {
           phase5_rotateBallToPushLocation = true;
         }
@@ -876,11 +859,6 @@ void draw() {
           global_yprime = cubes[0].y;
 
           phase7_findTangentPoints = true;
-
-
-          //Step3. Other toio rotates such that the wedge side faces to the pushing toio
-
-          //Step4. Other toio approaches the pushing toio to drop the object
         }
       } else if (applicationMode == "practice") {
         //We need to re-identify where the ball is now
@@ -962,7 +940,6 @@ void draw() {
           if (abs(cubes[0].x - global_finalx) < 15 && abs(cubes[0].y - global_finaly) < 15 && abs(cubes[1].x - global_xprime) < 15 && abs(cubes[1].y - global_yprime) < 15 ) {
 
             phase8_toioTravelToPrepLocation = true;
-
             //ufo_flag_nextBall controls when the next ball in the vertical screen shoould appear
             ufo_flag_nextBall = true;
           }
@@ -975,17 +952,14 @@ void draw() {
 
             phase8_toioTravelToPrepLocation = true;
 
-
             //ufo_flag_nextBall controls when the next ball in the vertical screen shoould appear
             ufo_flag_nextBall = true;
           }
         }
       } else if (applicationMode == "storage" ) {
         //pushing toio is 0, and other toio is 1
-        //Step1. Other toio travel to the pushing toio y location
         aimCubeSpeed(0, global_finalx, global_finaly);
         aimCubeSpeed(1, global_xprime, global_yprime);
-
 
         if (abs(cubes[0].x - global_finalx) < 15 && abs(cubes[0].y - global_finaly) < 15 && abs(cubes[1].x - global_xprime) < 15 && abs(cubes[1].y - global_yprime) < 15 ) {
 
@@ -1193,8 +1167,6 @@ void draw() {
             aimCubeSpeed(0, storage_recordPushingX+5, storage_recordPushingY);
           }
         }
-
-
         //we are finally done with all the phases after the toios drop the ball
         if (abs(storage_recordPushingX+convergeDistance - cubes[1].x) < 15 &&
           abs(storage_recordPushingY - cubes[1].y) < 15) {
@@ -1283,8 +1255,7 @@ void draw() {
 
               story_orangeCount+=1;
 
-              startTime = false; //newly added
-
+              startTime = false;
 
               if (applicationMode == "storage" && storage_status == "store") {
                 storage_status = "retrieve";
@@ -1297,7 +1268,6 @@ void draw() {
               } else if (applicationMode == "storage" && storage_status == "retrieve") {
                 storage_status = "store";
               }
-
             }
           }
         }

@@ -1,7 +1,9 @@
+//functions to calibrate the toio mat and object color in the kinect camera view
 Table table;
 
 int calibrationMode = 0; //0: no calibration, 1: position calibration, 2: color calibration
 
+//draw the debug window that contains the color camera view, depth camera view, and debug messages
 void drawDebugWindow() {
 
   background(100);
@@ -12,8 +14,7 @@ void drawDebugWindow() {
   image(kinect.getVideoImage(), 0, 0);
   image(kinect.getDepthImage(), 640, 0);
 
-
-  if (calibrationMode>0) {// if (clickCount < 4) { //draw circle during the calibration
+  if (calibrationMode>0) {
     String calibrationModeText = "none";
     if (calibrationMode == 1) {
       calibrationModeText = "POSITION";
@@ -29,15 +30,11 @@ void drawDebugWindow() {
     text("Hit 'c' to switch calibration modes, 's' for saving , 'l' for loading", 20, 20);
   }
 
-
-
   int box_w = mouseXLocationList[1] - mouseXLocationList[0];
   int box_h = mouseYLocationList[1] - mouseYLocationList[0];
   noFill();
   stroke(255, 0, 0);
   rect(mouseXLocationList[0], mouseYLocationList[0], box_w, box_h);
-
-
 
   textSize(10);
   fill(255);
@@ -56,7 +53,7 @@ void drawDebugWindow() {
   }
 }
 
-
+//save the calibration so we don't need to calibrate each time
 void saveCalibration() {
   table = new Table();
 
@@ -83,25 +80,7 @@ void saveCalibration() {
   saveTable(table, "data/calibration.csv");
 }
 
-void loadOrangePosition(int rowCount_) {
-  table = loadTable("../data/random_positions.csv", "header");
-
-  println(table.getRowCount() + " total rows in table");
-
-  float OrangeX_ = table.getFloat(rowCount_, "OrangeX");
-  float OrangeY_ = table.getFloat(rowCount_, "OrangeY");
-  float StartX_ = table.getFloat(rowCount_, "StartX");
-  float StartY_ = table.getFloat(rowCount_, "StartY");
-
-  OrangeX = OrangeX_;
-  OrangeY = OrangeY_;
-  StartX = StartX_;
-  StartY = StartY_;
-  startPositionX1 = StartX_;
-  startPositionY1 = StartY_;
-}
-
-
+//load the saved calibration
 void loadCalibration() {
   table = loadTable("data/calibration.csv", "header");
 
@@ -122,8 +101,7 @@ void loadCalibration() {
   println(r_, g_, b_, mouseXLocationList[0], mouseYLocationList[0], mouseYLocationList[1], mouseYLocationList[1]);
 }
 
-
-
+//use mouse to calibrate toio mat in camera when mouse pressed
 void mousePressedforPosCalibration() {
   int loc = mouseX + mouseY*kinect.getVideoImage().width;
   mouseXLocation = mouseX;
@@ -137,13 +115,14 @@ void mousePressedforPosCalibration() {
   }
 }
 
+//use mouse to calibrate toio mat in camera when mouse released
 void mouseReleasedforPosCalibration() {
   mouseXLocationList[1] = mouseX;
   mouseYLocationList[1] = mouseY;
 }
 
-
+//use mouse to record the color being detected
 void mousePressedforColorCalibration() {
   int loc = constrain(mouseX + mouseY*kinect.getVideoImage().width, 0, kinect.getVideoImage().width*kinect.getVideoImage().height);
-  trackColor = kinect.getVideoImage().pixels[loc]; //need to uncomment this
+  trackColor = kinect.getVideoImage().pixels[loc];
 }

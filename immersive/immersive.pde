@@ -1,4 +1,4 @@
-//immersive screen
+//immersive screen to show the orange picking experience with the bird
 
 PImage img;
 PImage orange1;
@@ -12,8 +12,6 @@ PImage speechBubble;
 float orangeXLocation = 500;
 float orangeYLocation = 200;
 
-
-
 boolean startTime = false;
 int time = millis();
 boolean startTime2 = false;
@@ -21,7 +19,7 @@ int time2 = millis();
 
 final int HowLongIsItWaiting1 = 300;
 final int HowLongIsItWaiting2 = 300;
-float m = millis(); // sores millis()
+float m = millis();
 char state='A';  // A or B
 float birdX = 0;
 float birdY = 0;
@@ -61,8 +59,6 @@ int orangeCount = 0;
 void loadOrangePosition() {
   table = loadTable("../data/position.csv", "header");
 
-  //println(table.getRowCount() + " total rows in table");
-
   float OrangeX1_ = table.getFloat(0, "OrangeX1");
   float OrangeY1_ = table.getFloat(0, "OrangeY1");
   float OrangeX2_ = table.getFloat(0, "OrangeX2");
@@ -71,21 +67,10 @@ void loadOrangePosition() {
   int dropFruit_ = table.getInt(0, "dropFruit");
   int nextOrange_ = table.getInt(0, "nextOrange");
 
-
-  //println("x_:", x_, "y_:", y_, "flyToOrange_:", flyToOrange_, "dropFruit_:", dropFruit);
-
   OrangeX1 = OrangeX1_;
   OrangeY1 = OrangeY1_;
   OrangeX2 = OrangeX2_;
   OrangeY2 = OrangeY2_;
-
-  //if (orangeCount == 0) {
-  //  orangeXLocation = OrangeX1;
-  //  orangeYLocation = OrangeY1;
-  //} else {
-  //  orangeXLocation = OrangeX2;
-  //  orangeYLocation = OrangeY2;
-  //}
 
   flyToOrange = flyToOrange_;
   dropFruit = dropFruit_;
@@ -154,20 +139,11 @@ void setup() {
 
   // Keystone will only work with P3D or OPENGL renderers,
   // since it relies on texture mapping to deform
-  //size(displayWidth, displayHeight, P3D);
-  size(1600, 900, P3D); //the size of the external monitor 
-  //size(614, 433, P3D);
-
-
+  size(1600, 900, P3D); //the size of the external monitor
 
   ks = new Keystone(this);
   surface = ks.createCornerPinSurface(614, 433, 20); //614, 433, 20
 
-  // We need an offscreen buffer to draw the surface we
-  // want projected
-  // note that we're matching the resolution of the
-  // CornerPinSurface.
-  // (The offscreen buffer can be P2D or P3D)
   offscreen = createGraphics(614, 433, P3D);
   birdX = birdNestX;
   birdY = birdNestY;
@@ -188,9 +164,6 @@ void draw() {
 
   offscreen.imageMode(CORNER);
   offscreen.image(img, 0, 0, 614, 433); //tree image
-
-
-
 
   if (dropOrange == false && orangeCount == 0) {
     offscreen.imageMode(CENTER);
@@ -215,9 +188,9 @@ void draw() {
   offscreen.imageMode(CORNER);
   if (birdRest == true) {
 
-
     offscreen.image(bird3, -745/8, 0, 745/4, 293/4);
   } else {
+    //flapping the bird
     if (state=='B') {
       offscreen.image(bird1, -745/8, 0, 745/4, 355/4);
 
@@ -228,8 +201,6 @@ void draw() {
     } else if (state=='A') {
       offscreen.image(bird2, -745/8, 0, 745/4, 293/4);
 
-
-
       if (millis()-m>HowLongIsItWaiting2) {
         m = millis();
         state='B';
@@ -237,16 +208,8 @@ void draw() {
     }
   }
 
-
-
-  //translated origin / red cross
-  //offscreen.stroke(200, 0, 0);
-  //offscreen.line(-10, 0, 10, 0);
-  //offscreen.line(0, -10, 0, 10);
-
   offscreen.popMatrix();
 
-  //println("quadrant: ", quadrant);
   if (stage1_flyToOrange == false) {
     println("Stage 0 preparing ");
     println("orangeYLocation: ", orangeYLocation);
@@ -260,11 +223,8 @@ void draw() {
     }
 
     //record the state of the bird before flying to the orange
-
     //record angle from bird's original position to the target orange
     angle = atan2(orangeYLocation - birdY, orangeXLocation-birdX) + PI/2;
-
-
     ratio = (abs(orangeXLocation-birdX)/abs(orangeYLocation-birdY));
 
     //record quadrant and change speed
@@ -311,9 +271,7 @@ void draw() {
       }
     }
 
-    //call robot push and drop the orange
-    //here we will just wait for some time
-
+    //robot push and drop the orange
 
     if (dropFruit == 1) {
 
@@ -323,14 +281,6 @@ void draw() {
 
       loadOrangePosition();
     }
-
-    //record go back angles
-    //angle = atan2(birdNestY - birdY, birdNestX-birdX) + PI/2;
-
-    //ratio = (abs(birdNestY-birdX)/abs(birdNestX-birdY));
-
-    ////record quadrant and change speed
-    //setSpeed(birdNestX, birdNestY, birdX, birdY);
   } else if (stage3_flyBack == true) {
 
     println("Stage3 Fly Back");
@@ -352,11 +302,7 @@ void draw() {
       offscreen.fill(0);
       offscreen.text("ZZZZ", birdX+10, birdY-40);
     }
-
-
     birdRest = true;
-
-
     if (nextOrange == 0) {
       loadOrangePosition();
     } else if (nextOrange == 1 && orangeCount == 0) {
@@ -370,40 +316,6 @@ void draw() {
       birdRest = false;
     }
   }
-
-
-
-
-  //else if (stage3_flyBack == true && stage4_sleep == false) {
-
-  //  //bird fly back now
-  //  if (abs(birdX - (birdNestX)) < 3 && abs(birdY -(birdNestY)) < 3) {
-  //    stage4_sleep = true;
-  //  } else {
-
-  //    birdX += xSpeed;
-  //    birdY += ySpeed;
-  //  }
-  //}
-
-
-  //offscreen.image(orange1, 50, 50, 40, 40);
-  //offscreen.image(orange2, 200, 200, 40, 40);
-  //offscreen.image(orange3, 450, 70, 40, 40);
-  //offscreen.image(orange4, 500, 300, 40, 40);
-  //offscreen.image(orange1, 260, 30, 40, 40);
-  //offscreen.image(orange2, 510, 250, 40, 40);
-  //offscreen.ellipse(surfaceMouse.x, surfaceMouse.y, 75, 75);
-  //offscreen.ellipse(100, 100, 40, 40);
-  //offscreen.ellipse(500, 120, 40, 40);
-  //offscreen.ellipse(450, 70, 40, 40);
-  //offscreen.ellipse(400, 100, 40, 40);
-  //offscreen.ellipse(420, 176, 40, 40);
-  //offscreen.ellipse(300, 67, 40, 40);
-  //offscreen.ellipse(260, 30, 40, 40);
-  //offscreen.ellipse(500, 370, 40, 40);
-  //offscreen.ellipse(450, 400, 40, 40);
-  //offscreen.ellipse(510, 250, 40, 40);
 
   offscreen.endDraw();
 
