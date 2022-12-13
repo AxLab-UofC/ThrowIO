@@ -986,7 +986,6 @@ void draw() {
         }
       }
     } else if (phase8_toioTravelToPrepLocation == true && phase9_rotateToDrop == false) {
-      exit();
       //Phase 9. One toio rotates to use the prong side to and the other rotates to use the wedge side for drop operation
       println("Phase 9. One toio rotates to use the prong side to and the other rotates to use the wedge side for drop operation");
 
