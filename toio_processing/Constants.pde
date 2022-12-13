@@ -25,7 +25,7 @@ int cubesPerHost = 12; // each BLE bridge can have up to 4 cubes
 int maxMotorSpeed = 100;
 int appFrameRate = 50;
 
-String applicationMode = "story"; //can be "ufo", "story", "storage", "practice"
+String applicationMode = "practice"; //can be "ufo", "story", "storage", "practice", "push_eval"
 
 //camera
 Capture video;
@@ -162,11 +162,19 @@ boolean ufo_flag_startSprinkle = false;
 boolean ufo_flag_addParticle = false;
 int ufo_ballCount = 0;
 
+
 float story_orangex1 = 150;
 float story_orangey1 = 200;
 float story_orangex2 = 400;
 float story_orangey2 = 150;
 int story_orangeCount = 0;
+
+float OrangeX = 0.0;
+float OrangeY = 0.0;
+float StartX = 0.0;
+float StartY = 0.0;
+int rowCount = 0;
+boolean travelToStartPosition = false;
 
 boolean story_flag_trackedStuckBall = false;
 boolean story_flag_trackedPushedBall = false;
@@ -188,6 +196,7 @@ float startPositionX2 = 600;
 float startPositionY2 = 250;
 float handPositionX = -50;
 float handPositionY = -50;
+boolean checkFinalPostion = false;
 
 // Raw location
 PVector storage_loc = new PVector(0, 0);

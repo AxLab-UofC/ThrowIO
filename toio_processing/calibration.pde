@@ -83,6 +83,25 @@ void saveCalibration() {
   saveTable(table, "data/calibration.csv");
 }
 
+void loadOrangePosition(int rowCount_) {
+  table = loadTable("../data/random_positions.csv", "header");
+
+  println(table.getRowCount() + " total rows in table");
+
+  float OrangeX_ = table.getFloat(rowCount_, "OrangeX");
+  float OrangeY_ = table.getFloat(rowCount_, "OrangeY");
+  float StartX_ = table.getFloat(rowCount_, "StartX");
+  float StartY_ = table.getFloat(rowCount_, "StartY");
+
+  OrangeX = OrangeX_;
+  OrangeY = OrangeY_;
+  StartX = StartX_;
+  StartY = StartY_;
+  startPositionX1 = StartX_;
+  startPositionY1 = StartY_;
+}
+
+
 void loadCalibration() {
   table = loadTable("data/calibration.csv", "header");
 

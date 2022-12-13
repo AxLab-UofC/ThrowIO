@@ -1,4 +1,118 @@
 //functions and commands for main code
+void captureEvent(Capture video) {
+  video.read();
+}
+
+void jumpToPhase1() {
+  phase1_seeBall = false; //phase 1
+  phase2_ballSticks = false; //phase 2
+  phase3_facePushLocation = false; //phase 3
+  phase4_travelToBallToPush = false; //phase 4
+  phase5_rotateBallToPushLocation = false; //phase 5
+  phase6_pushDone = false; //phase 6
+  phase7_findTangentPoints = false; //phase 7
+  phase8_toioTravelToPrepLocation = false; //phase 8
+  phase9_rotateToDrop = false; //phase 9
+  phase10_dropSucceed = false; //phase 10
+}
+
+void jumpToPhase3() {
+  phase1_seeBall = true; //phase 1
+  phase2_ballSticks = true; //phase 2
+  phase3_facePushLocation = false; //phase 3
+  phase4_travelToBallToPush = false; //phase 4
+  phase5_rotateBallToPushLocation = false; //phase 5
+  phase6_pushDone = false; //phase 6
+  phase7_findTangentPoints = false; //phase 7
+  phase8_toioTravelToPrepLocation = false; //phase 8
+  phase9_rotateToDrop = false; //phase 9
+  phase10_dropSucceed = false; //phase 10
+}
+
+void jumpToPhase7() {
+  phase1_seeBall = true; //phase 1
+  phase2_ballSticks = true; //phase 2
+  phase3_facePushLocation = true; //phase 3
+  phase4_travelToBallToPush = true; //phase 4
+  phase5_rotateBallToPushLocation = true; //phase 5
+  phase6_pushDone = true; //phase 6
+  phase7_findTangentPoints = false; //phase 7
+  phase8_toioTravelToPrepLocation = false; //phase 8
+  phase9_rotateToDrop = false; //phase 9
+  phase10_dropSucceed = false; //phase 10
+}
+
+void jumpToPhase10() {
+  phase1_seeBall = true; //phase 1
+  phase2_ballSticks = true; //phase 2
+  phase3_facePushLocation = true; //phase 3
+  phase4_travelToBallToPush = true; //phase 4
+  phase5_rotateBallToPushLocation = true; //phase 5
+  phase6_pushDone = true; //phase 6
+  phase7_findTangentPoints = true; //phase 7
+  phase8_toioTravelToPrepLocation = true; //phase 8
+  phase9_rotateToDrop = true; //phase 9
+  phase10_dropSucceed = false; //phase 10
+}
+
+void jumpToPhase11() {
+  phase1_seeBall = true; //phase 1
+  phase2_ballSticks = true; //phase 2
+  phase3_facePushLocation = true; //phase 3
+  phase4_travelToBallToPush = true; //phase 4
+  phase5_rotateBallToPushLocation = true; //phase 5
+  phase6_pushDone = true; //phase 6
+  phase7_findTangentPoints = true; //phase 7
+  phase8_toioTravelToPrepLocation = true; //phase 8
+  phase9_rotateToDrop = true; //phase 9
+  phase10_dropSucceed = true; //phase 10
+}
+void story_saveOrangePosition(float orangex1, float orangey1, float orangex2, float orangey2, int flyToOrange, int dropFruit, int nextOrange) {
+  table = new Table();
+
+  table.addColumn("OrangeX1");
+  table.addColumn("OrangeY1");
+  table.addColumn("OrangeX2");
+  table.addColumn("OrangeY2");
+  table.addColumn("flyToOrange");
+  table.addColumn("dropFruit");
+  table.addColumn("nextOrange");
+
+  TableRow newRow = table.addRow();
+  newRow.setFloat("OrangeX1", orangex1);
+  newRow.setFloat("OrangeY1", orangey1);
+  newRow.setFloat("OrangeX2", orangex2);
+  newRow.setFloat("OrangeY2", orangey2);
+  newRow.setInt("flyToOrange", flyToOrange);
+  newRow.setInt("dropFruit", dropFruit);
+  newRow.setInt("nextOrange", nextOrange);
+
+  saveTable(table, "../data/position.csv");
+}
+
+//helper functions to drive the cubes
+boolean rotateCubeMax(int id, float ta) {
+  float diff = ta-cubes[id].deg;
+  if (diff>180) diff-=360;
+  if (diff<-180) diff+=360;
+  if (abs(diff)<20) return true;
+  int dir = 1;
+  int strength = int(abs(diff) / 10);
+  strength = 1;//
+  if (diff<0)dir=-1;
+  //float left = ( 10*(1*strength)*dir);
+  //float right = (-10*(1+strength)*dir);
+
+  float left = (12*(1*strength)*dir);
+  float right = (-12*(1*strength)*dir);
+
+
+  //println("rotate speed", id, left, right); //maybe the speed here is kinda slow and can adjust the constant
+  int duration = 300;
+  motorControl(id, left, right, duration);
+  //println("rotate false "+diff +" "+ id+" "+ta +" "+cubes[id].deg);
+  return false;
+}
 
 float distSq(float x1, float y1, float z1, float x2, float y2, float z2) {
   float d = (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) +(z2-z1)*(z2-z1);
@@ -87,7 +201,7 @@ boolean detectBall(boolean recordHistory) {
     global_avgX = global_avgX / global_count;
     global_avgY = global_avgY / global_count;
     global_avgDepth = global_avgDepth / global_count;
-    println("depth within detect ball: ", global_avgDepth);
+    //println("depth within detect ball: ", global_avgDepth);
     //we are appending the historical positions here
     if (recordHistory) {
       global_xHist = append(global_xHist, global_avgX);
@@ -448,7 +562,7 @@ boolean findPushedLocation(int toio_number, float ballLandingX, float ballLandin
 
   float tempDist = sqrt ( pow ( ballLandingX - tempx, 2 ) + pow (ballLandingY - tempy, 2 ));
   //the distance between the ball and toio robot shell is 40
-  float ratio = 40/tempDist;
+  float ratio = 30/tempDist;
   
 
   v5 = new PVector(ballLandingX-tempx, ballLandingY-tempy); //final x and final y to ball
