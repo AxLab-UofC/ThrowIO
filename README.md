@@ -69,3 +69,5 @@ You need to first launch the main ThrowIO processing script (in toio_processing 
 - Run the processing script (in toio_processing folder)
 - Calibrate the overhanging toio mat and the ball color (you can skip this step if you previous calibrated before)
 - Start throw and catch with robots
+
+# Details
