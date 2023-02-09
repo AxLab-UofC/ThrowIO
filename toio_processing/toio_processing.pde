@@ -132,7 +132,7 @@ void draw() {
     if (phase1_seeBall == false) {
 
       //Phase 1. Check if the camera sees a ball
-      println("Phase 1. Check if the camera sees a ball");
+      println("Phase 1. Check if the camera sees a ball"); //ask David how to better reorganize phases, and ask David how to use the same phase code to deal with different applications
 
       if (applicationMode == "story" || applicationMode == "push_eval") {
         //since the experimentor will just click on where the ball sticks, we will just skip to phase3
@@ -208,6 +208,11 @@ void draw() {
         //quick debug area (set applicationMode to "debug")
         //print anything you want here!
         //as long as you don't make phase 1 flag true, then we can debug here!
+        println("cubes[0].x: ", cubes[0].x);
+        println("cubes[0].y: ", cubes[0].y);
+        //aimCubeSpeed(1,45,45);
+        //println("cubes[1].x: ", cubes[1].x);
+        //println("cubes[1].y: ", cubes[1].y);
       }
     } else if (phase1_seeBall == true && phase2_ballSticks == false) {
 
@@ -769,7 +774,7 @@ void draw() {
           if (flag_needBackout == false) {
             //If toios don't need to backout, we call findLocation() to find the prep location
 
-            if (findLocation() == true) {
+            if (find_location() == true) {
               //If we find the prep location, we move on to the next phase
               phase7_findTangentPoints = true;
             } else {
@@ -811,7 +816,7 @@ void draw() {
           if (flag_needBackout == false) {
             //If toios don't need to backout, we call findLocation() to find the prep location
 
-            if (findLocation() == true) {
+            if (find_location() == true) {
               //If we find the prep location, we move on to the next phase
               phase7_findTangentPoints = true;
             } else {
@@ -893,7 +898,7 @@ void draw() {
         if (flag_needBackout == false) {
           //If toios don't need to backout, we call findLocation() to find the prep location
 
-          if (findLocation() == true) {
+          if (find_location() == true) {
             //If we find the prep location, we move on to the next phase
             phase7_findTangentPoints = true;
           } else {

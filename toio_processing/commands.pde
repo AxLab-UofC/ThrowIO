@@ -215,133 +215,208 @@ boolean detectBall(boolean recordHistory) {
   }
 }
 
+//transform Computer Graphics Coordinate System with (0,0) on top left corner to Cartesian Coordinate System with an arbitrary center point 
+//find the 8 cases for this conversion ASK David for to return this value
+
+//void (){
+
+//}
+
+class Point {
+  float x;
+  float y;
+  
+  Point (float x_, float y_) {  
+    x = x_; 
+    y = y_; 
+  } 
+}
+
+String find_quadrant (Point object, Point center) {
+
+  if ((object.x - center.x) > 0 && (object.y - center.y) < 0) {
+    return "Q1";
+  } else if ((object.x - center.x) < 0 && (object.y - center.y) < 0) {
+    return "Q2";
+  } else if ((object.x - center.x) < 0 && (object.y - center.y) > 0) {
+    return "Q3";
+  } else if ((object.x - center.x) > 0 && (object.y - center.y) > 0) {
+    return "Q4";
+  } else if ((object.x - center.x) == 0 && (object.y - center.y) > 0) {
+    return "Q34";
+  } else if ((object.x - center.x) > 0 && (object.y - center.y) == 0) {
+    return "Q14";
+  } else if ((object.x - center.x) == 0 && (object.y - center.y) < 0) {
+    return "Q12";
+  } else if ((object.x - center.x) < 0 && (object.y - center.y) == 0) {
+    return "Q23";
+  } else {
+    println("In find_quadrant, something is wrong because the object and center are the same point");
+    exit();
+    return "Error";
+  }
+}
+
+boolean find_opposite_point(float theta_4, float diameter) {
+
+  Point start_point = new Point(global_finalx, global_finaly);
+  Point ball_point = new Point(global_ball_x, global_ball_y);
+  String quadrant = find_quadrant (ball_point, start_point);
+
+  float opposite_x = 0.0;
+  float opposite_y = 0.0;
+
+  if (quadrant.equals("Q1")) {
+
+    opposite_x = start_point.x + diameter * cos(theta_4);
+    opposite_y = start_point.y - diameter * sin(theta_4);
+  } else if (quadrant.equals("Q2")) {
+
+    opposite_x = start_point.x - diameter * cos(theta_4);
+    opposite_y = start_point.y - diameter * sin(theta_4);
+  } else if (quadrant.equals("Q3")) {
+    opposite_x = start_point.x - diameter * cos(theta_4);
+    opposite_y = start_point.y + diameter * sin(theta_4);
+  } else if (quadrant.equals("Q4")) {
+    opposite_x = start_point.x + diameter * cos(theta_4);
+    opposite_y = start_point.y + diameter * sin(theta_4);
+  } else {
+
+    //When tangent point and opposite point are on the same axis, theta_4 will be NAN.
+    //To address this issue, we let theta_4 = 0
+    theta_4 = 0;
+
+    if (quadrant.equals("Q34")) {
+      opposite_x = start_point.x + diameter * sin(theta_4);
+      opposite_y = start_point.y + diameter * cos(theta_4);
+    } else if (quadrant.equals("Q14")) {
+      opposite_x = start_point.x + diameter*cos(theta_4);
+      opposite_y = start_point.y - diameter*sin(theta_4);
+    } else if (quadrant.equals("Q12")) {
+
+      opposite_x = start_point.x + diameter*sin(theta_4);
+      opposite_y = start_point.y - diameter*cos(theta_4);
+    } else if (quadrant.equals("Q23")) {
+      opposite_x = start_point.x - diameter*cos(theta_4);
+      opposite_y = start_point.y - diameter*sin(theta_4);
+    } else {
+      println("In find_opposite_point, something is because the object and center are the same point!");
+      exit();
+    }
+  }
+
+  global_xprime = opposite_x;
+  global_yprime = opposite_y;
+
+  return true;
+}
+
 //set the tangent points in the processing of calculating prep position
-boolean setTangentPoint(float theta1, float theta2, float theta3, float d2, String mode) {
+boolean setTangentPoint(float theta_1, float theta_2, float dist_ct, String mode) {
 
-  //for the case of finding xprime and yprime, theta1 and theta2 will not be used, theta3 is theta4, d2 is diameter
+  float theta_3 = 0.0; //angle_between_cube_to_tangent_point_and_horizontal_axis
 
-  float x = 0.0;
-  float y = 0.0;
-
-  float tempx = 0.0;
-  float tempy = 0.0;
-
-  if (mode == "firstTangentPoint") {
-    theta3 = theta2+theta1;
-  } else if (mode == "secondTangentPoint") {
-    theta3 = theta2-theta1;
+  if (mode == "higher_tangent_point") {
+    theta_3 = theta_2 + theta_1;
+  } else{
+    //lower_tangent_point
+    theta_3 = theta_2 - theta_1;
   }
 
-  if (mode == "findOppositePoint") {
-    tempx = global_finalx;
-    tempy = global_finaly;
-  } else {
-    tempx = global_toio_center_x;
-    tempy = global_toio_center_y;
-  }
+  float tangent_x = 0.0;
+  float tangent_y = 0.0;
 
+  Point start_point = new Point(global_toio_center_x, global_toio_center_y);
+  Point ball_point = new Point(global_ball_x, global_ball_y);
+  String quadrant = find_quadrant (ball_point, start_point);
 
-  if ((global_ball_x - tempx) > 0 && (global_ball_y - tempy) < 0) {
+  if (quadrant.equals("Q1")) {
 
-    //println("ball in quadrant 1");
-    x = tempx+d2 * cos(theta3);
-    y = tempy-d2 * sin(theta3);
-  } else if ((global_ball_x - tempx) < 0 && (global_ball_y - tempy) < 0) {
+    tangent_x = start_point.x + dist_ct * cos(theta_3);
+    tangent_y = start_point.y - dist_ct * sin(theta_3);
+  } else if (quadrant.equals("Q2")) {
 
-    //println("ball in quadrant 2");
-    x = tempx-d2*cos(theta3);
-    y = tempy-d2*sin (theta3);
-  } else if ((global_ball_x - tempx) < 0 && (global_ball_y - tempy) > 0) {
-
-    //println("ball in quadrant 3");
-    x = tempx-d2*cos(theta3);
-    y = tempy+d2*sin (theta3);
-  } else if ((global_ball_x - tempx) > 0 && (global_ball_y - tempy) > 0) {
-
-    //println("ball in quadrant 4");
-
-    x = tempx+d2*cos(theta3);
-    y = tempy+d2*sin (theta3);
+    tangent_x = start_point.x - dist_ct * cos(theta_3);
+    tangent_y = start_point.y - dist_ct * sin(theta_3);
+  } else if (quadrant.equals("Q3")) {
+    tangent_x = start_point.x - dist_ct * cos(theta_3);
+    tangent_y = start_point.y + dist_ct * sin(theta_3);
+  } else if (quadrant.equals("Q4")) {
+    tangent_x = start_point.x + dist_ct * cos(theta_3);
+    tangent_y = start_point.y + dist_ct * sin(theta_3);
   } else {
 
-    //theta3 == NAN
-    //if theta2-theta1, then we say theta3 = -theta1
-    //if theta2+theta1, then we say theta3 = theta1
+    //When ball and cube are on the same axis, theta_3 will be NAN.
+    //To address this issue,
+    //if lower_tangent_point, then we let theta_3 = -theta_1
+    //if higher_tangent_point, then we let theta_3 = theta_1
 
-    if (mode == "firstTangentPoint") {
-      theta3 = theta1;
-    } else if (mode == "secondTangentPoint") {
-      theta3 = -theta1;
-    } else {
-      //case for theta4 == NAN, we make it to 0
-      theta3 = 0;
+    if (mode == "higher_tangent_point") {
+      theta_3 = theta_1;
+    } else{
+      //lower_tangent_point
+      theta_3 = -theta_1;
     }
 
-    if ((global_ball_x - tempx) == 0 && (global_ball_y - tempy) > 0) {
+    if (quadrant.equals("Q34")) {
+      tangent_x = start_point.x + dist_ct * sin(theta_3);
+      tangent_y = start_point.y + dist_ct * cos(theta_3);
+    } else if (quadrant.equals("Q14")) {
+      tangent_x = start_point.x + dist_ct*cos(theta_3);
+      tangent_y = start_point.y - dist_ct*sin(theta_3);
+    } else if (quadrant.equals("Q12")) {
 
-      //println("ball in between 3 and 4 quadrants");
-      x = tempx+d2*sin(theta3);
-      y = tempy+d2*cos(theta3);
-    } else if ((global_ball_x - tempx) > 0 && (global_ball_y - tempy) == 0) {
-
-      //println("ball in between 1 and 4 quadrants");
-      x = tempx+d2*cos(theta3);
-      y = tempy-d2*sin(theta3);
-    } else if ((global_ball_x - tempx) == 0 && (global_ball_y - tempy) < 0) {
-
-      //println("ball in between 1 and 2 quadrants");
-      x = tempx+d2*sin(theta3);
-      y = tempy-d2*cos(theta3);
-    } else if ((global_ball_x - tempx) < 0 && (global_ball_y - tempy) == 0) {
-
-      //println("ball in between 2 and 3 quadrants");
-      x = tempx-d2*cos(theta3);
-      y = tempy-d2*sin(theta3);
+      tangent_x = start_point.x + dist_ct*sin(theta_3);
+      tangent_y = start_point.y - dist_ct*cos(theta_3);
+    } else if (quadrant.equals("Q23")) {
+      tangent_x = start_point.x - dist_ct*cos(theta_3);
+      tangent_y = start_point.y - dist_ct*sin(theta_3);
     } else {
-      println("Something is wrong here!!");
+      println("In setTangentPoint, something is because the object and center are the same point!");
+      exit();
     }
   }
 
-  if (mode == "firstTangentPoint") {
-    global_x = x;
-    global_y = y;
-  } else if (mode == "secondTangentPoint") {
-    global_x2 = x;
-    global_y2 = y;
-  } else {
-    global_xprime = x;
-    global_yprime = y;
+  if (mode == "higher_tangent_point") {
+    global_x = tangent_x;
+    global_y = tangent_y;
+  } else{
+    //lower_tangent_point
+    global_x2 = tangent_x;
+    global_y2 = tangent_y;
   }
   return true;
 }
 
 //set the prep locations
-boolean findLocation() {
+boolean find_location() {
 
-  float c0_dist = 0.0;
-  float c1_dist = 0.0;
-
-  float d1 = 0.0;
-  float d2 = 0.0;
-  PVector v1, v2, v3, v4;
-  float theta1 = 0.0;
-  float theta2 = 0.0;
-  float theta3 = 0.0;
-  float theta4 = 0.0;
+  float dist_cb = 0.0; //distance_cube_to_ball
+  float dist_ct = 0.0; //distance_cube_to_tangent_point
+  PVector vector_c0; //vector_cube_to_ball_projection_on_horizontal_axis
+  PVector vector_cb; //vector_cube_to_ball
+  PVector vector_tb; //vector_tangent_point_to_ball
+  PVector vector_t0; //vector_tangent_point_to_ball_projection_on_horizontal_axis
+  float theta_1 = 0.0; //angle_between_cube_to_ball_and_cube_to_tangent_point
+  float theta_2 = 0.0; //angle_between_cube_to_ball_and_horizontal_axis
+  float theta_4 = 0.0; //angle_between_tangent_point_to_ball_and_horizontal_axis
 
   //1. Use closer toio to find two tangent points
-  c0_dist = cubes[0].distance(global_scaledX, global_scaledY);
-  c1_dist = cubes[1].distance(global_scaledX, global_scaledY);
+  float distance_cube0_ball = cubes[0].distance(global_scaledX, global_scaledY);
+  float distance_cube1_ball = cubes[1].distance(global_scaledX, global_scaledY);
 
   //set toio center x and y using closer toio x and y
-  if (c0_dist < c1_dist) {
+  if (distance_cube0_ball < distance_cube1_ball) {
     global_closer_toio_id = 0; //closer toio
     global_toio_center_x = cubes[0].x;
     global_toio_center_y = cubes[0].y;
+    global_toio_center_x = 100;
+    global_toio_center_y = 100;
   } else {
     global_closer_toio_id = 1; //further toio
     global_toio_center_x = cubes[1].x;
     global_toio_center_y = cubes[1].y;
+
   }
 
   //check if the dropper is outside the radius of the circle
@@ -353,21 +428,21 @@ boolean findLocation() {
     global_ball_y = global_scaledY;
 
     //find distance from ball to closer toio
-    d1 = sqrt ( pow ( global_ball_x - global_toio_center_x, 2 ) + pow ( global_ball_y - global_toio_center_y, 2 ));
+    dist_cb = sqrt(pow(global_ball_x - global_toio_center_x, 2) + pow (global_ball_y - global_toio_center_y, 2));
 
     //find distance from closer toio to lower tangent point
-    d2 = sqrt ( pow ( d1, 2 ) - pow ( global_radius, 2 ));
+    dist_ct = sqrt(pow(dist_cb, 2) - pow (global_radius, 2));
 
     //find vectors for angle calculation
-    v1 = new PVector(global_ball_x - global_toio_center_x, global_toio_center_y - global_toio_center_y); //closer toio horizontal extension
-    v2 = new PVector(global_ball_x - global_toio_center_x, global_ball_y - global_toio_center_y); //closer toio to ball
+    vector_c0 = new PVector(global_ball_x - global_toio_center_x, 0); //closer toio horizontal extension
+    vector_cb = new PVector(global_ball_x - global_toio_center_x, global_ball_y - global_toio_center_y); //closer toio to ball
 
     //determine angles
-    theta1 = acos(d2/d1);
-    theta2 = acos(v1.dot(v2)/(v1.mag()*v2.mag()));
+    theta_1  = acos(dist_ct/dist_cb);
+    theta_2 = acos(vector_c0.dot(vector_cb)/ (vector_c0.mag()*vector_cb.mag()));
 
-    setTangentPoint(theta1, theta2, theta3, d2, "firstTangentPoint");
-    setTangentPoint(theta1, theta2, theta3, d2, "secondTangentPoint");
+    setTangentPoint(theta_1, theta_2, dist_ct, "higher_tangent_point");
+    setTangentPoint(theta_1, theta_2, dist_ct, "lower_tangent_point");
 
     //2. use the further toio to find the tangent point that has longer distance
     if (global_closer_toio_id == 0) {
@@ -401,12 +476,12 @@ boolean findLocation() {
       global_finaly = global_y2;
     }
 
-    v3 = new PVector(global_ball_x-global_finalx, global_ball_y-global_finaly); //final x and final y to ball
-    v4 = new PVector(global_ball_x-global_finalx, global_finaly-global_finaly); //final x and final y horizontal extension
+    vector_tb = new PVector(global_ball_x-global_finalx, global_ball_y-global_finaly); //final x and final y to ball
+    vector_t0 = new PVector(global_ball_x-global_finalx, global_finaly-global_finaly); //final x and final y horizontal extension
 
-    theta4 = acos(v3.dot(v4)/(v3.mag()*v4.mag()));
+    theta_4 = acos(vector_tb.dot(vector_t0)/(vector_tb.mag()*vector_t0.mag()));
 
-    setTangentPoint(0, 0, theta4, 2*global_radius, "findOppositePoint");
+    find_opposite_point(theta_4, 2*global_radius);
   } else {
     //case when the ball is in the radius of the circle
     println("robot is within radius, it should backout ");
