@@ -215,13 +215,6 @@ boolean detectBall(boolean recordHistory) {
   }
 }
 
-//transform Computer Graphics Coordinate System with (0,0) on top left corner to Cartesian Coordinate System with an arbitrary center point 
-//find the 8 cases for this conversion ASK David for to return this value
-
-//void (){
-
-//}
-
 class Point {
   float x;
   float y;
@@ -410,8 +403,6 @@ boolean find_location() {
     global_closer_toio_id = 0; //closer toio
     global_toio_center_x = cubes[0].x;
     global_toio_center_y = cubes[0].y;
-    global_toio_center_x = 100;
-    global_toio_center_y = 100;
   } else {
     global_closer_toio_id = 1; //further toio
     global_toio_center_x = cubes[1].x;
@@ -485,6 +476,7 @@ boolean find_location() {
   } else {
     //case when the ball is in the radius of the circle
     println("robot is within radius, it should backout ");
+    
     return false;
   }
 
@@ -662,8 +654,8 @@ boolean findPushedLocation(int toio_number, float ballLandingX, float ballLandin
   }
 
   //we directly assign where the new pushx and pushy location should be
-  pushx = x;
-  pushy = y;
+  pushx = x+33;
+  pushy = y+33; //small adjustment
   return true;
 }
 

@@ -1,5 +1,5 @@
 //constants and libraries
-String applicationMode = "practice"; //can be "ufo", "story", "storage", "practice", "push_eval"
+String applicationMode = "storage"; //can be "ufo", "story", "storage", "practice", "push_eval", "basketball"
 
 //libraries and packages
 import oscP5.*;
@@ -185,3 +185,5 @@ float handDetectStartAreaX = mouseXLocationList[0]+(mouseXLocationList[1] - mous
 float handDetectStartAreaY = mouseYLocationList[0]+smallBox_h/2;
 float handDetectEndAreaX = handDetectStartAreaX+smallBox_w;
 float handDetectEndAreaY = handDetectStartAreaY+smallBox_h;
+float ceilingHeight;
+float ceilingWidth;

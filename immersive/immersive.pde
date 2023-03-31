@@ -218,6 +218,7 @@ void draw() {
       orangeXLocation = OrangeX1;
       orangeYLocation = OrangeY1;
     } else {
+      //second orange's location
       orangeXLocation = OrangeX2;
       orangeYLocation = OrangeY2;
     }
@@ -368,5 +369,17 @@ void keyPressed() {
     dropOrange = false;
     birdRest = false;
     break;
+   case '0':
+    //story_saveOrangePosition(story_orangex1, story_orangey1, story_orangex2, story_orangey2, 0, 0, story_orangeCount);
+    story_saveOrangePosition(150, 200, 400, 150, 0, 0, 0);
+    loadOrangePosition();
+    stage1_flyToOrange = false;
+    stage2_poking = false;
+    stage3_flyBack = false;
+    dropOrange = false;
+    birdRest = false;
+    orangeCount = 0;
+    birdX = birdNestX;
+    birdY = birdNestY;
   }
 }

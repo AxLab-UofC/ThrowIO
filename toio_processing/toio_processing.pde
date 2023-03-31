@@ -26,16 +26,19 @@ void setup() {
   //we'll be updating the cubes every frame, so don't try to go too high
   frameRate(30);
 
+
+  if (applicationMode == "ufo") {
+    
   box2d = new Box2DProcessing(this);
   box2d.createWorld();
   box2d.setGravity(0, -50); //change the gravity in box2D world here
-
-  if (applicationMode == "ufo") {
+  
     //allow two windows showing up at the same time
     //one for camera, the other for monitor screen
-    String[] args = {"TwoFrameTest"};
-    SecondApplet sa = new SecondApplet();
-    PApplet.runSketch(args, sa);
+    //String[] args = {"TwoFrameTest"};
+    //SecondApplet sa = new SecondApplet();
+    //PApplet.runSketch(args, sa);
+    
 
     ufo_file = new SoundFile(this, "explosion.wav");
     cannon_file = new SoundFile(this, "cannon.wav");
@@ -78,9 +81,9 @@ void setup() {
 
     //set starting position for the robots
     startPositionX1 = 100;
-    startPositionY1 = 200;
+    startPositionY1 = 350;
     startPositionX2 = 550;
-    startPositionY2 = 210;
+    startPositionY2 = 270;
   } else if (applicationMode == "push_eval") {
     //push evaluation only toio 0 will be pushing
 
@@ -92,6 +95,26 @@ void setup() {
 
     loadOrangePosition(rowCount);
     findPushedLocation(0, OrangeX, OrangeY);
+  }else if (applicationMode == "basketball"){
+      box2d = new Box2DProcessing(this);
+  box2d.createWorld();
+  box2d.setGravity(0, -120); //change the gravity in box2D world here
+  
+    //allow two windows showing up at the same time
+    //one for camera, the other for monitor screen
+    String[] args = {"TwoFrameTest"};
+    SecondApplet2 sa2 = new SecondApplet2();
+    PApplet.runSketch(args, sa2);
+
+    //set starting position for the robots
+    startPositionX1 = 100;
+    startPositionY1 = 100;
+    startPositionX2 = 600;
+    startPositionY2 = 250;
+
+    pushx = 360; //400
+    pushy = 180; //300
+  
   }
 
   loadCalibration();
@@ -137,7 +160,7 @@ void draw() {
       if (applicationMode == "story" || applicationMode == "push_eval") {
         //since the experimentor will just click on where the ball sticks, we will just skip to phase3
         jumpToPhase3();
-      } else if (applicationMode == "ufo" || (applicationMode == "storage" && storage_status == "store")) {
+      } else if (applicationMode == "ufo" || applicationMode == "basketball" || (applicationMode == "storage" && storage_status == "store")) {
         //applicationMode == "ufo" and "storage"
 
         //call detectBall function
@@ -514,9 +537,10 @@ void draw() {
             findPushedLocation(pushToio, story_orangex2, story_orangey2);
           }
 
+            //we tell the bird to move to the orange
+            story_saveOrangePosition(story_orangex1, story_orangey1, story_orangex2, story_orangey2, 1, 0, story_orangeCount);
+          
 
-          //we tell the bird to move to the orange
-          story_saveOrangePosition(story_orangex1, story_orangey1, story_orangex2, story_orangey2, 1, 0, story_orangeCount);
 
           //we need to record the angle between the pushing toio and the ball location
           if (flag_recordPushingToioAndBallAngle == false) {
@@ -739,7 +763,7 @@ void draw() {
 
       //Phase 7. Calculate prep location for both toios to travel
       println("Phase 7. Calculate prep location for both toios to travel");
-
+      
       if (applicationMode == "ufo") {
         //We need to re-identify where the ball is now
         if (flag_findPushedBallLocation == false) {
@@ -768,6 +792,7 @@ void draw() {
 
           flag_findPushedBallLocation = true;
         }
+        
         //If we are not killBall due to it not sticking, we can run the following block of code
         if (ufo_flag_killBall == false) {
           //After finding the ball's new position (which should be close to the push location), we find the prep location for both toios to travel
@@ -775,6 +800,7 @@ void draw() {
             //If toios don't need to backout, we call findLocation() to find the prep location
 
             if (find_location() == true) {
+              
               //If we find the prep location, we move on to the next phase
               phase7_findTangentPoints = true;
             } else {
@@ -935,6 +961,7 @@ void draw() {
 
       //Phase 8. Both toios travel to prep locations
       println("Phase 8. Both toios travel to prep locations");
+      
 
 
       if (applicationMode == "ufo" || applicationMode == "story") {
@@ -1258,6 +1285,12 @@ void draw() {
               story_flag_trackedPushedBall = false;
 
               story_orangeCount+=1;
+              
+              if(story_orangeCount==2){
+                //restart orange
+                story_orangeCount = 0;
+                findPushedLocation(1, story_orangex1, story_orangey1);
+              }
 
               startTime = false;
 
