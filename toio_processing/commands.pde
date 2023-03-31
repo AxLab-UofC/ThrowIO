@@ -158,9 +158,65 @@ boolean findHand(float handDetectStartAreaX, float handDetectStartAreaY, float h
   return true;
 }
 
-//function to detect the ball or thrown object
 boolean detectBall(boolean recordHistory) {
 
+  global_avgX = 0;
+  global_avgY = 0;
+  global_avgDepth = 0;
+  global_count = 0;
+   println(mouseXLocationList[0], mouseXLocationList[1],mouseYLocationList[0],mouseYLocationList[0]);
+  //begin loop to walk through every pixel
+  for (int x = mouseXLocationList[0]; x < mouseXLocationList[1]; x++ ) {
+    for (int y = mouseYLocationList[0]; y < mouseYLocationList[1]; y++ ) {
+
+      int loc = x + y * kinect.getVideoImage().width; //find the location of each pixel
+
+      float pixelDepth = kinect.getRawDepth()[loc];
+      color currentColor = kinect.getVideoImage().pixels[loc];
+      float r1 = red(currentColor);
+      float g1 = green(currentColor);
+      float b1 = blue(currentColor);
+      float r2 = red(trackColor);
+      float g2 = green(trackColor);
+      float b2 = blue(trackColor);
+
+      float d = distSq(r1, g1, b1, r2, g2, b2);
+
+      //compared the pixel color to the ball color
+      if (d < threshold*threshold) {
+        stroke(255);
+        strokeWeight(1);
+        point(x, y);
+        global_avgX += x;
+        global_avgY += y;
+        global_avgDepth += pixelDepth;
+        global_count++;
+      }
+    }
+  }
+
+  // we find the ball if count > 50 (this threshold can be changed)
+  if (global_count > 50) {
+    global_avgX = global_avgX / global_count;
+    global_avgY = global_avgY / global_count;
+    global_avgDepth = global_avgDepth / global_count;
+   
+    //we are appending the historical positions here
+    if (recordHistory) {
+      global_xHist = append(global_xHist, global_avgX);
+      global_yHist = append(global_yHist, global_avgY);
+      global_dHist = append(global_dHist, global_avgDepth);
+    }
+
+    return true;
+  } else {
+    return false;
+  }
+}
+
+//function to detect the ball or thrown object
+boolean old_detectBall(boolean recordHistory) {
+  
   global_avgX = 0;
   global_avgY = 0;
   global_avgDepth = 0;
@@ -201,7 +257,12 @@ boolean detectBall(boolean recordHistory) {
     global_avgX = global_avgX / global_count;
     global_avgY = global_avgY / global_count;
     global_avgDepth = global_avgDepth / global_count;
+    
+    println("detectball global_avgX:",global_avgX);
+    println("detectball global_avgY:",global_avgY);
+    println("detectball global_avgDepth:",global_avgDepth);
 
+    exit();
     //we are appending the historical positions here
     if (recordHistory) {
       global_xHist = append(global_xHist, global_avgX);
