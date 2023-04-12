@@ -1,16 +1,17 @@
-Point[] checking() {
+//Point[] checking() {
 
-  Point start_point = new Point(1, 2);
-  Point end_point = new Point(3, 7);
+//  Point start_point = new Point(1, 2);
+//  Point end_point = new Point(3, 7);
 
-  Point[] points;
-  points = new Point[2];
+//  Point[] points;
+//  points = new Point[2];
 
-  points[0] = start_point;
-  points[1] = end_point;
+//  points[0] = start_point;
+//  points[1] = end_point;
 
-  return points;
-}
+//  return points;
+//}
+
 
 String find_quadrant (Point object, Point center) {
 
@@ -291,15 +292,114 @@ Point[] find_location(float global_scaledX, float global_scaledY) {
 
     points[0] = final_point;
     points[1] = opposite_point;
-    
+    println("what? ");
+    println("points[0].x:", points[0].x);
+    println("points[0].y:", points[0].y);
+    println("points[1].x:", points[1].x);
+    println("points[1].y:", points[1].y);
     return points;
   } else {
     //case when the ball is in the radius of the circle
     println("robot is within radius, it should backout ");
-    exit();
 
     return null;
   }
   
+  //return true;
+}
+
+//find the backout location for the robot
+Point findbackoutLocation(int toio_number, float global_scaledX, float global_scaledY) {
+  
+  float global_bitMoreThanRadius = global_radius+20;
+  
+  float x = 0.0;
+  float y = 0.0;
+  PVector v5, v6;
+  float theta5 = 0.0;
+
+  float tempx = 0.0;
+  float tempy = 0.0;
+
+  if (toio_number == 0) {
+
+    tempx = cubes[0].x;
+    tempy = cubes[0].y;
+  } else {
+    tempx = cubes[1].x;
+    tempy = cubes[1].y;
+  }
+
+  float tempDist = sqrt ( pow ( global_scaledX - tempx, 2 ) + pow (global_scaledY - tempy, 2 ));
+  float ratio = global_bitMoreThanRadius/tempDist;
+
+  v5 = new PVector(global_scaledX-tempx, global_scaledY-tempy); //final x and final y to ball
+  v6 = new PVector(global_scaledX-tempx, tempy-tempy); //final x and final y horizontal extension
+
+  theta5 = acos(v5.dot(v6)/(v5.mag()*v6.mag()));
+
+
+  if ((global_scaledX - tempx)> 0 & (global_scaledY - tempy) < 0) {
+
+    //println("ball in quadrant 1");
+    x = global_scaledX-ratio*tempDist*cos(theta5);
+    y = global_scaledY+ratio*tempDist*sin(theta5);
+  } else if ((global_scaledX - tempx) < 0 & (global_scaledY - tempy) < 0) {
+
+    //println("ball in quadrant 2");
+    x = global_scaledX+ratio*tempDist*cos(theta5);
+    y = global_scaledY+ratio*tempDist*sin(theta5);
+  } else if ((global_scaledX - tempx) < 0 & (global_scaledY - tempy) > 0) {
+
+    //println("ball in quadrant 3");
+    x = global_scaledX+ratio*tempDist*cos(theta5);
+    y = global_scaledY-ratio*tempDist*sin(theta5);
+  } else if ((global_scaledX - tempx) > 0 & (global_scaledY - tempy) > 0) {
+
+    //println("ball in quadrant 4");
+    x = global_scaledX-ratio*tempDist*cos(theta5);
+    y = global_scaledY-ratio*tempDist*sin(theta5);
+  } else {
+
+    theta5 = 0;
+
+    if ((global_scaledX - tempx) == 0 & (global_scaledY - tempy) > 0) {
+
+      //println("ball in between 3 and 4 quadrants");
+      x = global_scaledX-ratio*tempDist*sin(theta5);
+      y = global_scaledY-ratio*tempDist*cos(theta5);
+    } else if ((global_scaledX - tempx) > 0 & (global_scaledY - tempy) == 0) {
+
+      //println("ball in between 1 and 4 quadrants");
+      x = global_scaledX-ratio*tempDist*cos(theta5);
+      y = global_scaledY+ratio*tempDist*sin(theta5);
+    } else if ((global_scaledX - tempx) == 0 & (global_scaledY - tempy) < 0) {
+
+      //println("ball in between 1 and 2 quadrants");
+      x = global_scaledX-ratio*tempDist*sin(theta5);
+      y = global_scaledY+ratio*tempDist*cos(theta5);
+    } else if ((global_scaledX - tempx) < 0 & (global_scaledY - tempy) == 0) {
+
+      //println("ball in between 2 and 3 quadrants");
+      x = global_scaledX+ratio*tempDist*cos(theta5);
+      y = global_scaledY+ratio*tempDist*sin(theta5);
+    } else {
+
+      println("Something is wrong here!!");
+    }
+  }
+
+   Point backout_point = new Point(x, y);
+   
+   return backout_point;
+
+
+  //if (toio_number == 0) {
+  //  global_backoutx0 = x;
+  //  global_backouty0 = y;
+  //} else {
+  //  global_backoutx1 = x;
+  //  global_backouty1 = y;
+  //}
   //return true;
 }

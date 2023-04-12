@@ -10,11 +10,49 @@ boolean spin = false;
 
 float global_radius = 120;
 
-boolean checking_flag = false;
-Point[] checking_points;
+//boolean checking_flag = false;
+//Point[] checking_points;
+
+
+
+String applicationMode = "desktop";
+boolean phase1_seeBall = false;
+boolean phase2_ballSticks = false;
+boolean phase3_facePushLocation = false;
+boolean phase4_travelToBallToPush = false;
+boolean phase5_rotateBallToPushLocation = false;
+boolean phase6_pushDone = false;
+boolean phase7_findTangentPoints = false;
+boolean phase8_toioTravelToPrepLocation = false;
+boolean phase9_rotateToDrop = false;
+boolean phase10_dropSucceed = false;
+boolean flag_findPushedBallLocation = false;
+boolean flag_needBackout = false;
+
+Point global_ball;
+
+Point[] travel_points;
+Point[] tangent_points;
+
+Point backout_0;
+Point backout_1;
+
+boolean flag_prepareBackout = false;
+boolean flag_recordToioAndBallAngle = false;
+float turnDegree1 = 0;
+float turnDegree0 = 0;
 float distance_cube0_ball;
 float distance_cube1_ball;
+boolean flag_rotate0 = false;
+boolean flag_rotate1 = false;
+boolean startTime = false;
+int convergeDistance = 45;
+int time = millis();
 
+float startPositionX1;
+float startPositionY1;
+float startPositionX2;
+float startPositionY2;
 
 //for OSC
 OscP5 oscP5;
