@@ -95,6 +95,5 @@ void oscEvent(OscMessage msg) {
     int id = cubesPerHost*hostId + relid;
     int battery = msg.get(2).intValue();
     cubes[id].battery = battery;
-    //println("Battery Level for id " + id + ": " + battery);
   }
 }

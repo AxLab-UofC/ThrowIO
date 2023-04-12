@@ -3,15 +3,11 @@ class Cube {
   int x;
   int y;
   int battery;
-
-
   int prex;
   int prey;
   float speedX;
   float speedY;
   int lastTime = 0;
-  //int oidx;
-  //int oidy;
   float targetx =-1;
   float targety =-1;
   boolean isLost;
@@ -59,7 +55,6 @@ class Cube {
     if (abs(diffAngle) < HALF_PI) {
       //in front
       float frac = cos(diffAngle);
-      //println(frac);
       if (diffAngle > 0) {
         //up-left
         left = floor(100*pow(frac, 1));

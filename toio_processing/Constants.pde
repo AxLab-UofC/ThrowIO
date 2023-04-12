@@ -1,5 +1,5 @@
 //constants and libraries
-String applicationMode = "storage"; //can be "ufo", "story", "storage", "practice", "push_eval", "basketball"
+String applicationMode = "story"; //can be "ufo", "story", "storage", "practice", "push_eval", "basketball"
 
 //libraries and packages
 import oscP5.*;

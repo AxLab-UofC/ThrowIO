@@ -22,6 +22,7 @@ void setup() {
   kinect.initDepth();
   kinect.initVideo();
 
+
   //do not send TOO MANY PACKETS
   //we'll be updating the cubes every frame, so don't try to go too high
   frameRate(30);
