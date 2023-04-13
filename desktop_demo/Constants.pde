@@ -8,7 +8,7 @@ boolean mouseDrive = false;
 boolean chase = false;
 boolean spin = false;
 
-float global_radius = 120;
+float global_radius = 100;
 
 //boolean checking_flag = false;
 //Point[] checking_points;
@@ -39,6 +39,7 @@ Point backout_1;
 
 boolean flag_prepareBackout = false;
 boolean flag_recordToioAndBallAngle = false;
+float turnDegree2 = 0;
 float turnDegree1 = 0;
 float turnDegree0 = 0;
 float distance_cube0_ball;
@@ -48,6 +49,7 @@ boolean flag_rotate1 = false;
 boolean startTime = false;
 int convergeDistance = 45;
 int time = millis();
+int global_closer_toio_id;
 
 float startPositionX1;
 float startPositionY1;

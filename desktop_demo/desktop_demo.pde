@@ -28,10 +28,10 @@ void setup() {
   frameRate(30);
 
   //set starting position for the robots
-  startPositionX1 = 100;
-  startPositionY1 = 350;
-  startPositionX2 = 550;
-  startPositionY2 = 270;
+  startPositionX1 = 80;
+  startPositionY1 = 80;
+  startPositionX2 = 295;
+  startPositionY2 = 205;
 }
 
 void draw() {
@@ -111,7 +111,17 @@ void draw() {
 
       if (travel_points != null) {
         //If we find the prep location, we move on to the next phase
-        println("we find travel points");
+
+        //we also find which toio is closer to the ball here!
+        distance_cube0_ball = cubes[0].distance(global_ball.x, global_ball.y);
+        distance_cube1_ball = cubes[1].distance(global_ball.x, global_ball.y);
+
+        if (distance_cube0_ball < distance_cube1_ball){
+            global_closer_toio_id = 0;
+        }else{
+            global_closer_toio_id = 1;
+        }
+
         phase7_findTangentPoints = true;
       } else {
         //If we can't find the prep locations, that means that at least one toio is too close the ball, so we need to move them out
@@ -134,7 +144,7 @@ void draw() {
           println("flag_prepareBackout:", flag_prepareBackout);
         }
       } else {
-  
+
         aimCubeSpeed(0, backout_0.x, backout_0.y);
         aimCubeSpeed(1, backout_1.x, backout_1.y);
 
@@ -142,7 +152,7 @@ void draw() {
           && abs(cubes[1].y -  backout_1.y) < 15 ) {
           //when toios finally backout, we set flag_needBackout to false so that we can once again call findLocation() to find the prep locaiton
           flag_needBackout = false;
-          
+          println("done backing out!");
         }
       }
     }
@@ -152,13 +162,10 @@ void draw() {
     println("Phase 8. Both toios travel to prep locations");
 
 
-    distance_cube0_ball = cubes[0].distance(global_ball.x, global_ball.y);
-    distance_cube1_ball = cubes[1].distance(global_ball.x, global_ball.y);
-
     //tangent_points = new Point[2];
-    travel_points = find_location(global_ball.x, global_ball.y);
+    //travel_points = find_location(global_ball.x, global_ball.y);
 
-    if (distance_cube0_ball < distance_cube1_ball) {
+    if (global_closer_toio_id == 0) {
       //If closer toio is cube0, we let it travel to global_finalx, global_finaly and let cube1 travel to global_xprime, global_yprime.
       aimCubeSpeed(0, travel_points[0].x, travel_points[0].y);
       aimCubeSpeed(1, travel_points[1].x, travel_points[1].y);
@@ -216,11 +223,20 @@ void draw() {
 
       //once both toios finish rotating, we move on to the next phase
       if (flag_rotate0 && flag_rotate1) {
-
+        
+        //extra line of to record angle to spin the toio ball toward toio 0, so that it is easier to be dropped
+        turnDegree2 = degrees(atan2(cubes[0].y-cubes[2].y,cubes[0].y-cubes[2].x));
+        
+        if (turnDegree2 < 0) {
+        turnDegree2+=360;
+      }
+      
         phase9_rotateToDrop = true;
       }
     }
   } else if (phase9_rotateToDrop == true && phase10_dropSucceed == false) {
+    
+    
 
     //Phase 10. Toio converge to drop the object
     println("Phase 10. Toio converge to drop the object");
@@ -228,9 +244,13 @@ void draw() {
     if (startTime == false) {
       time = millis();
       startTime = true;
+      
     } else {
+      
+      //Rotate the toio ball here while waiting to be dropped
+      rotateCubeMax(2, turnDegree2-180);
 
-      if (millis() > time + 500) { //wait for virtual ball to drop
+      if (millis() > time + 500) {
 
         //both toios travel to the ball's location
         aimCubeSpeed(0, global_ball.x, global_ball.y);
