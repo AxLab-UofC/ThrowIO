@@ -12,6 +12,16 @@
 //  return points;
 //}
 
+boolean checkTolerance(Cube cube_0, Cube cube_1, Point point_0, Point point_1, float tolerance) {
+
+  if (abs(cube_0.x - point_0.x) < tolerance && abs(cube_0.y - point_0.y) < tolerance
+    && abs(cube_1.x - point_1.x) < tolerance && abs(cube_1.y -  point_1.y) < tolerance) {
+
+    return true;
+  }
+
+  return false;
+}
 
 //helper functions to drive the cubes
 boolean rotateCubeMax(int id, float ta) {
@@ -202,7 +212,7 @@ Point[] find_location(float global_scaledX, float global_scaledY) {
 
   int global_closer_toio_id;
   String global_furtherTangentPoint;
-  
+
   float global_toio_center_x;
   float global_toio_center_y;
   Point final_point = new Point(-1000, -1000); //random initialization
@@ -288,7 +298,7 @@ Point[] find_location(float global_scaledX, float global_scaledY) {
 
     //3. use the furtherTangentPoint to find the opposite point
     if (global_furtherTangentPoint.equals("xy")) {
-      
+
       final_point.x = higher_tangent_point.x; //orignally global_finalx
       final_point.y = higher_tangent_point.y; //orignally global_finaly
     } else {
@@ -322,15 +332,15 @@ Point[] find_location(float global_scaledX, float global_scaledY) {
 
     return null;
   }
-  
+
   //return true;
 }
 
 //find the backout location for the robot
 Point findbackoutLocation(int toio_number, float global_scaledX, float global_scaledY) {
-  
+
   float global_bitMoreThanRadius = global_radius+20;
-  
+
   float x = 0.0;
   float y = 0.0;
   PVector v5, v6;
@@ -355,19 +365,18 @@ Point findbackoutLocation(int toio_number, float global_scaledX, float global_sc
   v6 = new PVector(global_scaledX-tempx, tempy-tempy); //final x and final y horizontal extension
 
   theta5 = acos(v5.dot(v6)/(v5.mag()*v6.mag()));
-   
-   
+
+
   Point ball_point = new Point(global_scaledX, global_scaledY);
   Point start_point = new Point(tempx, tempy);
-  
+
   String quadrant = find_quadrant (ball_point, start_point);
-  
+
   if (quadrant.equals("Q1")) {
 
     x = global_scaledX-ratio*tempDist*cos(theta5);
     y = global_scaledY+ratio*tempDist*sin(theta5);
-    
-  }else if (quadrant.equals("Q2")) {
+  } else if (quadrant.equals("Q2")) {
 
     //println("ball in quadrant 2");
     x = global_scaledX+ratio*tempDist*cos(theta5);
@@ -411,10 +420,10 @@ Point findbackoutLocation(int toio_number, float global_scaledX, float global_sc
       println("Something is wrong here!!");
     }
   }
-  
-   Point backout_point = new Point(x, y);
-   
-   return backout_point;
+
+  Point backout_point = new Point(x, y);
+
+  return backout_point;
 
 
   //if (toio_number == 0) {

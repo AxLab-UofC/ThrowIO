@@ -48,13 +48,15 @@ boolean flag_rotate0 = false;
 boolean flag_rotate1 = false;
 boolean startTime = false;
 int convergeDistance = 45;
+int travelErrorTolerance = 15;
+int rotateErrorTolerance = 10;
 int time = millis();
 int global_closer_toio_id;
 
-float startPositionX1;
-float startPositionY1;
-float startPositionX2;
-float startPositionY2;
+Point start_position_0;
+Point start_position_1;
+
+String phaseLabel = "";
 
 //for OSC
 OscP5 oscP5;
