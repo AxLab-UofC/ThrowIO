@@ -8,14 +8,12 @@ boolean mouseDrive = false;
 boolean chase = false;
 boolean spin = false;
 
-float global_radius = 75;
-
-//boolean checking_flag = false;
-//Point[] checking_points;
+float global_radius = 100;
 
 
+String applicationMode = "practice"; //"practice", "storage", "story"
+String cameraDetectionMode = "ir"; //color, ir, mouse
 
-String applicationMode = "desktop";
 boolean phase1_seeBall = false;
 boolean phase2_ballSticks = false;
 boolean phase3_facePushLocation = false;
@@ -28,6 +26,8 @@ boolean phase9_rotateToDrop = false;
 boolean phase10_dropSucceed = false;
 boolean flag_findPushedBallLocation = false;
 boolean flag_needBackout = false;
+
+
 
 Point global_ball;
 
@@ -47,7 +47,7 @@ float distance_cube1_ball;
 boolean flag_rotate0 = false;
 boolean flag_rotate1 = false;
 boolean startTime = false;
-int convergeDistance = 40;
+int convergeDistance = 45;
 int travelErrorTolerance = 15;
 int rotateErrorTolerance = 10;
 int time = millis();
@@ -57,6 +57,25 @@ Point start_position_0;
 Point start_position_1;
 
 String phaseLabel = "";
+
+//camera
+Capture video;
+Kinect kinect;
+
+int[] mouseXLocationList = new int[4];
+int[] mouseYLocationList = new int[4];
+color global_trackColor;
+int mouseXLocation = -50;
+int mouseYLocation = -50;
+int clickCount = 0;
+int[] story_mouseXForOrange =  new int[1];
+int[] story_mouseYForOrange =  new int[1];
+float[] global_xHist = {};
+float[] global_yHist = {};
+float[] global_dHist = {};
+
+float[] ir_values;
+
 
 //for OSC
 OscP5 oscP5;

@@ -28,8 +28,8 @@ void setup() {
   frameRate(30);
 
   //set starting position for the robots
-  start_position_0 = new Point(80, 80);
-  start_position_1 = new Point(295, 205);
+  start_position_0 = new Point(90, 90);
+  start_position_1 = new Point(285, 195);
   //startPositionX1 = 80;
   //startPositionY1 = 80;
   //startPositionX2 = 295;
@@ -168,13 +168,6 @@ void draw() {
           println("done backing out!");
         }
 
-
-        //if (abs(cubes[0].x - backout_0.x) < travelErrorTolerance && abs(cubes[0].y - backout_0.y) < travelErrorTolerance
-        //&& abs(cubes[1].x - backout_1.x) < travelErrorTolerance && abs(cubes[1].y -  backout_1.y) < travelErrorTolerance) {
-        //  //when toios finally backout, we set flag_needBackout to false so that we can once again call findLocation() to find the prep locaiton
-        //  flag_needBackout = false;
-        //  println("done backing out!");
-        //}
       }
     }
   } else if (phase7_findTangentPoints == true && phase8_toioTravelToPrepLocation == false) {
@@ -183,9 +176,6 @@ void draw() {
     phaseLabel = "Phase 8/11. Both toios travel to prep locations";
     println(phaseLabel);
 
-
-    //tangent_points = new Point[2];
-    //travel_points = find_location(global_ball.x, global_ball.y);
 
     if (global_closer_toio_id == 0) {
       //If closer toio is cube0, we let it travel to global_finalx, global_finaly and let cube1 travel to global_xprime, global_yprime.
@@ -196,12 +186,6 @@ void draw() {
         phase8_toioTravelToPrepLocation = true;
       }
 
-
-      //if (abs(cubes[0].x - travel_points[0].x) < travelErrorTolerance && abs(cubes[0].y - travel_points[0].y) < travelErrorTolerance
-      //  && abs(cubes[1].x - travel_points[1].x) < travelErrorTolerance && abs(cubes[1].y - travel_points[1].y) < travelErrorTolerance ) {
-
-      //  phase8_toioTravelToPrepLocation = true;
-      //}
     } else {
 
       //If closer toio is cube1, we let it travel to global_finalx, global_finaly and let cube0 travel to global_xprime, global_yprime.
@@ -212,11 +196,6 @@ void draw() {
         phase8_toioTravelToPrepLocation = true;
       }
 
-      //if (abs(cubes[1].x - travel_points[0].x) < travelErrorTolerance && abs(cubes[1].y - travel_points[0].y) < travelErrorTolerance
-      //&& abs(cubes[0].x - travel_points[1].x) < travelErrorTolerance && abs(cubes[0].y - travel_points[1].y) < travelErrorTolerance) {
-
-      //  phase8_toioTravelToPrepLocation = true;
-      //}
     }
   } else if (phase8_toioTravelToPrepLocation == true && phase9_rotateToDrop == false) {
     //Phase 9. One toio rotates to use the prong side to and the other rotates to use the wedge side for drop operation
@@ -243,7 +222,7 @@ void draw() {
       if (abs(cubes[0].deg - turnDegree0) < rotateErrorTolerance) {
         flag_rotate0 = true;
       } else {
-        rotateCube(0, turnDegree0);
+        rotateCubeMax(0, turnDegree0);
       }
 
       //based on cube0 degree, we rotate cube1
@@ -252,7 +231,7 @@ void draw() {
         flag_rotate1 = true;
       } else {
 
-        rotateCube(1, turnDegree1-180); //cube 1 use chopstick side
+        rotateCubeMax(1, turnDegree1-180); //cube 1 use chopstick side
       }
 
       //once both toios finish rotating, we move on to the next phase
@@ -298,12 +277,6 @@ void draw() {
       startTime = false;
     }
 
-    //if (abs(cubes[0].x - global_ball.x) < convergeDistance && abs(cubes[1].x - global_ball.x) < convergeDistance &&
-    //  abs(cubes[0].y - global_ball.y) < convergeDistance &&  abs(cubes[1].y - global_ball.y) < convergeDistance) {
-
-    //  phase10_dropSucceed = true;
-    //  startTime = false;
-    //}
   } else if (phase10_dropSucceed == true) {
 
     //Phase 11. Reset all of the flags so that we can start the algorithm again
@@ -343,31 +316,6 @@ void draw() {
           startTime = false;
         }
         
-        //if (abs(cubes[0].x - startPositionX1) < travelErrorTolerance && abs(cubes[1].x - startPositionX2) < travelErrorTolerance &&
-        //  abs(cubes[0].y - startPositionY1) < travelErrorTolerance && abs(cubes[1].y - startPositionY2) < travelErrorTolerance) {
-
-        //  //reset phase flags to false
-        //  phase1_seeBall = false; //phase 1
-        //  phase2_ballSticks = false; //phase 2
-        //  phase3_facePushLocation = false; //phase 3
-        //  phase4_travelToBallToPush = false; //phase 4
-        //  phase5_rotateBallToPushLocation = false; //phase 5
-        //  phase6_pushDone = false; //phase 6
-        //  phase7_findTangentPoints = false; //phase 7
-        //  phase8_toioTravelToPrepLocation = false; //phase 8
-        //  phase9_rotateToDrop = false; //phase 9
-        //  phase10_dropSucceed = false; //phase 10
-
-        //  //reset flags
-        //  flag_rotate0 = false;
-        //  flag_rotate1 = false;
-        //  flag_recordToioAndBallAngle = false;
-        //  flag_prepareBackout = false;
-        //  flag_findPushedBallLocation = false;
-        //  turnDegree1 = 0;
-        //  turnDegree0 = 0;
-        //  startTime = false;
-        //}
       }
     }
   }
