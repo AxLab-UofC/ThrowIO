@@ -27,6 +27,37 @@ void keyPressed() {
   case 't':
     //travelToStartPosition = true;
     break;
+
+  case 'i':
+    //we want to make sure that this can only be pressed during calibration or something
+    cameraDetectionMode = "ir";
+    if (ir == false) {
+      ir = true;
+      kinect.enableIR(ir); //enable ir image
+    }
+
+    break;
+
+  case 'm':
+    if (ir == true) {
+      ir = false;
+      kinect.enableIR(ir); //disabling ir image
+    }
+    cameraDetectionMode = "mouse";
+
+    break;
+
+  case 'o': //color mode, stand for orange color
+
+    if (ir == true) {
+      ir = false;
+      kinect.enableIR(ir); //disabling ir image
+    }
+    cameraDetectionMode = "color";
+
+
+    break;
+
   default:
     break;
   }

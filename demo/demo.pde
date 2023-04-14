@@ -39,7 +39,12 @@ void setup() {
 
 
   loadCalibration();
+  
+  if(cameraDetectionMode == "ir"){
+    ir = true;
+  }
 }
+
 
 void draw() {
   //START DO NOT EDIT
@@ -78,14 +83,16 @@ void draw() {
     if (cameraDetectionMode == "color") {
       println("In color detect mode");
       colorDetecBall(false);
+      
     } else if (cameraDetectionMode == "ir") {
+      
       println("In IR detect mode");
-
-      ir_values = irDetectBall();
-      if (ir_values != null) {
-        println("avgX:", ir_values[0]);
-        println("avgY:", ir_values[1]);
-        ellipse(640+ir_values[0], ir_values[1], 20, 20);
+      Point ir_tracking_point = irDetectBall();
+      if (ir_tracking_point != null) {
+        println("ir_tracking_point x :", ir_tracking_point.x);
+        println("ir_tracking_point y:", ir_tracking_point.y);
+        
+        ellipse(ir_tracking_point.x, ir_tracking_point.y, 20, 20);
       } else {
 
         println("no values");

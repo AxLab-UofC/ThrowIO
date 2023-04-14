@@ -28,8 +28,8 @@ void setup() {
   frameRate(30);
 
   //set starting position for the robots
-  start_position_0 = new Point(90, 90);
-  start_position_1 = new Point(285, 195);
+  start_position_0 = new Point(100, 100);
+  start_position_1 = new Point(275, 185);
   //startPositionX1 = 80;
   //startPositionY1 = 80;
   //startPositionX2 = 295;
@@ -222,7 +222,7 @@ void draw() {
       if (abs(cubes[0].deg - turnDegree0) < rotateErrorTolerance) {
         flag_rotate0 = true;
       } else {
-        rotateCubeMax(0, turnDegree0);
+        rotateCube(0, turnDegree0);
       }
 
       //based on cube0 degree, we rotate cube1
@@ -231,7 +231,7 @@ void draw() {
         flag_rotate1 = true;
       } else {
 
-        rotateCubeMax(1, turnDegree1-180); //cube 1 use chopstick side
+        rotateCube(1, turnDegree1-180); //cube 1 use chopstick side
       }
 
       //once both toios finish rotating, we move on to the next phase

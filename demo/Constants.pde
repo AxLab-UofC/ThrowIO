@@ -12,7 +12,7 @@ float global_radius = 100;
 
 
 String applicationMode = "practice"; //"practice", "storage", "story"
-String cameraDetectionMode = "ir"; //color, ir, mouse
+String cameraDetectionMode = "color"; //color, ir, mouse
 
 boolean phase1_seeBall = false;
 boolean phase2_ballSticks = false;
@@ -74,7 +74,10 @@ float[] global_xHist = {};
 float[] global_yHist = {};
 float[] global_dHist = {};
 
-float[] ir_values;
+//ir tracking
+Point ir_tracking_point;
+boolean ir = false;
+boolean mouse = false;
 
 
 //for OSC

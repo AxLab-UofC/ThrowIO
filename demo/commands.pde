@@ -18,64 +18,149 @@ float distSq(float x1, float y1, float z1, float x2, float y2, float z2) {
 }
 
 //if the ball has led light, we can use this function to track the object in the depth camera window.
-float[] irDetectBall() {
+//float[] irDetectBall() {
 
-  float avgX = 0;
-  float avgY = 0;
-  float avgDepth = 0;
-  float count = 0;
-  float threshold = 40; //150 for red
-   
-  //println(50, 100, 50, 100);
-  //begin loop to walk through every pixel in the calibrated rectangle
+//  float avgX = 0;
+//  float avgY = 0;
+//  float avgDepth = 0;
+//  float count = 0;
+//  float threshold = 40; //150 for red
+
+//  //println(50, 100, 50, 100);
+//  //begin loop to walk through every pixel in the calibrated rectangle
+
+//  for (int x = mouseXLocationList[0]; x < mouseXLocationList[1]; x++ ) {
+//    for (int y = mouseYLocationList[0]; y < mouseYLocationList[1]; y++ ) {
+
+//      int loc = x + y * kinect.getDepthImage().width; //find the location of each pixel
+
+//      float pixelDepth = kinect.getRawDepth()[loc];
+//      color currentColor = kinect.getDepthImage().pixels[loc];
+//      float r1 = red(currentColor);
+//      float g1 = green(currentColor);
+//      float b1 = blue(currentColor);
+
+//      //we want to find all black color
+//      float r2 = 0;
+//      float g2 = 0;
+//      float b2 = 0;
+
+//      float d = distSq(r1, g1, b1, r2, g2, b2);
+
+//      //compared the pixel color to the ball color
+//      if (d < threshold*threshold) {
+//        //stroke(255);
+//        //strokeWeight(1);
+//        //point(x, y);
+//        avgX += x;
+//        avgY += y;
+//        avgDepth += pixelDepth;
+//        count++;
+//      }
+//    }
+//  }
+
+//  // we find the ball if count > 50 (this threshold can be changed)
+//  if (count > 50) {
+//    avgX = avgX / count;
+//    avgY = avgY / count;
+//    avgDepth = avgDepth / count;
+
+//    float[] values = new float[3];
+
+//    values[0] = avgX;
+//    values[1] = avgY;
+//    values[2] = avgDepth;
+//    return values;
+
+//  } else {
+//    return null;
+//  }
+//}
+
+Point irDetectBall() {
   
+  ///TODO: need to disregard hand in the camera, 
+  //because hand too close to the camera might cause the alogirhtm to detect as the IR ball
+
+  float ir_threshold = 2;
+  float ir_blobSize = 10;
+  Blob ir_biggestBlob = new Blob(-1,-1); // just for initialization purposes
+  Point ir_biggestBlobPos;
+  color ir_trackColor = color(255, 255, 255); //track white
+  ArrayList<Blob> ir_blobs = new ArrayList<Blob>();
+  ir_blobs.clear();
+
+  // Begin loop to walk through every pixel
   for (int x = mouseXLocationList[0]; x < mouseXLocationList[1]; x++ ) {
     for (int y = mouseYLocationList[0]; y < mouseYLocationList[1]; y++ ) {
-
-      int loc = x + y * kinect.getDepthImage().width; //find the location of each pixel
-
-      float pixelDepth = kinect.getRawDepth()[loc];
-      color currentColor = kinect.getDepthImage().pixels[loc];
+      int loc = x + y * kinect.getVideoImage().width; //change back to depth image
+      // What is current color
+      color currentColor = kinect.getVideoImage().pixels[loc]; //change back to depth image
       float r1 = red(currentColor);
       float g1 = green(currentColor);
       float b1 = blue(currentColor);
-      
-      //we want to find all black color
-      float r2 = 0;
-      float g2 = 0;
-      float b2 = 0;
+      float r2 = red(ir_trackColor);
+      float g2 = green(ir_trackColor);
+      float b2 = blue(ir_trackColor);
 
       float d = distSq(r1, g1, b1, r2, g2, b2);
 
-      //compared the pixel color to the ball color
-      if (d < threshold*threshold) {
-        //stroke(255);
-        //strokeWeight(1);
-        //point(x, y);
-        avgX += x;
-        avgY += y;
-        avgDepth += pixelDepth;
-        count++;
+      if (d < ir_threshold) {
+
+        boolean found = false;
+        for (Blob b : ir_blobs) {
+          if (b.isNear(x, y)) {
+            b.add(x, y);
+            found = true;
+            break;
+          }
+        }
+
+        if (!found) {
+          Blob b = new Blob(x, y);
+          ir_blobs.add(b);
+        }
       }
     }
   }
+  
+  //theoritically the biggiest blob is what we want
+  float maxSize = 0;
+  if (ir_blobs.isEmpty() == false) {
+    for (Blob b : ir_blobs) {
+      //if (b.size() > ir_blobSize) {
+      //  b.show();
+      //}
+      if (b.size() > ir_blobSize) {
+        if (b.size() > maxSize) {
+          maxSize = b.size();
+          //record biggest blob
+          ir_biggestBlob = b;
+        }
+      }
+    }
 
-  // we find the ball if count > 50 (this threshold can be changed)
-  if (count > 50) {
-    avgX = avgX / count;
-    avgY = avgY / count;
-    avgDepth = avgDepth / count;
-     
-    float[] values = new float[3];
+    if (maxSize != 0) {
+      println("Found the biggest blob!");
+      ir_biggestBlob.show();
+      ir_biggestBlobPos = new Point ((ir_biggestBlob.minx+ir_biggestBlob.maxx)/2, (ir_biggestBlob.miny+ir_biggestBlob.maxy)/2);
+      
+      println("blob center x is: ",ir_biggestBlobPos.x);
+      println("blob center y is: ",ir_biggestBlobPos.y);
     
-    values[0] = avgX;
-    values[1] = avgY;
-    values[2] = avgDepth;
-    return values;
-    
-  } else {
-    return null;
+      return ir_biggestBlobPos;
+    }
+
   }
+  
+  return null;
+}
+
+// Custom distance functions w/ no square root for optimization
+float distSq2(float x1, float y1, float x2, float y2) {
+  float d = (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1);
+  return d;
 }
 
 boolean colorDetecBall(boolean recordHistory) {
@@ -85,10 +170,10 @@ boolean colorDetecBall(boolean recordHistory) {
   float avgDepth = 0;
   float count = 0;
   float threshold = 40; //150 for red
-   
-   println(mouseXLocationList[0], mouseXLocationList[1],mouseYLocationList[0],mouseYLocationList[0]);
+
+  println(mouseXLocationList[0], mouseXLocationList[1], mouseYLocationList[0], mouseYLocationList[0]);
   //begin loop to walk through every pixel in the calibrated rectangle
-  
+
   for (int x = mouseXLocationList[0]; x < mouseXLocationList[1]; x++ ) {
     for (int y = mouseYLocationList[0]; y < mouseYLocationList[1]; y++ ) {
 
@@ -123,7 +208,7 @@ boolean colorDetecBall(boolean recordHistory) {
     avgX = avgX / count;
     avgY = avgY / count;
     avgDepth = avgDepth / count;
-   
+
     //we are appending the historical positions here
     if (recordHistory) {
       global_xHist = append(global_xHist, avgX);

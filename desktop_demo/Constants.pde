@@ -8,7 +8,7 @@ boolean mouseDrive = false;
 boolean chase = false;
 boolean spin = false;
 
-float global_radius = 75;
+float global_radius = 80;
 
 //boolean checking_flag = false;
 //Point[] checking_points;
@@ -47,7 +47,7 @@ float distance_cube1_ball;
 boolean flag_rotate0 = false;
 boolean flag_rotate1 = false;
 boolean startTime = false;
-int convergeDistance = 40;
+int convergeDistance = 42;
 int travelErrorTolerance = 15;
 int rotateErrorTolerance = 10;
 int time = millis();
