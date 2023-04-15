@@ -486,6 +486,7 @@ void draw() {
               turnDegree1 = 0;
               turnDegree0 = 0;
               startTime = false;
+              practice_flag_trackedStuckBall = false;
             }
           }
         }

@@ -87,7 +87,7 @@ void mousePressed() {
   
   if (applicationMode == "practice" && calibrationMode == 0 && phase1_seeBall == false) {
     //when the experimentor needs to wizard of Oz to track where the ball sticks
-    mousePressedforTrackStuckBall("practice");
+    mousePressedforTrackStuckBall(applicationMode);
   }
 
   //if (applicationMode == "story" && calibrationMode == 0 && phase2_ballSticks == true && phase3_facePushLocation == false) {

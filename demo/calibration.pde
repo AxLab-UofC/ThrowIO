@@ -27,8 +27,8 @@ void drawDebugWindow() {
   text("CalibrationMode: " + calibrationModeText, 20, 580);
 
   textSize(13);
-  text("Hit 'c' to switch calibration modes, 's' for saving , 'l' for loading", 20, 560);
-
+  text("Hit 'c' to switch calibration modes, 's' for saving , 'l' for loading. "+
+  "In calibration modes, hit 'i' to switch to IR, 'm' to switch to Mouse, 'o' to switch to Color (default)", 20, 560);
 
   int box_w = mouseXLocationList[1] - mouseXLocationList[0];
   int box_h = mouseYLocationList[1] - mouseYLocationList[0];
