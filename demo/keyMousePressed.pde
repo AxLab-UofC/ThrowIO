@@ -24,8 +24,16 @@ void keyPressed() {
     loadCalibration();
     break;
 
-  case 't':
-    //travelToStartPosition = true;
+  case '1': //practice
+    applicationMode = "practice";
+    break;
+
+  case '2': //storytelling application
+    applicationMode = "story";
+    break;
+    
+  case '3': //storage application
+    applicationMode = "storage";
     break;
 
   case 'i':
@@ -56,6 +64,7 @@ void keyPressed() {
     cameraDetectionMode = "color";
 
 
+
     break;
 
   default:
@@ -74,6 +83,11 @@ void mousePressed() {
 
   if (calibrationMode == 2 && mouseX < kinect.getVideoImage().width && mouseY < kinect.getVideoImage().height) {// for color
     mousePressedforColorCalibration();
+  }
+  
+  if (applicationMode == "practice" && calibrationMode == 0 && phase1_seeBall == false) {
+    //when the experimentor needs to wizard of Oz to track where the ball sticks
+    mousePressedforTrackStuckBall("practice");
   }
 
   //if (applicationMode == "story" && calibrationMode == 0 && phase2_ballSticks == true && phase3_facePushLocation == false) {

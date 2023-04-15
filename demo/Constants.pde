@@ -29,7 +29,7 @@ boolean flag_needBackout = false;
 
 
 
-Point global_ball;
+Point global_ball_toio_coord;
 
 Point[] travel_points;
 Point[] tangent_points;
@@ -55,6 +55,10 @@ int global_closer_toio_id;
 
 Point start_position_0;
 Point start_position_1;
+Point[] start_positions;
+
+int time2 = millis();
+boolean startTime2 = false;
 
 String phaseLabel = "";
 
@@ -64,7 +68,7 @@ Kinect kinect;
 
 int[] mouseXLocationList = new int[4];
 int[] mouseYLocationList = new int[4];
-color global_trackColor;
+
 int mouseXLocation = -50;
 int mouseYLocation = -50;
 int clickCount = 0;
@@ -79,6 +83,11 @@ Point ir_tracking_point;
 boolean ir = false;
 boolean mouse = false;
 
+//color tracking
+Point color_tracking_point;
+color global_trackColor;
+
+boolean practice_flag_trackedStuckBall = false;
 
 //for OSC
 OscP5 oscP5;

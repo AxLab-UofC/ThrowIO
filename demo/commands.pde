@@ -1,16 +1,45 @@
-//Point[] checking() {
 
-//  Point start_point = new Point(1, 2);
-//  Point end_point = new Point(3, 7);
+Point detectBallWithColorOrIR(String mode, color global_trackColor) {
 
-//  Point[] points;
-//  points = new Point[2];
+  if (mode == "color") {
+    println("In color detect mode");
+    //colorDetecBall(false);
+    Point color_tracking_point = colorBlobDetectBall(global_trackColor);
+    if (color_tracking_point != null) {
+      println("color_tracking_point x :", color_tracking_point.x);
+      println("color_tracking_point y:", color_tracking_point.y);
 
-//  points[0] = start_point;
-//  points[1] = end_point;
+      ellipse(color_tracking_point.x, color_tracking_point.y, 20, 20);
 
-//  return points;
-//}
+      return color_tracking_point;
+    } else {
+      println("no values");
+      return null;
+    }
+  } else if (mode == "ir") {
+
+    println("In IR detect mode");
+    Point ir_tracking_point = irDetectBall();
+    if (ir_tracking_point != null) {
+      println("ir_tracking_point x :", ir_tracking_point.x);
+      println("ir_tracking_point y:", ir_tracking_point.y);
+
+      ellipse(ir_tracking_point.x, ir_tracking_point.y, 20, 20);
+      
+      return ir_tracking_point;
+    } else {
+      println("no values");
+      return null;
+    }
+  } else {
+    //mouse tracking but current not supported
+    println("In mouse detect mode is not supported in this helper function");
+    exit();
+
+    return null;
+  }
+}
+
 
 float distSq(float x1, float y1, float z1, float x2, float y2, float z2) {
   float d = (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) +(z2-z1)*(z2-z1);
@@ -78,98 +107,15 @@ float distSq(float x1, float y1, float z1, float x2, float y2, float z2) {
 //  }
 //}
 
-Point irDetectBall() {
-  
-  ///TODO: need to disregard hand in the camera, 
-  //because hand too close to the camera might cause the alogirhtm to detect as the IR ball
-
-  float ir_threshold = 2;
-  float ir_blobSize = 10;
-  Blob ir_biggestBlob = new Blob(-1,-1); // just for initialization purposes
-  Point ir_biggestBlobPos;
-  color ir_trackColor = color(255, 255, 255); //track white
-  ArrayList<Blob> ir_blobs = new ArrayList<Blob>();
-  ir_blobs.clear();
-
-  // Begin loop to walk through every pixel
-  for (int x = mouseXLocationList[0]; x < mouseXLocationList[1]; x++ ) {
-    for (int y = mouseYLocationList[0]; y < mouseYLocationList[1]; y++ ) {
-      int loc = x + y * kinect.getVideoImage().width; //change back to depth image
-      // What is current color
-      color currentColor = kinect.getVideoImage().pixels[loc]; //change back to depth image
-      float r1 = red(currentColor);
-      float g1 = green(currentColor);
-      float b1 = blue(currentColor);
-      float r2 = red(ir_trackColor);
-      float g2 = green(ir_trackColor);
-      float b2 = blue(ir_trackColor);
-
-      float d = distSq(r1, g1, b1, r2, g2, b2);
-
-      if (d < ir_threshold) {
-
-        boolean found = false;
-        for (Blob b : ir_blobs) {
-          if (b.isNear(x, y)) {
-            b.add(x, y);
-            found = true;
-            break;
-          }
-        }
-
-        if (!found) {
-          Blob b = new Blob(x, y);
-          ir_blobs.add(b);
-        }
-      }
-    }
-  }
-  
-  //theoritically the biggiest blob is what we want
-  float maxSize = 0;
-  if (ir_blobs.isEmpty() == false) {
-    for (Blob b : ir_blobs) {
-      //if (b.size() > ir_blobSize) {
-      //  b.show();
-      //}
-      if (b.size() > ir_blobSize) {
-        if (b.size() > maxSize) {
-          maxSize = b.size();
-          //record biggest blob
-          ir_biggestBlob = b;
-        }
-      }
-    }
-
-    if (maxSize != 0) {
-      println("Found the biggest blob!");
-      ir_biggestBlob.show();
-      ir_biggestBlobPos = new Point ((ir_biggestBlob.minx+ir_biggestBlob.maxx)/2, (ir_biggestBlob.miny+ir_biggestBlob.maxy)/2);
-      
-      println("blob center x is: ",ir_biggestBlobPos.x);
-      println("blob center y is: ",ir_biggestBlobPos.y);
-    
-      return ir_biggestBlobPos;
-    }
-
-  }
-  
-  return null;
-}
-
-// Custom distance functions w/ no square root for optimization
-float distSq2(float x1, float y1, float x2, float y2) {
-  float d = (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1);
-  return d;
-}
-
-boolean colorDetecBall(boolean recordHistory) {
+Point colorDetectBall(boolean recordHistory) { //old code rely on aggregated color detection
 
   float avgX = 0;
   float avgY = 0;
   float avgDepth = 0;
   float count = 0;
   float threshold = 40; //150 for red
+
+  Point color_pos;
 
   println(mouseXLocationList[0], mouseXLocationList[1], mouseYLocationList[0], mouseYLocationList[0]);
   //begin loop to walk through every pixel in the calibrated rectangle
@@ -216,10 +162,174 @@ boolean colorDetecBall(boolean recordHistory) {
       global_dHist = append(global_dHist, avgDepth);
     }
 
-    return true;
+    color_pos = new Point (avgX, avgY);
+    return color_pos;
   } else {
-    return false;
+    return null;
   }
+}
+
+Point colorBlobDetectBall(color global_trackColor) {
+
+  float color_distThreshold = 3; // how close should we determine whether a pixel belongs to this blob
+  float color_threshold = 1000; //how close we want the pixel color to be, compared to our track color
+  float color_blobSize = 50; //we only care about blobsize that is bigger than this number of pixels
+  Blob color_biggestBlob = new Blob(-1, -1, color_distThreshold); // just for initialization purposes
+  Point color_biggestBlobPos;
+
+  ArrayList<Blob> color_blobs = new ArrayList<Blob>();
+  color_blobs.clear();
+
+  // Begin loop to walk through every pixel
+  for (int x = mouseXLocationList[0]; x < mouseXLocationList[1]; x++ ) {
+    for (int y = mouseYLocationList[0]; y < mouseYLocationList[1]; y++ ) {
+      int loc = x + y * kinect.getVideoImage().width; //change back to depth image
+      // What is current color
+      color currentColor = kinect.getVideoImage().pixels[loc]; //change back to depth image
+      float r1 = red(currentColor);
+      float g1 = green(currentColor);
+      float b1 = blue(currentColor);
+      float r2 = red(global_trackColor);
+      float g2 = green(global_trackColor);
+      float b2 = blue(global_trackColor);
+
+      float d = distSq(r1, g1, b1, r2, g2, b2);
+
+      if (d < color_threshold) {
+
+        boolean found = false;
+        for (Blob b : color_blobs) {
+          if (b.isNear(x, y)) {
+            b.add(x, y);
+            found = true;
+            break;
+          }
+        }
+
+        if (!found) {
+          Blob b = new Blob(x, y, color_distThreshold);
+          color_blobs.add(b);
+        }
+      }
+    }
+  }
+
+  //theoritically the biggiest blob is what we want
+  float maxSize = 0;
+  if (color_blobs.isEmpty() == false) {
+    for (Blob b : color_blobs) {
+      //if (b.size() > ir_blobSize) {
+      //  b.show();
+      //}
+      if (b.size() > color_blobSize) {
+        if (b.size() > maxSize) {
+          maxSize = b.size();
+          //record biggest blob
+          color_biggestBlob = b;
+        }
+      }
+    }
+
+    if (maxSize != 0) {
+      println("Found the biggest blob!");
+      //color_biggestBlob.show();
+
+      color_biggestBlobPos = new Point ((color_biggestBlob.minx+color_biggestBlob.maxx)/2, (color_biggestBlob.miny+color_biggestBlob.maxy)/2);
+
+      fill(255);
+      ellipse(color_biggestBlobPos.x, color_biggestBlobPos.y, 20, 20);
+      println("blob center x is: ", color_biggestBlobPos.x);
+      println("blob center y is: ", color_biggestBlobPos.y);
+
+      return color_biggestBlobPos;
+    }
+  }
+  println("before null");
+  return null;
+}
+
+Point irDetectBall() {
+
+  ///TODO: need to disregard hand in the camera,
+  //because hand too close to the camera might cause the alogirhtm to detect as the IR ball
+  float ir_distThreshold = 3;
+  float ir_threshold = 2;
+  float ir_blobSize = 15;
+  Blob ir_biggestBlob = new Blob(-1, -1, ir_distThreshold); // just for initialization purposes
+  Point ir_biggestBlobPos;
+  color ir_trackColor = color(255, 255, 255); //track white
+  ArrayList<Blob> ir_blobs = new ArrayList<Blob>();
+  ir_blobs.clear();
+
+  // Begin loop to walk through every pixel
+  for (int x = mouseXLocationList[0]; x < mouseXLocationList[1]; x++ ) {
+    for (int y = mouseYLocationList[0]; y < mouseYLocationList[1]; y++ ) {
+      int loc = x + y * kinect.getVideoImage().width; //change back to depth image
+      // What is current color
+      color currentColor = kinect.getVideoImage().pixels[loc]; //change back to depth image
+      float r1 = red(currentColor);
+      float g1 = green(currentColor);
+      float b1 = blue(currentColor);
+      float r2 = red(ir_trackColor);
+      float g2 = green(ir_trackColor);
+      float b2 = blue(ir_trackColor);
+
+      float d = distSq(r1, g1, b1, r2, g2, b2);
+
+      if (d < ir_threshold) {
+
+        boolean found = false;
+        for (Blob b : ir_blobs) {
+          if (b.isNear(x, y)) {
+            b.add(x, y);
+            found = true;
+            break;
+          }
+        }
+
+        if (!found) {
+          Blob b = new Blob(x, y, ir_distThreshold);
+          ir_blobs.add(b);
+        }
+      }
+    }
+  }
+
+  //theoritically the biggiest blob is what we want
+  float maxSize = 0;
+  if (ir_blobs.isEmpty() == false) {
+    for (Blob b : ir_blobs) {
+      //if (b.size() > ir_blobSize) {
+      //  b.show();
+      //}
+      if (b.size() > ir_blobSize) {
+        if (b.size() > maxSize) {
+          maxSize = b.size();
+          //record biggest blob
+          ir_biggestBlob = b;
+        }
+      }
+    }
+
+    if (maxSize != 0) {
+      println("Found the biggest blob!");
+      ir_biggestBlob.show();
+      ir_biggestBlobPos = new Point ((ir_biggestBlob.minx+ir_biggestBlob.maxx)/2, (ir_biggestBlob.miny+ir_biggestBlob.maxy)/2);
+
+      println("blob center x is: ", ir_biggestBlobPos.x);
+      println("blob center y is: ", ir_biggestBlobPos.y);
+
+      return ir_biggestBlobPos;
+    }
+  }
+
+  return null;
+}
+
+// Custom distance functions w/ no square root for optimization
+float distSq2(float x1, float y1, float x2, float y2) {
+  float d = (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1);
+  return d;
 }
 
 boolean checkTolerance(Cube cube_0, Cube cube_1, Point point_0, Point point_1, float tolerance) {
@@ -456,8 +566,8 @@ Point[] find_location(float global_scaledX, float global_scaledY) {
   if (sqrt ( pow ( global_scaledX - global_toio_center_x, 2 ) + pow ( global_scaledY - global_toio_center_y, 2 )) > global_radius) {
 
     //set the ball's location by scaledX and scaledY
-    //global_ball_x = global_scaledX;
-    //global_ball_y = global_scaledY;
+    //global_ball_toio_coord_x = global_scaledX;
+    //global_ball_toio_coord_y = global_scaledY;
 
     //find distance from ball to closer toio
     dist_cb = sqrt(pow(global_scaledX - global_toio_center_x, 2) + pow (global_scaledY - global_toio_center_y, 2));

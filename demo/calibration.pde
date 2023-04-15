@@ -14,7 +14,7 @@ void drawDebugWindow() {
   image(kinect.getVideoImage(), 0, 0);
   image(kinect.getDepthImage(), 640, 0);
 
-  String calibrationModeText = "NOT ACTIVATED";
+  String calibrationModeText = "PROGRAM RUNNING, NO CALIBRATION";
 
   if (calibrationMode == 1) {
     calibrationModeText = "POSITION";
@@ -46,11 +46,15 @@ void drawDebugWindow() {
   textSize(20);
   fill(255);
   text("Camera Detection Mode: "+ cameraDetectionMode, 20, 600);
-
+  
+  textSize(20);
+  fill(255);
+  text("Application Mode: "+ applicationMode, 20, 620);
+  
   //phase instructions
   textSize(30);
   fill(0);
-  text(phaseLabel, 20, 630);
+  text(phaseLabel, 20, 650);
 
 
   if (calibrationMode==2) {

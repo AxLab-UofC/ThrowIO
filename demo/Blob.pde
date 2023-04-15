@@ -4,19 +4,21 @@
 // Code for: https://youtu.be/1scFcY-xMrI
 
 class Blob {
-  float ir_distThreshold = 3;
+  
   float minx;
   float miny;
   float maxx;
   float maxy;
+  float distThreshold;
 
   ArrayList<PVector> points;
 
-  Blob(float x, float y) {
+  Blob(float x, float y, float threshold) {
     minx = x;
     miny = y;
     maxx = x;
     maxy = y;
+    distThreshold = threshold;
     points = new ArrayList<PVector>();
     points.add(new PVector(x, y));
   }
@@ -65,7 +67,7 @@ class Blob {
       }
     }
 
-    if (d < ir_distThreshold) {
+    if (d < distThreshold) {
       return true;
     } else {
       return false;
