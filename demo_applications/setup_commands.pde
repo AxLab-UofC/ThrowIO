@@ -30,6 +30,14 @@ Point setInitialPushLocation(String mode) {
   if (mode == "storage") {
 
     push_pos = new Point(storage_postiion.x, storage_postiion.y);
+  } else if (mode == "story") {
+    //save orange positions
+    story_saveOrangePosition(story_orange1.x, story_orange1.y, story_orange2.x, story_orange2.y, 0, 0, story_orangeCount);
+
+    //this is where the robot will go to push the ball
+    //findPushedLocation will set pushx and pushy directly (a way to find where the robot should move so that the pushed ball in on top of the orange)
+    push_pos = findPushedLocation(1, story_orange1.x, story_orange1.y);
+    
   } else {
     return null;
   }

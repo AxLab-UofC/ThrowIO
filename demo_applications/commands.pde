@@ -1,3 +1,118 @@
+//find the pushx and pushy for the pushing toio such that the ball will land in an orange for example
+Point findPushedLocation(int toio_number, float ballLandingX, float ballLandingY) {
+  float x = 0.0;
+  float y = 0.0;
+  PVector v5, v6;
+  float theta5 = 0.0;
+
+  float tempx = 0.0;
+  float tempy = 0.0;
+
+  if (toio_number == 0) {
+    //change this to cube[0].x for example
+    tempx = cubes[0].x;
+    tempy = cubes[0].y;
+  } else {
+    tempx = cubes[1].x;
+    tempy = cubes[1].y;
+  }
+
+
+  float tempDist = sqrt ( pow ( ballLandingX - tempx, 2 ) + pow (ballLandingY - tempy, 2 ));
+  //the distance between the ball and toio robot shell is 30
+  float ratio = 30/tempDist;
+
+
+  v5 = new PVector(ballLandingX-tempx, ballLandingY-tempy); //final x and final y to ball
+  v6 = new PVector(ballLandingX-tempx, tempy-tempy); //final x and final y horizontal extension
+
+  theta5 = acos(v5.dot(v6)/(v5.mag()*v6.mag()));
+
+  Point ball_point = new Point(ballLandingX, ballLandingY);
+  Point start_point = new Point(tempx, tempy);
+
+  String quadrant = find_quadrant (ball_point, start_point);
+
+  if (quadrant.equals("Q1")) {
+
+    //println("ball in quadrant 1");
+    x = ballLandingX-ratio*tempDist*cos(theta5);
+    y = ballLandingY+ratio*tempDist*sin(theta5);
+  } else if (quadrant.equals("Q2")) {
+
+    //println("ball in quadrant 2");
+    x = ballLandingX+ratio*tempDist*cos(theta5);
+    y = ballLandingY+ratio*tempDist*sin(theta5);
+  } else if (quadrant.equals("Q3")) {
+
+    //println("ball in quadrant 3");
+    x = ballLandingX+ratio*tempDist*cos(theta5);
+    y = ballLandingY-ratio*tempDist*sin(theta5);
+  } else if (quadrant.equals("Q4")) {
+
+    //println("ball in quadrant 4");
+
+    x = ballLandingX-ratio*tempDist*cos(theta5);
+    y = ballLandingY-ratio*tempDist*sin(theta5);
+  } else {
+
+    theta5 = 0;
+
+    if (quadrant.equals("Q34")) {
+
+      //println("ball in between 3 and 4 quadrants");
+      x = ballLandingX-ratio*tempDist*sin(theta5);
+      y = ballLandingY-ratio*tempDist*cos(theta5);
+    } else if (quadrant.equals("Q14")) {
+
+      //println("ball in between 1 and 4 quadrants");
+      x = ballLandingX-ratio*tempDist*cos(theta5);
+      y = ballLandingY+ratio*tempDist*sin(theta5);
+    } else if (quadrant.equals("Q12")) {
+
+      //println("ball in between 1 and 2 quadrants");
+      x = ballLandingX-ratio*tempDist*sin(theta5);
+      y = ballLandingY+ratio*tempDist*cos(theta5);
+    } else if (quadrant.equals("Q23")) {
+
+      //println("ball in between 2 and 3 quadrants");
+      x = ballLandingX+ratio*tempDist*cos(theta5);
+      y = ballLandingY+ratio*tempDist*sin(theta5);
+    } else {
+
+      println("Something is wrong here!!");
+    }
+  }
+
+  //we directly assign where the new pushx and pushy location should be //small adjustment
+  Point push_position = new Point(x+33, y+33);
+  return push_position;
+}
+
+//save the orange position
+void story_saveOrangePosition(float orangex1, float orangey1, float orangex2, float orangey2, int flyToOrange, int dropFruit, int nextOrange) {
+  table = new Table();
+
+  table.addColumn("OrangeX1");
+  table.addColumn("OrangeY1");
+  table.addColumn("OrangeX2");
+  table.addColumn("OrangeY2");
+  table.addColumn("flyToOrange");
+  table.addColumn("dropFruit");
+  table.addColumn("nextOrange");
+
+  TableRow newRow = table.addRow();
+  newRow.setFloat("OrangeX1", orangex1);
+  newRow.setFloat("OrangeY1", orangey1);
+  newRow.setFloat("OrangeX2", orangex2);
+  newRow.setFloat("OrangeY2", orangey2);
+  newRow.setInt("flyToOrange", flyToOrange);
+  newRow.setInt("dropFruit", dropFruit);
+  newRow.setInt("nextOrange", nextOrange);
+
+  saveTable(table, "../data/position.csv");
+}
+
 //function to detect hand position
 boolean findHand(float handDetectStartAreaX, float handDetectStartAreaY, float handDetectEndAreaX, float handDetectEndAreaY, PVector loc, PVector  lerpedLoc) {
   int threshold = 500;
@@ -59,7 +174,7 @@ Point detectBallWithColorOrIR(String mode, color global_trackColor) {
       println("ir_tracking_point y:", ir_tracking_point.y);
 
       ellipse(ir_tracking_point.x, ir_tracking_point.y, 20, 20);
-      
+
       return ir_tracking_point;
     } else {
       println("no values");

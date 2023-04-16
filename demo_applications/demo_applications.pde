@@ -139,10 +139,9 @@ void draw() {
         } else if (cameraDetectionMode == "ir") {
 
           ball_point = detectBallWithColorOrIR("ir", global_trackColor);
-          
+
           if (ball_point != null) {
             phase1_seeBall = true;
-            
           } else {
             phase1_seeBall = false;
           }
@@ -150,7 +149,7 @@ void draw() {
           //mouse mode
           //If the experimentor sees that the ball thrown by the user is stuck,
           //they will use the mouse to click on the ball's location in the camera window
-          println("Practice: waiting the experimentor click on stuck ball in the camera...");
+          println("Practice/Storage: waiting the experimentor click on stuck ball in the camera...");
 
           if (flag_trackedStuckBall == true) {
 
@@ -169,7 +168,7 @@ void draw() {
 
           //If the experimentor sees that the ball thrown by the user is stuck,
           //they will use the mouse to click on the ball's location in the camera window
-          println("Practice: waiting the experimentor click on stuck ball in the camera...");
+          println("Storage: waiting the experimentor click on stuck ball in the camera...");
 
           if (flag_trackedStuckBall == true) {
             jumpToPhase3();
@@ -221,6 +220,45 @@ void draw() {
             phase1_seeBall = true;
           }
         }
+      } else if (applicationMode == "story") {
+        Point ball_point;
+        if (cameraDetectionMode == "color") {
+
+          println("Unfortunately, we don't support color detection for immersive storytelling now!");
+          phase1_seeBall = false;
+        } else if (cameraDetectionMode == "ir") {
+
+          ball_point = detectBallWithColorOrIR("ir", global_trackColor);
+
+          if (ball_point != null) {
+            phase1_seeBall = true;
+          } else {
+            phase1_seeBall = false;
+          }
+        } else {
+          //mouse mode
+          //If the experimentor sees that the ball thrown by the user is stuck,
+          //they will use the mouse to click on the ball's location in the camera window
+          //By doing so, (1) we can tell the robot where to travel for pushing (2) we can also tell the bird to start flying to the orange
+          println("Story: waiting the experimentor click on stuck ball in the camera...");
+
+
+          if (flag_trackedStuckBall == true) {
+
+            if (story_orangeCount == 1) {
+              println("story_orangeCount: ", story_orangeCount);
+              story_saveOrangePosition(story_orange1.x, story_orange1.y, story_orange2.x, story_orange2.y, 0, 0, story_orangeCount); //tell the immersive screen to start drop orange
+
+              //update new pushx and pushy using the next orange location
+              push_position = findPushedLocation(global_pushToio, story_orange2.x, story_orange2.y);
+            }
+
+            //we tell the bird to move to the orange when story_orangeCount = 0
+            story_saveOrangePosition(story_orange1.x, story_orange1.y, story_orange2.x, story_orange2.y, 1, 0, story_orangeCount);
+
+            jumpToPhase3();
+          }
+        }
       }
     } else if (phase1_seeBall == true && phase2_ballSticks == false) {
 
@@ -247,8 +285,9 @@ void draw() {
             } else {
               //cameraDetectionMode == "ir"
               ball_point = detectBallWithColorOrIR("ir", global_trackColor);
-
             }
+
+            //we skip cameraDetectionMode == "mouse" because we woud have skipped this phase if our mode is "mouse"
 
             if (ball_point != null) {
 
@@ -368,6 +407,47 @@ void draw() {
           println("Ball did not stick check point in Phase 3");
           jumpToPhase1();
         }
+      } else if (applicationMode == "story") {
+        //we need to record the angle between the pushing toio and the ball location
+        if (flag_recordPushingToioAndBallAngle == false) {
+
+          //the ball sticks in between the spaces between the toio robots
+
+          if (global_ball_toio_coord.x < push_position.x) {
+            //record that cube 0 will push
+            global_pushToio = 0;
+
+            //turnDegree0 is to what degrees that toio0 needs to spin to so that it will face its front (wedge) side to ball location
+            turnDegree0 = degrees(atan2(global_ball_toio_coord.y-cubes[0].y, global_ball_toio_coord.x-cubes[0].x));
+            if (turnDegree0 < 0) {
+              turnDegree0+=360;
+            }
+          } else {
+            //record that cube 1 will push
+            global_pushToio = 1;
+
+            //turnDegree1 is to what degrees that toio1 needs to spin to so that it will face its front (wedge) side to ball location
+            turnDegree1 = degrees(atan2(global_ball_toio_coord.y-cubes[1].y, global_ball_toio_coord.x-cubes[1].x));
+
+            if (turnDegree1 < 0) {
+              turnDegree1+=360;
+            }
+          }
+
+          flag_recordPushingToioAndBallAngle = true;
+        } else {
+          if (global_pushToio == 0) {
+            // we rotate the cube0 180 degress so that now its back (prong) side is facing toward the ball location
+            if (rotateCube(0, turnDegree0-180)) {
+              phase3_facePushLocation = true;
+            }
+          } else {
+            // we rotate the cube1 180 degress so that now its back (prong) side is facing toward the ball location
+            if (rotateCube(1, turnDegree1-180)) {
+              phase3_facePushLocation = true;
+            }
+          }
+        }
       }
     } else if (phase3_facePushLocation == true && phase4_travelToBallToPush == false) {
 
@@ -404,7 +484,7 @@ void draw() {
       phaseLabel = "Phase 5/11. Pushing toio rotates the ball such that they face the push location";
       println(phaseLabel);
 
-      if (applicationMode == "storage") {
+      if (applicationMode == "storage" || applicationMode == "story") {
         if (global_pushToio == 0) {
           //cube0 is the pushing toio and rotates itself with the ball facing push location
 
@@ -425,7 +505,7 @@ void draw() {
       phaseLabel = "Phase 6/11. Pushing toio pushes the ball to the push location";
       println(phaseLabel);
 
-      if (applicationMode == "storage") {
+      if (applicationMode == "storage" || applicationMode == "story") {
 
         if (global_pushToio == 0) {
           //cube0 is the pushing toio and pushes the ball to push location
@@ -486,9 +566,13 @@ void draw() {
             Point ball_point;
             if (cameraDetectionMode == "color") {
               ball_point = detectBallWithColorOrIR("color", global_trackColor);
-            } else {
-              //cameraDetectionMode == "ir"
+            } else if (cameraDetectionMode == "ir") {
+
               ball_point = detectBallWithColorOrIR("ir", global_trackColor);
+            } else {
+
+              //cameraDetectionMode == "mouse" we already know the location of the ball before hand
+              ball_point = global_ball_toio_coord;
             }
 
 
@@ -541,6 +625,77 @@ void draw() {
 
           phase7_findTangentPoints = true;
         }
+      } else if (applicationMode == "story") {
+        
+        println("Story: waiting the experimentor click on stuck ball in the camera...");
+
+        if (flag_trackedPushedBall == true) {
+
+          //After finding the ball's new position (which should be close to the push location), we find the prep location for both toios to travel
+          if (flag_needBackout == false) {
+            //If toios don't need to backout, we call findLocation() to find the prep location
+
+            travel_points = new Point[2];
+            travel_points = find_location(global_ball_toio_coord.x, global_ball_toio_coord.y);
+
+            if (travel_points != null) {
+              //If we find the prep location, we move on to the next phase
+
+              //we also find which toio is closer to the ball here!
+              distance_cube0_ball = cubes[0].distance(global_ball_toio_coord.x, global_ball_toio_coord.y);
+              distance_cube1_ball = cubes[1].distance(global_ball_toio_coord.x, global_ball_toio_coord.y);
+
+              if (distance_cube0_ball < distance_cube1_ball) {
+                global_closer_toio_id = 0;
+              } else {
+                global_closer_toio_id = 1;
+              }
+
+              phase7_findTangentPoints = true;
+            } else {
+              //If we can't find the prep locations, that means that at least one toio is too close the ball, so we need to move them out
+              flag_needBackout = true;
+            }
+          } else {
+
+            //By calling findbackoutLocation(), we can move toio back (on the line formed by toio and the ball)
+            println("Back out toio because they are within radius");
+
+            if (flag_prepareBackout == false) {
+
+              //detect the location of the ball
+              Point ball_point;
+              if (cameraDetectionMode == "color") {
+                ball_point = detectBallWithColorOrIR("color", global_trackColor);
+              } else if (cameraDetectionMode == "ir") {
+
+                ball_point = detectBallWithColorOrIR("ir", global_trackColor);
+              } else {
+
+                //cameraDetectionMode == "mouse" we already know the location of the ball before hand
+                ball_point = global_ball_toio_coord;
+              }
+              if (ball_point != null) {
+
+                backout_0 = findbackoutLocation(0, global_ball_toio_coord.x, global_ball_toio_coord.y);
+                backout_1 = findbackoutLocation(1, global_ball_toio_coord.x, global_ball_toio_coord.y);
+
+                flag_prepareBackout = true;
+                println("flag_prepareBackout:", flag_prepareBackout);
+              }
+            } else {
+
+              aimCubeSpeed(0, backout_0.x, backout_0.y);
+              aimCubeSpeed(1, backout_1.x, backout_1.y);
+
+              if (checkTolerance(cubes[0], cubes[1], backout_0, backout_1, travelErrorTolerance)) {
+                //when toios finally backout, we set flag_needBackout to false so that we can once again call findLocation() to find the prep locaiton
+                flag_needBackout = false;
+                println("done backing out!");
+              }
+            }
+          }
+        }
       }
     } else if (phase7_findTangentPoints == true && phase8_toioTravelToPrepLocation == false) {
 
@@ -548,7 +703,7 @@ void draw() {
       phaseLabel = "Phase 8/11. Both toios travel to prep locations";
       println(phaseLabel);
 
-      if (applicationMode == "practice") {
+      if (applicationMode == "practice" || applicationMode == "story") {
 
         if (global_closer_toio_id == 0) {
           //If closer toio is cube0, we let it travel to global_finalx, global_finaly and let cube1 travel to global_xprime, global_yprime.
@@ -573,7 +728,6 @@ void draw() {
         aimCubeSpeed(0, travel_points[0].x, travel_points[0].y);
         aimCubeSpeed(1, travel_points[1].x, travel_points[1].y);
 
-        println("why are you here?");
         if (checkTolerance(cubes[0], cubes[1], travel_points[0], travel_points[1], travelErrorTolerance)) {
           phase8_toioTravelToPrepLocation = true;
         }
@@ -583,7 +737,7 @@ void draw() {
       phaseLabel = "Phase 9/11. One toio rotates to use the prong side to and the other rotates to use the wedge side for drop operation";
       println(phaseLabel);
 
-      if (applicationMode == "practice") {
+      if (applicationMode == "practice" || applicationMode == "story") {
 
         if (flag_recordToioAndBallAngle == false) {
           turnDegree0 = degrees(atan2(global_ball_toio_coord.y-cubes[0].y, global_ball_toio_coord.x-cubes[0].x));
@@ -703,6 +857,27 @@ void draw() {
           phase10_dropSucceed = true;
           startTime = false;
         }
+      } else if (applicationMode == "story") {
+
+        if (startTime == false) {
+          time = millis();
+          startTime = true;
+        } else {
+
+          if (millis() > time + 500) {
+
+            //both toios travel to the ball's location
+            aimCubeSpeed(0, global_ball_toio_coord.x, global_ball_toio_coord.y);
+            aimCubeSpeed(1, global_ball_toio_coord.x, global_ball_toio_coord.y);
+          }
+        }
+
+        //we are finally done with all the phases after the toios drop the ball
+        if (checkTolerance(cubes[0], cubes[1], global_ball_toio_coord, global_ball_toio_coord, convergeDistance)) {
+          phase10_dropSucceed = true;
+          startTime = false;
+          story_saveOrangePosition(story_orange1.x, story_orange1.y, story_orange2.x, story_orange2.y, 1, 1, story_orangeCount);
+        }
       }
     } else if (phase10_dropSucceed == true) {
 
@@ -710,7 +885,7 @@ void draw() {
       phaseLabel = "Phase 11/11. Reset all of the flags so that we can start the algorithm again";
       println(phaseLabel);
 
-      if (applicationMode == "practice" || applicationMode == "storage") {
+      if (applicationMode == "practice" || applicationMode == "storage" || applicationMode == "story") {
 
         if (startTime == false) {
           time = millis();
@@ -745,6 +920,15 @@ void draw() {
               turnDegree0 = 0;
               startTime = false;
               flag_trackedStuckBall = false;
+
+              //story
+              story_orangeCount+=1;
+              flag_trackedPushedBall = false;
+              if (story_orangeCount==2) {
+                //restart orange
+                story_orangeCount = 0;
+                push_position = findPushedLocation(1, story_orange1.x, story_orange1.y);
+              }
 
               if (applicationMode == "storage" && storage_status == "store") {
                 storage_status = "retrieve";

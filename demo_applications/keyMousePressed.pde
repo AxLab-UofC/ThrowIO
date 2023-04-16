@@ -86,7 +86,8 @@ void mousePressed() {
   }
 
   if ((applicationMode == "practice" && calibrationMode == 0 && phase1_seeBall == false) ||
-    (applicationMode == "storage" && calibrationMode == 0 && phase1_seeBall == false)) {
+    (applicationMode == "storage" && calibrationMode == 0 && phase1_seeBall == false) ||
+    (applicationMode == "story" && calibrationMode == 0 && phase1_seeBall == false)) {
     //when the experimentor needs to wizard of Oz to track where the ball sticks
     mousePressedforTrackStuckBall(applicationMode);
   }
@@ -97,11 +98,12 @@ void mousePressed() {
   //  mousePressedforTrackStuckBall();
   //}
 
-  //if (applicationMode == "story" && calibrationMode == 0 && phase6_pushDone == true && phase7_findTangentPoints == false) {
+  if (applicationMode == "story" && calibrationMode == 0 && phase6_pushDone == true && phase7_findTangentPoints == false) {
 
-  //  //when the experimentor needs to wizard of Oz to track where the ball sticks
-  //  mousePressedforTrackPushedBall();
-  //}
+    //when the experimentor needs to wizard of Oz to track where the ball sticks
+    mousePressedforTrackPushedBall();
+  }
+  
   //if (applicationMode == "push_eval" && calibrationMode == 0 && phase2_ballSticks == true && phase3_facePushLocation == false) {
 
   //  //when the experimentor needs to track where the ball sticks

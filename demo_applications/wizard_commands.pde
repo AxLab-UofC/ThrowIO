@@ -37,5 +37,22 @@ void mousePressedforTrackStuckBall(String mode) {
       map(mouseY, mouseYLocationList[0], mouseYLocationList[1], 35, 466));
 
     flag_trackedStuckBall = true;
+  } else if (mode == "story") {
+    global_ball_toio_coord = new Point(
+      map(mouseX, mouseXLocationList[0], mouseXLocationList[1], 34, 644),
+      map(mouseY, mouseYLocationList[0], mouseYLocationList[1], 35, 466));
+
+    flag_trackedStuckBall = true;
   }
+}
+
+void mousePressedforTrackPushedBall() {
+  story_mouseXForOrange[0] = mouseX;
+  story_mouseYForOrange[0] = mouseY;
+
+  global_ball_toio_coord = new Point(
+    map(mouseX, mouseXLocationList[0], mouseXLocationList[1], 34, 644),
+    map(mouseY, mouseYLocationList[0], mouseYLocationList[1], 35, 466));
+
+  flag_trackedPushedBall = true;
 }

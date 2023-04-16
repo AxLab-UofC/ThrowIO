@@ -11,7 +11,7 @@ boolean spin = false;
 float global_radius = 100;
 
 
-String applicationMode = "practice"; //"practice", "storage", "story"
+String applicationMode = "story"; //"practice", "storage", "story"
 String cameraDetectionMode = "color"; //color, ir, mouse
 
 boolean phase1_seeBall = false;
@@ -116,6 +116,11 @@ Point handPosition = new Point (-50,-50); //orignally handPositionX and handPosi
 PVector storage_loc = new PVector(0, 0);
 // Interpolated location
 PVector  storage_lerpedLoc = new PVector(0, 0);
+
+int story_orangeCount = 0;
+Point story_orange1 = new Point(150, 200);
+Point story_orange2 = new Point(400, 150);
+boolean flag_trackedPushedBall = false;
 
 int global_pushToio = 0;
 

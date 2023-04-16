@@ -53,7 +53,7 @@ float OrangeX1 = 0;
 float OrangeY1 = 0;
 float OrangeX2 = 0;
 float OrangeY2 = 0;
-int orangeColunt = 0;
+int orangeCount = 0;
 
 
 void loadOrangePosition() {
