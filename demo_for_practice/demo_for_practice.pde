@@ -78,7 +78,14 @@ void draw() {
 
   //END DO NOT EDIT
 
+
   if (calibrationMode > 0) {
+
+    println("mouseXLocationList[0]: ", mouseXLocationList[0]);
+    println("mouseXLocationList[1]: ", mouseXLocationList[1]);
+    println("mouseYLocationList[0]: ", mouseYLocationList[0]);
+    println("mouseYLocationList[1]: ", mouseYLocationList[1]);
+
 
     //move toio to standby positions while calibrating
     aimCubeSpeed(0, start_position_0.x, start_position_0.y);
@@ -114,8 +121,6 @@ void draw() {
       //mouse tracking
       println("In mouse detect mode");
     }
-    
-    
   } else {
 
     //phase starts here
@@ -140,8 +145,15 @@ void draw() {
 
           ball_point = detectBallWithColorOrIR("ir", global_trackColor);
 
+
           if (ball_point != null) {
+            println("mouseXLocationList[0]: ", mouseXLocationList[0]);
+            println("mouseXLocationList[1]: ", mouseXLocationList[1]);
+            println("mouseYLocationList[0]: ", mouseYLocationList[0]);
+            println("mouseYLocationList[1]: ", mouseYLocationList[1]);
             phase1_seeBall = true;
+
+            exit();
           } else {
             phase1_seeBall = false;
           }
@@ -199,7 +211,7 @@ void draw() {
             } else {
               //cameraDetectionMode == "ir"
               ball_point = detectBallWithColorOrIR("ir", global_trackColor);
-            } 
+            }
 
             if (ball_point != null) {
 

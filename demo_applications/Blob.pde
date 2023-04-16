@@ -30,7 +30,9 @@ class Blob {
     rectMode(CORNERS);
     rect(minx, miny, maxx, maxy);
 
-    rect(minx+640, miny, maxx+640, maxy);
+    rectMode(CORNER);
+    
+    //rect(minx+640, miny, maxx+640, maxy);
 
     for (PVector v : points) {
       //stroke(0, 0, 255);

@@ -47,7 +47,6 @@ float threshold = 40; //150 for red
 int clickCount = 0;
 int mouseXLocation = -50;
 int mouseYLocation = -50;
-boolean phase2_ballSticks = false;
 int[] mouseXLocationList = new int[4];
 int[] mouseYLocationList = new int[4];
 int[] story_mouseXForOrange =  new int[1];
@@ -93,15 +92,21 @@ int time = millis();
 boolean startTime = false;
 float turnDegree1 = 0;
 float turnDegree0 = 0;
-boolean phase7_findTangentPoints = false;
-boolean phase8_toioTravelToPrepLocation = false;
-boolean phase10_dropSucceed = false;
+
 boolean phase1_seeBall = false;
-boolean phase9_rotateToDrop = false;
+boolean phase2_ballSticks = false;
+boolean phase3_facePushLocation = false;
 boolean phase4_travelToBallToPush = false;
 boolean phase5_rotateBallToPushLocation = false;
 boolean phase6_pushDone = false;
-boolean phase3_facePushLocation = false;
+boolean phase7_findTangentPoints = false;
+boolean phase8_toioTravelToPrepLocation = false;
+boolean phase9_rotateToDrop = false;
+boolean phase10_dropSucceed = false;
+
+
+
+
 boolean flag_rotate0 = false;
 boolean flag_rotate1 = false;
 boolean flag_recordToioAndBallAngle = false;
