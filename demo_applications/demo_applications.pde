@@ -221,6 +221,7 @@ void draw() {
           }
         }
       } else if (applicationMode == "story") {
+
         Point ball_point;
         if (cameraDetectionMode == "color") {
 
@@ -266,7 +267,7 @@ void draw() {
       phaseLabel = "Phase 2/11. Check if ball sticks";
       println(phaseLabel);
 
-      if (applicationMode == "practice" || (applicationMode == "storage")) {
+      if (applicationMode == "practice" || (applicationMode == "storage" || applicationMode == "story")) {
 
         if (startTime == false) {
           time = millis();
@@ -305,7 +306,23 @@ void draw() {
               if (applicationMode == "practice") {
 
                 jumpToPhase7();
+              } else if (applicationMode == "story") {
+
+                //basically, doing the same thing as mouse tracking in phase 1
+                if (story_orangeCount == 1) {
+                  println("story_orangeCount: ", story_orangeCount);
+                  story_saveOrangePosition(story_orange1.x, story_orange1.y, story_orange2.x, story_orange2.y, 0, 0, story_orangeCount); //tell the immersive screen to start drop orange
+
+                  //update new pushx and pushy using the next orange location
+                  push_position = findPushedLocation(global_pushToio, story_orange2.x, story_orange2.y);
+                }
+
+                //we tell the bird to move to the orange when story_orangeCount = 0
+                story_saveOrangePosition(story_orange1.x, story_orange1.y, story_orange2.x, story_orange2.y, 1, 0, story_orangeCount);
+
+                phase2_ballSticks = true;
               } else {
+
                 //applicationMode == "storage" && storage_status == "store"
                 phase2_ballSticks = true;
               }
@@ -626,36 +643,55 @@ void draw() {
           phase7_findTangentPoints = true;
         }
       } else if (applicationMode == "story") {
-        
-        println("Story: waiting the experimentor click on stuck ball in the camera...");
 
-        if (flag_trackedPushedBall == true) {
+        if (cameraDetectionMode == "color") {
+
+          println("Unfortunately, we don't support color detection in story");
+        } else if (cameraDetectionMode == "ir") {
 
           //After finding the ball's new position (which should be close to the push location), we find the prep location for both toios to travel
           if (flag_needBackout == false) {
             //If toios don't need to backout, we call findLocation() to find the prep location
 
-            travel_points = new Point[2];
-            travel_points = find_location(global_ball_toio_coord.x, global_ball_toio_coord.y);
 
-            if (travel_points != null) {
-              //If we find the prep location, we move on to the next phase
+            //We need to redetect the position of the IR ball
+            Point ball_point;
+            ball_point = detectBallWithColorOrIR("ir", global_trackColor);
 
-              //we also find which toio is closer to the ball here!
-              distance_cube0_ball = cubes[0].distance(global_ball_toio_coord.x, global_ball_toio_coord.y);
-              distance_cube1_ball = cubes[1].distance(global_ball_toio_coord.x, global_ball_toio_coord.y);
 
-              if (distance_cube0_ball < distance_cube1_ball) {
-                global_closer_toio_id = 0;
+            if (ball_point != null) {
+
+              global_ball_toio_coord = ball_point;
+
+              travel_points = new Point[2];
+              travel_points = find_location(global_ball_toio_coord.x, global_ball_toio_coord.y);
+
+              if (travel_points != null) {
+                //If we find the prep location, we move on to the next phase
+
+                //we also find which toio is closer to the ball here!
+                distance_cube0_ball = cubes[0].distance(global_ball_toio_coord.x, global_ball_toio_coord.y);
+                distance_cube1_ball = cubes[1].distance(global_ball_toio_coord.x, global_ball_toio_coord.y);
+
+                if (distance_cube0_ball < distance_cube1_ball) {
+                  global_closer_toio_id = 0;
+                } else {
+                  global_closer_toio_id = 1;
+                }
+
+                phase7_findTangentPoints = true;
               } else {
-                global_closer_toio_id = 1;
+                //If we can't find the prep locations, that means that at least one toio is too close the ball, so we need to move them out
+                flag_needBackout = true;
               }
+            }else{
+                //maybe the IR tracking can't find the ball
+                //if this is the case, we should just wait (assuming the ball doesn't drop)
+                println("waiting to see if IR ball will appear");
 
-              phase7_findTangentPoints = true;
-            } else {
-              //If we can't find the prep locations, that means that at least one toio is too close the ball, so we need to move them out
-              flag_needBackout = true;
             }
+            
+            
           } else {
 
             //By calling findbackoutLocation(), we can move toio back (on the line formed by toio and the ball)
@@ -664,17 +700,10 @@ void draw() {
             if (flag_prepareBackout == false) {
 
               //detect the location of the ball
+
               Point ball_point;
-              if (cameraDetectionMode == "color") {
-                ball_point = detectBallWithColorOrIR("color", global_trackColor);
-              } else if (cameraDetectionMode == "ir") {
+              ball_point = detectBallWithColorOrIR("ir", global_trackColor);
 
-                ball_point = detectBallWithColorOrIR("ir", global_trackColor);
-              } else {
-
-                //cameraDetectionMode == "mouse" we already know the location of the ball before hand
-                ball_point = global_ball_toio_coord;
-              }
               if (ball_point != null) {
 
                 backout_0 = findbackoutLocation(0, global_ball_toio_coord.x, global_ball_toio_coord.y);
@@ -692,6 +721,66 @@ void draw() {
                 //when toios finally backout, we set flag_needBackout to false so that we can once again call findLocation() to find the prep locaiton
                 flag_needBackout = false;
                 println("done backing out!");
+              }
+            }
+          }
+        } else {
+
+          println("Story: waiting the experimentor click on stuck ball in the camera...");
+
+          if (flag_trackedPushedBall == true) {
+
+            //After finding the ball's new position (which should be close to the push location), we find the prep location for both toios to travel
+            if (flag_needBackout == false) {
+              //If toios don't need to backout, we call findLocation() to find the prep location
+
+              travel_points = new Point[2];
+              travel_points = find_location(global_ball_toio_coord.x, global_ball_toio_coord.y);
+
+              if (travel_points != null) {
+                //If we find the prep location, we move on to the next phase
+
+                //we also find which toio is closer to the ball here!
+                distance_cube0_ball = cubes[0].distance(global_ball_toio_coord.x, global_ball_toio_coord.y);
+                distance_cube1_ball = cubes[1].distance(global_ball_toio_coord.x, global_ball_toio_coord.y);
+
+                if (distance_cube0_ball < distance_cube1_ball) {
+                  global_closer_toio_id = 0;
+                } else {
+                  global_closer_toio_id = 1;
+                }
+
+                phase7_findTangentPoints = true;
+              } else {
+                //If we can't find the prep locations, that means that at least one toio is too close the ball, so we need to move them out
+                flag_needBackout = true;
+              }
+            } else {
+
+              //By calling findbackoutLocation(), we can move toio back (on the line formed by toio and the ball)
+              println("Back out toio because they are within radius");
+
+              if (flag_prepareBackout == false) {
+
+
+                //we are in cameraDetectionMode == "mouse", so we already know the location of the ball before hand
+                //no need to redetect the push location
+
+                backout_0 = findbackoutLocation(0, global_ball_toio_coord.x, global_ball_toio_coord.y);
+                backout_1 = findbackoutLocation(1, global_ball_toio_coord.x, global_ball_toio_coord.y);
+
+                flag_prepareBackout = true;
+                println("flag_prepareBackout:", flag_prepareBackout);
+              } else {
+
+                aimCubeSpeed(0, backout_0.x, backout_0.y);
+                aimCubeSpeed(1, backout_1.x, backout_1.y);
+
+                if (checkTolerance(cubes[0], cubes[1], backout_0, backout_1, travelErrorTolerance)) {
+                  //when toios finally backout, we set flag_needBackout to false so that we can once again call findLocation() to find the prep locaiton
+                  flag_needBackout = false;
+                  println("done backing out!");
+                }
               }
             }
           }
