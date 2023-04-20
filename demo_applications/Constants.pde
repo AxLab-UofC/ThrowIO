@@ -10,9 +10,9 @@ boolean spin = false;
 
 float global_radius = 100;
 
-
 String applicationMode = "story"; //"practice", "storage", "story"
 String cameraDetectionMode = "color"; //color, ir, mouse
+String storage_status = "store"; //can be "store" or "retrieve"
 
 boolean phase1_seeBall = false;
 boolean phase2_ballSticks = false;
@@ -27,7 +27,9 @@ boolean phase10_dropSucceed = false;
 boolean flag_findPushedBallLocation = false;
 boolean flag_needBackout = false;
 
+int handDepthThreshold = 700; //the board depth is around 800 away from the camera
 
+int handDepth = 850;
 
 Point global_ball_toio_coord;
 
@@ -47,7 +49,7 @@ float distance_cube1_ball;
 boolean flag_rotate0 = false;
 boolean flag_rotate1 = false;
 boolean startTime = false;
-int convergeDistance = 45;
+int convergeDistance = 45; //45
 int travelErrorTolerance = 15;
 int rotateErrorTolerance = 10;
 int time = millis();
@@ -59,9 +61,8 @@ Point[] start_positions;
 Point push_position; //originally pushx and pushy
 
 
-
-Point storage_postiion = new Point(240, 270); //this is where we want to ball to be stored, originally storage_shelfX and storage_shelfY
-Point storage_drop_position = new Point(400, 270); //this is where we want to ball to be dropped
+Point storage_postiion = new Point(260, 240); //this is where we want to ball to be stored, originally storage_shelfX and storage_shelfY
+Point storage_drop_position = new Point(400, 240); //this is where we want to ball to be dropped
 Point storage_recordPushing;
 
 int time2 = millis();
@@ -96,7 +97,7 @@ color global_trackColor;
    
    
 boolean flag_trackedStuckBall = false;
-String storage_status = "store"; //can be "store" or "retrieve"
+
 boolean flag_recordPushingToioAndBallAngle = false;
 int distanceBetweenPushingToioAndBall = 45;
 int distanceBetweenPushingToioAndPushLocation = 25;
@@ -118,8 +119,8 @@ PVector storage_loc = new PVector(0, 0);
 PVector  storage_lerpedLoc = new PVector(0, 0);
 
 int story_orangeCount = 0;
-Point story_orange1 = new Point(150, 200);
-Point story_orange2 = new Point(400, 150);
+Point story_orange1 = new Point(200, 250);
+Point story_orange2 = new Point(350, 200);
 boolean flag_trackedPushedBall = false;
 
 int global_pushToio = 0;

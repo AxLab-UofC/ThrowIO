@@ -47,7 +47,7 @@ float distance_cube1_ball;
 boolean flag_rotate0 = false;
 boolean flag_rotate1 = false;
 boolean startTime = false;
-int convergeDistance = 45;
+int convergeDistance = 35;
 int travelErrorTolerance = 15;
 int rotateErrorTolerance = 10;
 int time = millis();

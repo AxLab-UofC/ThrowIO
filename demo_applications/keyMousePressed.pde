@@ -19,9 +19,10 @@ void keyPressed() {
     break;
 
   case 'l':
-    println("load calibration!");
 
+    println("load calibration");
     loadCalibration();
+
     break;
 
   case '1': //practice
@@ -103,7 +104,7 @@ void mousePressed() {
     //when the experimentor needs to wizard of Oz to track where the ball sticks
     mousePressedforTrackPushedBall();
   }
-  
+
   //if (applicationMode == "push_eval" && calibrationMode == 0 && phase2_ballSticks == true && phase3_facePushLocation == false) {
 
   //  //when the experimentor needs to track where the ball sticks

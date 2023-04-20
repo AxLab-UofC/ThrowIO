@@ -114,8 +114,8 @@ void story_saveOrangePosition(float orangex1, float orangey1, float orangex2, fl
 }
 
 //function to detect hand position
-boolean findHand(float handDetectStartAreaX, float handDetectStartAreaY, float handDetectEndAreaX, float handDetectEndAreaY, PVector loc, PVector  lerpedLoc) {
-  int threshold = 500;
+boolean findHand(float handDetectStartAreaX, float handDetectStartAreaY, float handDetectEndAreaX, float handDetectEndAreaY, PVector loc, PVector lerpedLoc, int handDepthThreshold) {
+
   float sumX = 0;
   float sumY = 0;
   float count = 0;
@@ -129,7 +129,7 @@ boolean findHand(float handDetectStartAreaX, float handDetectStartAreaY, float h
       int rawDepth = kinect.getRawDepth()[offset];
 
       // Testing against threshold
-      if (rawDepth < threshold) {
+      if (rawDepth < handDepthThreshold) { //the closer you are to the camera, the higher the depth number is
         sumX += x;
         sumY += y;
         count++;
@@ -153,7 +153,7 @@ Point detectBallWithColorOrIR(String mode, color global_trackColor) {
   if (mode == "color") {
     println("In color detect mode");
 
-    Point color_tracking_point = colorBlobDetectBall(global_trackColor);
+    Point color_tracking_point = colorBlobDetectBall(global_trackColor, applicationMode, handDepth);
     if (color_tracking_point != null) {
       println("color_tracking_point x :", color_tracking_point.x);
       println("color_tracking_point y:", color_tracking_point.y);
@@ -256,6 +256,38 @@ float distSq(float x1, float y1, float z1, float x2, float y2, float z2) {
 //  }
 //}
 
+boolean checkDepth(){ 
+
+  float avgDepth = 0;
+  float count = 0;
+
+  println(mouseXLocationList[0], mouseXLocationList[1], mouseYLocationList[0], mouseYLocationList[0]);
+  //begin loop to walk through every pixel in the calibrated rectangle
+
+  for (int x = mouseXLocationList[0]; x < mouseXLocationList[1]; x++ ) {
+    for (int y = mouseYLocationList[0]; y < mouseYLocationList[1]; y++ ) {
+
+      int loc = x + y * kinect.getVideoImage().width; //find the location of each pixel
+      float pixelDepth = kinect.getRawDepth()[loc];
+
+        avgDepth += pixelDepth;
+        count++;
+      
+    }
+  }
+
+  // we find the ball if count > 50 (this threshold can be changed)
+  if (count > 50) {
+    avgDepth = avgDepth / count;
+    println("avgDepth: ", avgDepth);
+
+    return true;
+  } 
+    
+    return false;
+  
+}
+
 Point colorDetectBall(boolean recordHistory) { //old code rely on aggregated color detection
 
   float avgX = 0;
@@ -273,8 +305,8 @@ Point colorDetectBall(boolean recordHistory) { //old code rely on aggregated col
     for (int y = mouseYLocationList[0]; y < mouseYLocationList[1]; y++ ) {
 
       int loc = x + y * kinect.getVideoImage().width; //find the location of each pixel
-
       float pixelDepth = kinect.getRawDepth()[loc];
+
       color currentColor = kinect.getVideoImage().pixels[loc];
       float r1 = red(currentColor);
       float g1 = green(currentColor);
@@ -303,6 +335,7 @@ Point colorDetectBall(boolean recordHistory) { //old code rely on aggregated col
     avgX = avgX / count;
     avgY = avgY / count;
     avgDepth = avgDepth / count;
+    println("avgDepth: ", avgDepth);
 
     //we are appending the historical positions here
     if (recordHistory) {
@@ -318,13 +351,14 @@ Point colorDetectBall(boolean recordHistory) { //old code rely on aggregated col
   }
 }
 
-Point colorBlobDetectBall(color global_trackColor) {
+Point colorBlobDetectBall(color global_trackColor, String application_mode, int depthThreshold) {
 
   float color_distThreshold = 3; // how close should we determine whether a pixel belongs to this blob
   float color_threshold = 1000; //how close we want the pixel color to be, compared to our track color
   float color_blobSize = 50; //we only care about blobsize that is bigger than this number of pixels
   Blob color_biggestBlob = new Blob(-1, -1, color_distThreshold); // just for initialization purposes
   Point color_biggestBlobPos;
+
 
   ArrayList<Blob> color_blobs = new ArrayList<Blob>();
   color_blobs.clear();
@@ -335,29 +369,63 @@ Point colorBlobDetectBall(color global_trackColor) {
       int loc = x + y * kinect.getVideoImage().width; //change back to depth image
       // What is current color
       color currentColor = kinect.getVideoImage().pixels[loc]; //change back to depth image
-      float r1 = red(currentColor);
-      float g1 = green(currentColor);
-      float b1 = blue(currentColor);
-      float r2 = red(global_trackColor);
-      float g2 = green(global_trackColor);
-      float b2 = blue(global_trackColor);
+      float pixelDepth = kinect.getRawDepth()[loc];
 
-      float d = distSq(r1, g1, b1, r2, g2, b2);
+      if (application_mode == "storage" && storage_status == "retrieve" && pixelDepth > handDepthThreshold) {
 
-      if (d < color_threshold) {
+        //only record pixels that are above users hand
+        if (pixelDepth < depthThreshold) { // we only want pixels on the board and its depth should be smaller than the hand
 
-        boolean found = false;
-        for (Blob b : color_blobs) {
-          if (b.isNear(x, y)) {
-            b.add(x, y);
-            found = true;
-            break;
+          float r1 = red(currentColor);
+          float g1 = green(currentColor);
+          float b1 = blue(currentColor);
+          float r2 = red(global_trackColor);
+          float g2 = green(global_trackColor);
+          float b2 = blue(global_trackColor);
+          float d = distSq(r1, g1, b1, r2, g2, b2);
+
+          if (d < color_threshold) {
+
+            boolean found = false;
+            for (Blob b : color_blobs) {
+              if (b.isNear(x, y)) {
+                b.add(x, y);
+                found = true;
+                break;
+              }
+            }
+
+            if (!found) {
+              Blob b = new Blob(x, y, color_distThreshold);
+              color_blobs.add(b);
+            }
           }
         }
+      } else {
 
-        if (!found) {
-          Blob b = new Blob(x, y, color_distThreshold);
-          color_blobs.add(b);
+        float r1 = red(currentColor);
+        float g1 = green(currentColor);
+        float b1 = blue(currentColor);
+        float r2 = red(global_trackColor);
+        float g2 = green(global_trackColor);
+        float b2 = blue(global_trackColor);
+        float d = distSq(r1, g1, b1, r2, g2, b2);
+
+        if (d < color_threshold) {
+
+          boolean found = false;
+          for (Blob b : color_blobs) {
+            if (b.isNear(x, y)) {
+              b.add(x, y);
+              found = true;
+              break;
+            }
+          }
+
+          if (!found) {
+            Blob b = new Blob(x, y, color_distThreshold);
+            color_blobs.add(b);
+          }
         }
       }
     }

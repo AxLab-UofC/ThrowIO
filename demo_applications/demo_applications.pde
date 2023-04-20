@@ -90,7 +90,7 @@ void draw() {
     if (cameraDetectionMode == "color") {
       println("In color detect mode");
       //colorDetecBall(false);
-      Point color_tracking_point = colorBlobDetectBall(global_trackColor);
+      Point color_tracking_point = colorBlobDetectBall(global_trackColor,applicationMode, handDepth);
       if (color_tracking_point != null) {
         println("color_tracking_point x :", color_tracking_point.x);
         println("color_tracking_point y:", color_tracking_point.y);
@@ -183,7 +183,7 @@ void draw() {
           stroke(255, 0, 0);
           rect(handDetectStartArea.x, handDetectStartArea.y, smallBox_w, smallBox_h);
 
-          findHand(handDetectStartArea.x, handDetectStartArea.y, handDetectEndArea.x, handDetectEndArea.y, storage_loc, storage_lerpedLoc);
+          findHand(handDetectStartArea.x, handDetectStartArea.y, handDetectEndArea.x, handDetectEndArea.y, storage_loc, storage_lerpedLoc, handDepthThreshold);
 
           // Let's draw the raw location
           PVector v1 = storage_loc;
@@ -194,8 +194,8 @@ void draw() {
           ellipse(v1.x, v1.y, 20, 20);
 
           //draw on depth camera
-          noStroke();
-          ellipse(v1.x+640, v1.y, 20, 20);
+          //noStroke();
+          //ellipse(v1.x+640, v1.y, 20, 20);
 
           // Let's draw the "lerped" location
           PVector v2 = storage_lerpedLoc;
@@ -260,6 +260,11 @@ void draw() {
             jumpToPhase3();
           }
         }
+      }else{
+        //debug area if ww put a random string to mode
+        println("Debugging");
+        checkDepth();
+      
       }
     } else if (phase1_seeBall == true && phase2_ballSticks == false) {
 
@@ -319,6 +324,9 @@ void draw() {
 
                 //we tell the bird to move to the orange when story_orangeCount = 0
                 story_saveOrangePosition(story_orange1.x, story_orange1.y, story_orange2.x, story_orange2.y, 1, 0, story_orangeCount);
+                
+                println("why not working");
+                exit();
 
                 phase2_ballSticks = true;
               } else {
@@ -327,9 +335,10 @@ void draw() {
                 phase2_ballSticks = true;
               }
 
-              //upper left corber coordinate is (32, 32) and lower right corver is (646, 465)
+              //upper left corber coordinate is (34, 35) and lower right corver is (644, 466)
 
-              if (global_ball_toio_coord.x > 596 || global_ball_toio_coord.y > 415 || global_ball_toio_coord.y < 82 || global_ball_toio_coord.x < 82) {
+              //orignal condition if (global_ball_toio_coord.x > 596 || global_ball_toio_coord.y > 415 || global_ball_toio_coord.y < 82 || global_ball_toio_coord.x < 82) {
+              if (global_ball_toio_coord.x > 596 || global_ball_toio_coord.y > 411 || global_ball_toio_coord.y < 90 || global_ball_toio_coord.x < 82) {
                 //this is the case when ball sticks on the edge of theceiling so that robot can't travel to drop it
                 //in this case, a user needs to manually grab the ball and re-throw it again
                 phase2_ballSticks = false;
@@ -469,7 +478,6 @@ void draw() {
     } else if (phase3_facePushLocation == true && phase4_travelToBallToPush == false) {
 
       //Phase 4. Let pushing toio travel to ball (preparing to push)
-      //applicationMode == "ufo" "story" "storage" "push_eval" use this phase
       phaseLabel = "Phase 4/11. Let pushing toio travel to ball (preparing to push)";
       println(phaseLabel);
 
@@ -652,16 +660,16 @@ void draw() {
           //After finding the ball's new position (which should be close to the push location), we find the prep location for both toios to travel
           if (flag_needBackout == false) {
             //If toios don't need to backout, we call findLocation() to find the prep location
-
-
+          
             //We need to redetect the position of the IR ball
             Point ball_point;
             ball_point = detectBallWithColorOrIR("ir", global_trackColor);
 
-
             if (ball_point != null) {
 
-              global_ball_toio_coord = ball_point;
+              global_ball_toio_coord = new Point(
+                map(ball_point.x, mouseXLocationList[0], mouseXLocationList[1], 34, 644),
+                map(ball_point.y, mouseYLocationList[0], mouseYLocationList[1], 35, 466));
 
               travel_points = new Point[2];
               travel_points = find_location(global_ball_toio_coord.x, global_ball_toio_coord.y);
@@ -680,20 +688,22 @@ void draw() {
                 }
 
                 phase7_findTangentPoints = true;
+                
               } else {
                 //If we can't find the prep locations, that means that at least one toio is too close the ball, so we need to move them out
+
                 flag_needBackout = true;
               }
             }else{
                 //maybe the IR tracking can't find the ball
                 //if this is the case, we should just wait (assuming the ball doesn't drop)
                 println("waiting to see if IR ball will appear");
-
+                
             }
             
             
           } else {
-
+   
             //By calling findbackoutLocation(), we can move toio back (on the line formed by toio and the ball)
             println("Back out toio because they are within radius");
 
@@ -936,7 +946,7 @@ void draw() {
             aimCubeSpeed(1, storage_recordPushing.x+convergeDistance, storage_recordPushing.y);
 
             //the pushing toio apply forces to remain at the same location (we secret increase the speed)
-            aimCubeSpeed(0, storage_recordPushing.x+5, storage_recordPushing.y);
+            aimCubeSpeed(0, storage_recordPushing.x+2, storage_recordPushing.y);
           }
         }
         //we are finally done with all the phases after the toios drop the ball

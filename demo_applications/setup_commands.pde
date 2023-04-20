@@ -8,10 +8,10 @@ Point[] setInitialRobotLocation(String mode) {
   if (mode == "story") {
 
     start_pos_0 = new Point(100, 100);
-    start_pos_1 = new Point(600, 250);
+    start_pos_1 = new Point(550, 250);
   } else if (mode == "storage") {
     start_pos_0 = new Point(100, 245);
-    start_pos_1 = new Point(600, 250);
+    start_pos_1 = new Point(550, 250);
   } else {
     //practice
     start_pos_0 = new Point(100, 350);

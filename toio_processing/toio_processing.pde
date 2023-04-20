@@ -540,8 +540,6 @@ void draw() {
           //we tell the bird to move to the orange
           story_saveOrangePosition(story_orangex1, story_orangey1, story_orangex2, story_orangey2, 1, 0, story_orangeCount);
 
-
-
           //we need to record the angle between the pushing toio and the ball location
           if (flag_recordPushingToioAndBallAngle == false) {
 
@@ -582,6 +580,7 @@ void draw() {
               }
             }
           }
+
         }
       } else if (applicationMode == "storage") {
 

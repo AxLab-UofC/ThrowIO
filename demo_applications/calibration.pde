@@ -28,7 +28,7 @@ void drawDebugWindow() {
 
   textSize(13);
   text("Hit 'c' to switch calibration modes, 's' for saving , 'l' for loading. "+
-  "In calibration modes, hit 'i' to switch to IR, 'm' to switch to Mouse, 'o' to switch to Color (default)", 20, 560);
+    "In calibration modes, hit 'i' to switch to IR, 'm' to switch to Mouse, 'o' to switch to Color (default), '1' to practice, '2' to story, '3' to storage", 20, 560);
 
   int box_w = mouseXLocationList[1] - mouseXLocationList[0];
   int box_h = mouseYLocationList[1] - mouseYLocationList[0];
@@ -46,11 +46,11 @@ void drawDebugWindow() {
   textSize(20);
   fill(255);
   text("Camera Detection Mode: "+ cameraDetectionMode, 20, 600);
-  
+
   textSize(20);
   fill(255);
   text("Application Mode: "+ applicationMode, 20, 620);
-  
+
   //phase instructions
   textSize(30);
   fill(0);
@@ -91,12 +91,26 @@ void saveCalibration() {
   newRow.setInt("x", mouseXLocationList[1]);
   newRow.setInt("y", mouseYLocationList[1]);
 
-  saveTable(table, "data/calibration.csv");
+  if (cameraDetectionMode == "ir") {
+    saveTable(table, "data/ir_calibration.csv");
+  } else {
+    saveTable(table, "data/calibration.csv");
+  }
 }
+
+
+
 
 //load the saved calibration
 void loadCalibration() {
-  table = loadTable("data/calibration.csv", "header");
+
+  if (cameraDetectionMode == "ir") {
+    println("load calibration for ir!");
+    table = loadTable("data/ir_calibration.csv", "header");
+  } else {
+    println("load calibration for color and mouse!");
+    table = loadTable("data/calibration.csv", "header");
+  }
 
   println(table.getRowCount() + " total rows in table");
 
@@ -114,6 +128,30 @@ void loadCalibration() {
 
   println(r_, g_, b_, mouseXLocationList[0], mouseYLocationList[0], mouseYLocationList[1], mouseYLocationList[1]);
 }
+
+////load the saved calibration
+//void loadCalibration() {
+
+
+
+//  table = loadTable("data/calibration.csv", "header");
+
+//  println(table.getRowCount() + " total rows in table");
+
+
+//  int r_ = table.getInt(0, "r");
+//  int g_ = table.getInt(0, "g");
+//  int b_ = table.getInt(0, "b");
+//  global_trackColor = color(r_, g_, b_);
+
+//  mouseXLocationList[0] = table.getInt(0, "x");
+//  mouseYLocationList[0] = table.getInt(0, "y");
+
+//  mouseXLocationList[1] = table.getInt(1, "x");
+//  mouseYLocationList[1] = table.getInt(1, "y");
+
+//  println(r_, g_, b_, mouseXLocationList[0], mouseYLocationList[0], mouseYLocationList[1], mouseYLocationList[1]);
+//}
 
 //use mouse to calibrate toio mat in camera when mouse pressed
 void mousePressedforPosCalibration() {
