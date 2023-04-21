@@ -324,9 +324,6 @@ void draw() {
 
                 //we tell the bird to move to the orange when story_orangeCount = 0
                 story_saveOrangePosition(story_orange1.x, story_orange1.y, story_orange2.x, story_orange2.y, 1, 0, story_orangeCount);
-                
-                println("why not working");
-                exit();
 
                 phase2_ballSticks = true;
               } else {

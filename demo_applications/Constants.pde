@@ -10,7 +10,7 @@ boolean spin = false;
 
 float global_radius = 100;
 
-String applicationMode = "story"; //"practice", "storage", "story"
+String applicationMode = "practice"; //"practice", "storage", "story"
 String cameraDetectionMode = "color"; //color, ir, mouse
 String storage_status = "store"; //can be "store" or "retrieve"
 
