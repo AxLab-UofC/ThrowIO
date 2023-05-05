@@ -169,7 +169,7 @@ void draw() {
     
     offscreen.fill(0, 0, 0);
     offscreen.rect(0, 0, 610, 431);
-    println("wantBlackScreen: ", wantBlackScreen);
+    //println("wantBlackScreen: ", wantBlackScreen);
   } else {
     offscreen.image(img, 0, 0, 610, 431); //tree image
 
