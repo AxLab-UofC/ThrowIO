@@ -11,6 +11,10 @@ example: `cargo run -- -a 33,90`
 example: `cargo run -- -n f3K,L6T`
 example: `cargon run -- -a 33,90 -n D2F`
 
+# CHI 2023 Body-Scale Demo Structure
+
+![body-scale-structure](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/2840a46c-8bb9-4eaf-bc0b-ea778d8299ad)
+
 # Application: Orange (Immersive Haptic Experience)
 
 ## How to set up
