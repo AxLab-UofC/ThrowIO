@@ -13,7 +13,7 @@ example: `cargon run -- -a 33,90 -n D2F`
 
 # CHI 2023 Body-Scale Demo Structure
 
-![body-scale-structure](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/2840a46c-8bb9-4eaf-bc0b-ea778d8299ad)
+![body-scale-structure](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/c8c5fbdc-6654-49aa-a13b-3f1403e9ae7a)
 
 # CHI 2023 Desktop Demo Structure
 
