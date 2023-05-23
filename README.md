@@ -11,13 +11,18 @@ example: `cargo run -- -a 33,90`
 example: `cargo run -- -n f3K,L6T`
 example: `cargon run -- -a 33,90 -n D2F`
 
+# UChicago AxLab Demo Structure (shown in paper)
+
+![lab-structure](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/98e6a020-ba04-4f10-9eee-f65262657710)
+
 # CHI 2023 Body-Scale Demo Structure
 
-![body-scale-structure](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/c8c5fbdc-6654-49aa-a13b-3f1403e9ae7a)
+![body-scale-structure](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/ba2e776d-789e-4993-8df8-4c6fde023476)
 
 # CHI 2023 Desktop Demo Structure
 
-![desktop structure](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/f19fca14-46b2-4be5-b963-75888c0faabd)
+![desktop-structure](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/eabd97da-342e-43fb-9cd2-dacf954ad7d8)
+
 
 # Application: Orange (Immersive Haptic Experience)
 
