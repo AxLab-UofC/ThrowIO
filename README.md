@@ -1,6 +1,36 @@
 # ThrowIO
+We introduce ThrowIO, a novel style of actuated tangible user interface that facilitates throwing and catching spatial interaction powered by mobile wheeled robots on overhanging surfaces. In our approach, users throw and stick objects that are embedded with magnets to an overhanging ferromagnetic surface where wheeled robots can move and drop them at desired locations, allowing users to catch them. The thrown objects are tracked with an RGBD camera system to perform closed-loop robotic manipulations. By computationally facilitating throwing and catching interaction, our approach can be applied in many applications including kinesthetic learning, gaming, immersive haptic experience, ceiling storage, and communication. We demonstrate the applications with a proof-of-concept system enabled by wheeled robots, ceiling hardware design, and software control. Overall, ThrowIO opens up novel spatial, dynamic, and tangible interaction for users via overhanging robots, which has great potential to be integrated into our everyday space.
 
-# Connect to toio robots via Rust OSC
+# Things to Install for ThrowIO
+- [Rust](https://www.rust-lang.org/tools/install): We connect to toio robots via Rust OSC bridge.
+- [Processing IDE](https://processing.org/download): We use Processing to control toio robots, enable kinect camera tracking, and provide visuals. You might need to install more libraries in Processing depending on your environment.
+
+# Things to Prepare for ThrowIO
+- ThrowIO Structures: We share the design instructions for ThrowIO structures below. 
+- 3D Printing STL Files: We share the stl files for the thrown object and toio shells in this github.
+- [Toio Robots and Toio Mats](https://www.sony.com/en/SonyInfo/design/stories/toio/)
+- Kinect Camera
+
+# ThrowIO Structures
+
+## UChicago AxLab Demo Structure (shown in paper)
+
+Main materials and equipment: height-adjustable table, foam mats, ferromagnetic metal plate, magnets holding ferromagnetic metal plate, 4 toio mats. 
+![lab-structure](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/98e6a020-ba04-4f10-9eee-f65262657710)
+
+
+## CHI 2023 Body-Scale Demo Structure
+
+Main materials and equipment: 1-1/2 PVC pipes, 1-1/2 PVC joints, foam mats, clamp holding kinect camera, ferromagnetic metal plate, wooden board with central part carved out, 4 toio mats. 
+![body-scale-structure](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/ba2e776d-789e-4993-8df8-4c6fde023476)
+
+## CHI 2023 Desktop Demo Structure
+Main materials and equipment: 1/2 PVC pipes, 1/2 PVC joints, foam mats, ferromagnetic metal plate, wooden board, 1 toio mat.
+![desktop-structure](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/eabd97da-342e-43fb-9cd2-dacf954ad7d8)
+
+# Steps To Run ThrowIO with UChicago AxLab Demo Structure or CHI 2023 Body-Scale Demo Structure
+
+How to Connect toio Robots via Rust OSC
 
 cd ThrowIO/rust_osc
 `source $HOME/.cargo/env` or `./build.sh`
@@ -11,18 +41,7 @@ example: `cargo run -- -a 33,90`
 example: `cargo run -- -n f3K,L6T`
 example: `cargon run -- -a 33,90 -n D2F`
 
-# UChicago AxLab Demo Structure (shown in paper)
-
-![lab-structure](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/98e6a020-ba04-4f10-9eee-f65262657710)
-
-# CHI 2023 Body-Scale Demo Structure
-
-![body-scale-structure](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/ba2e776d-789e-4993-8df8-4c6fde023476)
-
 # CHI 2023 Desktop Demo Structure
-
-![desktop-structure](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/eabd97da-342e-43fb-9cd2-dacf954ad7d8)
-
 
 # Application: Orange (Immersive Haptic Experience)
 
