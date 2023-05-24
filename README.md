@@ -41,7 +41,7 @@ example: `cargo run -- -a 33,90`
 example: `cargo run -- -n f3K,L6T`
 example: `cargon run -- -a 33,90 -n D2F`
 
-# CHI 2023 Desktop Demo Structure
+# Steps To Run ThrowIO with CHI 2023 Desktop Demo Structure
 
 # Application: Orange (Immersive Haptic Experience)
 
