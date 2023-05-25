@@ -28,20 +28,23 @@ Main materials and equipment: 1-1/2 PVC pipes, 1-1/2 PVC joints, foam mats, clam
 Main materials and equipment: 1/2 PVC pipes, 1/2 PVC joints, foam mats, ferromagnetic metal plate, wooden board, 1 toio mat.
 ![desktop-structure](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/eabd97da-342e-43fb-9cd2-dacf954ad7d8)
 
-# Steps To Run ThrowIO with UChicago AxLab Demo Structure or CHI 2023 Body-Scale Demo Structure
+# How to Connect to toio Robots via Rust OSC
 
-How to Connect toio Robots via Rust OSC
-
-cd ThrowIO/rust_osc
-`source $HOME/.cargo/env` or `./build.sh`
-
-connect to 2 toio robots
+1. Navigate to rust_osc folder in the terminal by typing `cd ThrowIO/rust_osc`
+2. Setup cargo environment by typing `source $HOME/.cargo/env` or `./build.sh`
+3. Connect to 2 toio robots by typing the following example commands (you can also connect to 3 toio robots by adjusting the following command)
 
 example: `cargo run -- -a 33,90`
 example: `cargo run -- -n f3K,L6T`
-example: `cargon run -- -a 33,90 -n D2F`
+
+
+# Steps To Run ThrowIO with UChicago AxLab Demo Structure or CHI 2023 Body-Scale Demo Structure
 
 # Steps To Run ThrowIO with CHI 2023 Desktop Demo Structure
+
+1. Setup desktop demo structure specified above and 3D print the robot shells (desktop-demo-robot-shell.stl and desktop-demo-robot-ball-shell.stl)
+2. Connect to 3 toio robots via Rust OSC bridge (first two connected toio robots will be dropping robots and the last one will be the toio ball) by typing, for example, `cargo run -- -a 24,27`
+3.  
 
 # Application: Orange (Immersive Haptic Experience)
 
