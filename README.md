@@ -113,4 +113,7 @@ You need to first launch the main ThrowIO processing script (in toio_processing 
 - Calibrate the overhanging toio mat and the ball color (you can skip this step if you previous calibrated before)
 - Start throw and catch with robots
 
-# Details
+# Other Notes
+## Toio Mat Dimension and Coordinates
+
+![toio-mat-dimension](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/c6988aee-4d0d-4d11-a802-045bcebcda9c)
