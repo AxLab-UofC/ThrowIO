@@ -117,3 +117,9 @@ You need to first launch the main ThrowIO processing script (in toio_processing 
 ## Toio Mat Dimension and Coordinates
 
 ![toio-mat-dimension](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/c6988aee-4d0d-4d11-a802-045bcebcda9c)
+
+## Tangent Point Calculation Detail
+
+![tangent-point-calculation](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/41df02d5-e9d1-4eaf-afa6-686b081c7c0e)
+
+
