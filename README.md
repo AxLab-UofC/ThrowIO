@@ -24,9 +24,14 @@ Main materials and equipment: 1-1/2 PVC pipes, 1-1/2 PVC joints, foam mats, clam
 ![body-scale-structure](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/ba2e776d-789e-4993-8df8-4c6fde023476)
 
 ## CHI 2023 Desktop Demo Structure
-Demo Structure Purpose: This simple setup shows how ceiling robots can collaborate and faciliate throwing and catching action using a toio robot as the thrown object. Comparing to the other structures, this setup is easy to transport and does not require a kinect camera. A user can place a toio ball in the middle of the two dropping robots, and they will drop the toio ball, allowing users to catch.
 
-Main materials and equipment: 1/2 PVC pipes, 1/2 PVC joints, foam mats, ferromagnetic metal plate, wooden board, 1 toio mat.
+### What does this structure demonstrate?
+This setup allows users to closely see how ceiling robots collaborate and faciliate throwing and catching action using a magnetic toio robot as the thrown object. In this demo, a user can place a toio ball in the middle of the two dropping robots, and they will converge and drop the toio ball, allowing users to catch it. Comparing to the other structures, this setup is easy to transport and does not require a kinect camera.
+
+### Main materials and equipment: 
+
+1/2 PVC pipes, 1/2 PVC joints, foam mats, ferromagnetic metal plate, wooden board, 1 toio mat.
+
 ![desktop-structure](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/eabd97da-342e-43fb-9cd2-dacf954ad7d8)
 
 # How to Connect to toio Robots via Rust OSC
