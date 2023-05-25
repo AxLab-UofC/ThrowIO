@@ -10,8 +10,8 @@ boolean spin = false;
 
 float global_radius = 100;
 
-String applicationMode = "story"; //"practice", "storage", "story" for willa: practice
-String cameraDetectionMode = "color"; //color, ir, mouse, for willa: mouse
+String applicationMode = "practice"; //"practice", "storage", "story"
+String cameraDetectionMode = "mouse"; //color, ir, mouse
 String storage_status = "store"; //can be "store" or "retrieve"
 
 boolean phase1_seeBall = false;

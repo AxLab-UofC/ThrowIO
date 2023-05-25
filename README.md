@@ -20,7 +20,13 @@ Main materials and equipment: height-adjustable table, foam mats, ferromagnetic 
 
 ## CHI 2023 Body-Scale Demo Structure
 
-Main materials and equipment: 1-1/2 PVC pipes, 1-1/2 PVC joints, foam mats, clamp holding kinect camera, ferromagnetic metal plate, wooden board with central part carved out, 4 toio mats. 
+### What does this structure demonstrate?
+This setup allows users to experience three applications of ThrowIO: throw-catch practice, immersive haptic experience, and ceiling storage.
+
+
+### Main materials and equipment: 
+1-1/2 PVC pipes, 1-1/2 PVC joints, foam mats, clamp holding kinect camera, ferromagnetic metal plate, wooden board with central part carved out, 4 toio mats.
+
 ![body-scale-structure](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/ba2e776d-789e-4993-8df8-4c6fde023476)
 
 ## CHI 2023 Desktop Demo Structure
@@ -45,13 +51,24 @@ example: `cargo run -- -n f3K,L6T`
 
 # Steps To Run ThrowIO with UChicago AxLab Demo Structure or CHI 2023 Body-Scale Demo Structure
 
+1. Setup desktop demo structure specified above and 3D print the robot shells (regular robot shell with fillet.stl)
+2. Connect to 2 toio robots via Rust OSC bridge in the terminal by typing, for example, `cargo run -- -a 27,91`
+3. Place the 3D printed shells on the toio robots
+4. Navigate to demo_applications folder and double click demo_applications.pde file. Once the Processing file is loaded, press the Play button.
+5. Place the two robots to the overhanging surface. If you don't know which robot goes to which corner, you can press `c` key to turn on calibration mode. By doing so, the robots will each automatically travel to their respective starting position. 
+6. Now, on the camera window, you can also calibrate the size of the detection toio mat area (calibration mode == position) and the color of the thrown object (calibration mode == color). You can also save and load the calibration results by hitting `s` key for saving and `l` key for loading.
+7. On the camera window, you can also switch the detection mode: color detection, IR detection, mouse clicking. You can hit `i` key to switch to IR, `m` key to switch to Mouse, `o` key to switch to Color (default).
+8. ON the camera window, you can also switch the application mode: practice(throw-catch practice), story (immersive haptic experience), storage (ceiling storage). You can do so by pressing `1` key to practice, `2` key to story, `3` key to storage.
+9. Once everything is set up and calibrated, you can ask your users to throw and catch with the ceiling robots.
+
+
 # Steps To Run ThrowIO with CHI 2023 Desktop Demo Structure
 
 1. Setup desktop demo structure specified above and 3D print the robot shells (desktop-demo-robot-shell.stl and desktop-demo-robot-ball-shell.stl)
 2. Connect to 3 toio robots via Rust OSC bridge (first two connected toio robots will be dropping robots and the last one will be the toio ball) by typing, for example, `cargo run -- -a 24,27,87`
 3. Place the 3D printed shells on the toio robots
 4. Navigate to desktop_demo folder and double click desktop_demo.pde file. Once the Processing file is loaded, press the Play button.
-5. Place the two dropping robots to the overhanging surface. If you don't know which robot goes to which corner, you can press `c` key to turn on calibration mode. By doing so, the dropping robots each automatically travel to their respective starting position. Remember to press `c` key again to turn off the calibration mode.
+5. Place the two dropping robots to the overhanging surface. If you don't know which robot goes to which corner, you can press `c` key to turn on calibration mode. By doing so, the dropping robots will each automatically travel to their respective starting position. Remember to press `c` key again to turn off the calibration mode.
 6. We can now place the toio ball to the middle of the two dropping robots, and they will drop the toio ball, allowing users to catch.
 
 # Application: Orange (Immersive Haptic Experience)
