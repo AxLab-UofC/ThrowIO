@@ -61,6 +61,8 @@ example: `cargo run -- -n f3K,L6T`
 8. On the camera window, you can also switch the application mode: practice (throw-catch practice), story (immersive haptic experience), storage (ceiling storage). You can do so by pressing `1` key to practice, `2` key to story, `3` key to storage.
 9. Once everything is set up and calibrated, you can ask your users to throw and catch with the ceiling robots.
 
+<img width="1273" alt="camera-window" src="https://github.com/AxLab-UofC/ThrowIO/assets/66953378/49acfb6d-cc50-4c5b-84df-94af97b73b58">
+
 
 # Steps To Run ThrowIO with CHI 2023 Desktop Demo Structure
 
