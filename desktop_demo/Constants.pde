@@ -10,6 +10,8 @@ boolean spin = false;
 
 float global_radius = 80;
 
+int calibrationMode = 0; //0: no calibration, 1: calibration mode
+
 //boolean checking_flag = false;
 //Point[] checking_points;
 

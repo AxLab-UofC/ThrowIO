@@ -14,7 +14,6 @@ We introduce ThrowIO, a novel style of actuated tangible user interface that fac
 # ThrowIO Structures
 
 ## UChicago AxLab Demo Structure (shown in paper)
-
 Main materials and equipment: height-adjustable table, foam mats, ferromagnetic metal plate, magnets holding ferromagnetic metal plate, 4 toio mats. 
 ![lab-structure](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/98e6a020-ba04-4f10-9eee-f65262657710)
 
@@ -25,6 +24,8 @@ Main materials and equipment: 1-1/2 PVC pipes, 1-1/2 PVC joints, foam mats, clam
 ![body-scale-structure](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/ba2e776d-789e-4993-8df8-4c6fde023476)
 
 ## CHI 2023 Desktop Demo Structure
+Demo Structure Purpose: This simple setup shows how ceiling robots can collaborate and faciliate throwing and catching action using a toio robot as the thrown object. Comparing to the other structures, this setup is easy to transport and does not require a kinect camera. A user can place a toio ball in the middle of the two dropping robots, and they will drop the toio ball, allowing users to catch.
+
 Main materials and equipment: 1/2 PVC pipes, 1/2 PVC joints, foam mats, ferromagnetic metal plate, wooden board, 1 toio mat.
 ![desktop-structure](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/eabd97da-342e-43fb-9cd2-dacf954ad7d8)
 
@@ -37,14 +38,16 @@ Main materials and equipment: 1/2 PVC pipes, 1/2 PVC joints, foam mats, ferromag
 example: `cargo run -- -a 33,90`
 example: `cargo run -- -n f3K,L6T`
 
-
 # Steps To Run ThrowIO with UChicago AxLab Demo Structure or CHI 2023 Body-Scale Demo Structure
 
 # Steps To Run ThrowIO with CHI 2023 Desktop Demo Structure
 
 1. Setup desktop demo structure specified above and 3D print the robot shells (desktop-demo-robot-shell.stl and desktop-demo-robot-ball-shell.stl)
-2. Connect to 3 toio robots via Rust OSC bridge (first two connected toio robots will be dropping robots and the last one will be the toio ball) by typing, for example, `cargo run -- -a 24,27`
-3.  
+2. Connect to 3 toio robots via Rust OSC bridge (first two connected toio robots will be dropping robots and the last one will be the toio ball) by typing, for example, `cargo run -- -a 24,27,87`
+3. Place the 3D printed shells on the toio robots
+4. Navigate to desktop_demo folder and double click desktop_demo.pde file. Once the Processing file is loaded, press the Play button.
+5. Place the two dropping robots to the overhanging surface. If you don't know which robot goes to which corner, you can press `c` key to turn on calibration mode. By doing so, the dropping robots each automatically travel to their respective starting position. Remember to press `c` key again to turn off the calibration mode.
+6. We can now place the toio ball to the middle of the two dropping robots, and they will drop the toio ball, allowing users to catch.
 
 # Application: Orange (Immersive Haptic Experience)
 
