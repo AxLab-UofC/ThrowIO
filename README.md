@@ -1,3 +1,5 @@
+
+
 # ThrowIO
 
 We introduce ThrowIO, a novel style of actuated tangible user interface that facilitates throwing and catching spatial interaction powered by mobile wheeled robots on overhanging surfaces. In our approach, users throw and stick objects that are embedded with magnets to an overhanging ferromagnetic surface where wheeled robots can move and drop them at desired locations, allowing users to catch them. The thrown objects are tracked with an RGBD camera system to perform closed-loop robotic manipulations. By computationally facilitating throwing and catching interaction, our approach can be applied in many applications including kinesthetic learning, gaming, immersive haptic experience, ceiling storage, and communication. We demonstrate the applications with a proof-of-concept system enabled by wheeled robots, ceiling hardware design, and software control. Overall, ThrowIO opens up novel spatial, dynamic, and tangible interaction for users via overhanging robots, which has great potential to be integrated into our everyday space.
@@ -113,6 +115,8 @@ You need to first launch the main ThrowIO processing script (in toio_processing 
 - Make sure that the game screen is shared on the monitor while the camera screen is shared on the laptop
 - Start playing the ufo game!
 
+![story](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/5a175d70-b9ca-49b2-8244-f2473573128f)
+
 # Application: Ceiling Storage
 
 ## How to set up 
@@ -126,6 +130,8 @@ You need to first launch the main ThrowIO processing script (in toio_processing 
 - Calibrate the overhanging toio mat and the ball color (you can skip this step if you previous calibrated before)
 - Start "store", and then "retrieve" item with the robots
 
+![storage](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/d9ab4344-7888-48f2-8fc4-01990af091e6)
+
 # Application: Pratice Throw and Catch 
 
 ## How to set up 
@@ -137,6 +143,7 @@ You need to first launch the main ThrowIO processing script (in toio_processing 
 - Run the processing script (in toio_processing folder)
 - Calibrate the overhanging toio mat and the ball color (you can skip this step if you previous calibrated before)
 - Start throw and catch with robots
+
 
 # Other Notes
 ## Toio Mat Dimension and Coordinates
