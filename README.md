@@ -4,6 +4,9 @@ We introduce ThrowIO, a novel style of actuated tangible user interface that fac
 
 Authors: Ting-Han (Timmy) Lin (tinghan@uchicago.edu), Willa Yunqi Yang (yunqiy@uchicago.edu), Ken Nakagaki (knakagaki@uchicago.edu)
 
+ACM: https://dl.acm.org/doi/10.1145/3544548.3581267
+
+
 # Things to Install for ThrowIO
 - [Rust](https://www.rust-lang.org/tools/install): We connect to toio robots via Rust OSC bridge.
 - [Processing IDE](https://processing.org/download): We use Processing to control toio robots, enable kinect camera tracking, and provide visuals. You might need to install more libraries in Processing depending on your environment.
@@ -18,8 +21,8 @@ Authors: Ting-Han (Timmy) Lin (tinghan@uchicago.edu), Willa Yunqi Yang (yunqiy@u
 
 ## UChicago AxLab Demo Structure (shown in paper)
 Main materials and equipment: height-adjustable table, foam mats, ferromagnetic metal plate, magnets holding ferromagnetic metal plate, 4 toio mats. 
-![lab-structure](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/98e6a020-ba04-4f10-9eee-f65262657710)
 
+<img src="https://github.com/AxLab-UofC/ThrowIO/assets/66953378/98e6a020-ba04-4f10-9eee-f65262657710" width="600">
 
 ## CHI 2023 Body-Scale Demo Structure
 
