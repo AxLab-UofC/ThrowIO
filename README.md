@@ -62,88 +62,56 @@ example: `cargo run -- -n f3K,L6T`
 1. Setup demo structure specified above and 3D print the robot shells (regular robot shell with fillet.stl)
 2. Connect to 2 toio robots via Rust OSC bridge in the terminal by typing, for example, `cargo run -- -a 27,91`
 3. Place the 3D printed shells on the toio robots
-4. Navigate to demo_applications folder and double click demo_applications.pde file. Once the Processing file is loaded, press the Play button.
+4. Navigate to `demo_applications` folder and double click `demo_applications.pde` file. Once the Processing file is loaded, press the Play button.
 5. Place the two robots to the overhanging surface. If you don't know which robot goes to which corner, you can press `c` key to turn on calibration mode. By doing so, the robots will each automatically travel to their respective starting position. 
 6. Now, on the camera window, you can also calibrate the size of the detection toio mat area (calibration mode == position) and the color of the thrown object (calibration mode == color). You can also save and load the calibration results by hitting `s` key for saving and `l` key for loading.
 7. On the camera window, you can also switch the detection mode: color detection, IR detection, mouse clicking. You can hit `i` key to switch to IR, `m` key to switch to Mouse, `o` key to switch to Color (default).
 8. On the camera window, you can also switch the application mode: practice (throw-catch practice), story (immersive haptic experience), storage (ceiling storage). You can do so by pressing `1` key to practice, `2` key to story, `3` key to storage.
-9. Once everything is set up and calibrated, you can ask your users to throw and catch with the ceiling robots.
+9. Once everything is set up and calibrated, you can ask your users to throw and catch with the ceiling robots. The details and other dependencies on how to run story (immersive haptic experience) and storage (ceiling storage) are specified below.
 
 <img width="1273" alt="camera-window" src="https://github.com/AxLab-UofC/ThrowIO/assets/66953378/49acfb6d-cc50-4c5b-84df-94af97b73b58">
-
 
 # Steps To Run ThrowIO with CHI 2023 Desktop Demo Structure
 
 1. Setup desktop demo structure specified above and 3D print the robot shells (desktop-demo-robot-shell.stl and desktop-demo-robot-ball-shell.stl)
 2. Connect to 3 toio robots via Rust OSC bridge (first two connected toio robots will be dropping robots and the last one will be the toio ball) by typing, for example, `cargo run -- -a 24,27,87`
 3. Place the 3D printed shells on the toio robots
-4. Navigate to desktop_demo folder and double click desktop_demo.pde file. Once the Processing file is loaded, press the Play button.
+4. Navigate to `desktop_demo` folder and double click `desktop_demo.pde` file. Once the Processing file is loaded, press the Play button.
 5. Place the two dropping robots to the overhanging surface. If you don't know which robot goes to which corner, you can press `c` key to turn on calibration mode. By doing so, the dropping robots will each automatically travel to their respective starting position. Remember to press `c` key again to turn off the calibration mode.
 6. We can now place the toio ball to the middle of the two dropping robots, and they will drop the toio ball, allowing users to catch.
 
-# Application: Orange (Immersive Haptic Experience)
+# Application: Story (Immersive Haptic Experience)
 
-## How to set up
+## Summary
 
-- Prepare one laptop (connected to Kinect Camera)
-- Connect a monitor as an extended screen to laptop
-- Adjust the height of the overhanging ceiling as needed 
-- Inside of toio_processing folder, go to "Constants" script, and change "applicationMode" to "story"
-- Connect two toio robots using rust 
-- Run the processing script (in toio_processing folder)
-- Calibrate the overhanging toio mat (you can skip this step if you previous calibrated before)
-- Make sure to use the white ball
-- Run the immersive story script (in immersive folder)
-- Make sure that the story telling screen is shared by the projector
-- Start interact in the story!
+In the application of immersive haptic experience, a user is invited to an orange picking story. They are asked to throw a ball to wake their bird companion up, which will then fly to drop the oranges for the user. When the virtual orange is dropped, it is accompanied by the dropping of a physical ball. This experience allows users to tangibly interact with characters and items in the projected digital screen.
 
-Use one laptop and connect it to a project and an external monitor. Go to System Preferences, Displays, and you can make the laptop as the extended screen and the monitor as the main screen (which will mirror the project). Drag the toio camera screen to the laptop and drag the immersive screen to the monitor, so that the projector will only show the storytelling screen. 
+## How to Run Story
 
-You need to first launch the main ThrowIO processing script (in toio_processing folder), then run the immersive processing script (in immersive folder).
+Once you complete everything in Steps To Run ThrowIO with UChicago AxLab Demo Structure or CHI 2023 Body-Scale Demo Structure, you will also need to do the following the steps.
 
-# Application: UFO Gaming
-
-## How to set up
-
-- Prepare one laptop (connected to Kinect Camera)
-- Connect a monitor that is placed on top of the overhanging ceiling to laptop
-- Adjust the height of the overhanging ceiling as needed 
-- Inside of toio_processing folder, go to "Constants" script, and change "applicationMode" to "ufo"
-- Connect two toio robots using rust 
-- Run the processing script (in toio_processing folder)
-- Calibrate the overhanging toio mat and the ball color (you can skip this step if you previous calibrated before)
-- Make sure that the game screen is shared on the monitor while the camera screen is shared on the laptop
-- Start playing the ufo game!
+9-1. Connect your laptop to a projector.
+9-2. Navigate to `immersive` folder and double click `immersive.pde` file. Once the Processing file is loaded, press the Play button.
+9-3. Drag the pop up window to the projector's screen.
+9-4. Perform projection mapping by hitting `c` key and then drag the corners of the story screen to match the overhanging toio mats. Once you are done, you can hit  `c` key again to exit calibration mode. You can also click `s` key save to current projection mapping. By now, you should see that your story screen is beautifully projected onto the ceiling.
+9-5. Now, users can throw the ball and interact with the bird in the storytelling screen!
 
 ![story](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/5a175d70-b9ca-49b2-8244-f2473573128f)
 
 # Application: Ceiling Storage
 
-## How to set up 
+## Summary 
 
-- Prepare one laptop (connected to Kinect Camera)
-- Adjust the height of the overhanging ceiling as needed 
-- Put the overhanging shelf on the overhaning ceiling
-- Inside of toio_processing folder, go to "Constants" script, and change "applicationMode" to "storage"
-- Connect two toio robots using rust 
-- Run the processing script (in toio_processing folder)
-- Calibrate the overhanging toio mat and the ball color (you can skip this step if you previous calibrated before)
-- Start "store", and then "retrieve" item with the robots
+In the application of ceiling storage, a user is throwing a ball that has a key attached to it. Once the items are stuck on the ceiling, the robots will push and store the items to a storage area. A user can also retrieve items by placing their hand under the ceiling and the robots will drop the objects to their palm, illustrating a novel and fast way to retrieve objects.
+
+## How to Run Storage
+
+Once you complete everything in Steps To Run ThrowIO with UChicago AxLab Demo Structure or CHI 2023 Body-Scale Demo Structure, you will also need to do the following the steps.
+
+9-1. Instruct your user to throw the items to the right half of the ceiling because the current code assumes the left side is the storage place.
+9-2. After your user successfully throws and stores the items with the robots, you will also need to instruct them to put their hands under the right half of the ceiling telling the system to drop the store items back to the users hand. 
 
 ![storage](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/d9ab4344-7888-48f2-8fc4-01990af091e6)
-
-# Application: Pratice Throw and Catch 
-
-## How to set up 
-
-- Prepare one laptop (connected to Kinect Camera)
-- Adjust the height of the overhanging ceiling as needed 
-- Inside of toio_processing folder, go to "Constants" script, and change "applicationMode" to "practice"
-- Connect two toio robots using rust 
-- Run the processing script (in toio_processing folder)
-- Calibrate the overhanging toio mat and the ball color (you can skip this step if you previous calibrated before)
-- Start throw and catch with robots
-
 
 # Other Notes
 ## Toio Mat Dimension and Coordinates
