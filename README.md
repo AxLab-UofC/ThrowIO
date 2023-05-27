@@ -65,8 +65,8 @@ example: `cargo run -- -n f3K,L6T`
 4. Navigate to `demo_applications` folder and double click `demo_applications.pde` file. Once the Processing file is loaded, press the Play button.
 5. Place the two robots to the overhanging surface. If you don't know which robot goes to which corner, you can press `c` key to turn on calibration mode. By doing so, the robots will each automatically travel to their respective starting position. 
 6. Now, on the camera window, you can also calibrate the size of the detection toio mat area (calibration mode == position) and the color of the thrown object (calibration mode == color). You can also save and load the calibration results by hitting `s` key for saving and `l` key for loading.
-7. On the camera window, you can also switch the detection mode: color detection, IR detection, mouse clicking. You can hit `i` key to switch to IR, `m` key to switch to Mouse, `o` key to switch to Color (default).
-8. On the camera window, you can also switch the application mode: practice (throw-catch practice), story (immersive haptic experience), storage (ceiling storage). You can do so by pressing `1` key to practice, `2` key to story, `3` key to storage.
+7. On the camera window, you can also switch the detection mode: color detection, IR detection, mouse clicking. You can hit `i` key to switch to IR, `m` key to switch to Mouse, `o` key to switch to Color (default). Please note that you will need to use the IR ball (ball embedded with a LED light) if you would like to use this IR mode.
+8. On the camera window, you can also switch the application mode: practice (throw-catch practice), story (immersive haptic experience), storage (ceiling storage). You can do so by pressing `1` key to practice, `2` key to story, `3` key to storage. Please also note that color mode is not recommended for story because the projection may influence the accuracy for color detection.
 9. Once everything is set up and calibrated, you can ask your users to throw and catch with the ceiling robots. The details and other dependencies on how to run story (immersive haptic experience) and storage (ceiling storage) are specified below.
 
 <img width="1273" alt="camera-window" src="https://github.com/AxLab-UofC/ThrowIO/assets/66953378/49acfb6d-cc50-4c5b-84df-94af97b73b58">
@@ -91,9 +91,13 @@ In the application of immersive haptic experience, a user is invited to an orang
 Once you complete everything in Steps To Run ThrowIO with UChicago AxLab Demo Structure or CHI 2023 Body-Scale Demo Structure, you will also need to do the following the steps.
 
 9-1. Connect your laptop to a projector.
+
 9-2. Navigate to `immersive` folder and double click `immersive.pde` file. Once the Processing file is loaded, press the Play button.
+
 9-3. Drag the pop up window to the projector's screen.
+
 9-4. Perform projection mapping by hitting `c` key and then drag the corners of the story screen to match the overhanging toio mats. Once you are done, you can hit  `c` key again to exit calibration mode. You can also click `s` key save to current projection mapping. By now, you should see that your story screen is beautifully projected onto the ceiling.
+
 9-5. Now, users can throw the ball and interact with the bird in the storytelling screen!
 
 ![story](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/5a175d70-b9ca-49b2-8244-f2473573128f)
@@ -109,6 +113,7 @@ In the application of ceiling storage, a user is throwing a ball that has a key 
 Once you complete everything in Steps To Run ThrowIO with UChicago AxLab Demo Structure or CHI 2023 Body-Scale Demo Structure, you will also need to do the following the steps.
 
 9-1. Instruct your user to throw the items to the right half of the ceiling because the current code assumes the left side is the storage place.
+
 9-2. After your user successfully throws and stores the items with the robots, you will also need to instruct them to put their hands under the right half of the ceiling telling the system to drop the store items back to the users hand. 
 
 ![storage](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/d9ab4344-7888-48f2-8fc4-01990af091e6)
