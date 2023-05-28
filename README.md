@@ -55,6 +55,7 @@ This setup allows users to closely see how ceiling robots collaborate and facili
 3. Connect to 2 toio robots by typing the following example commands (you can also connect to 3 toio robots by adjusting the following command)
 
 example: `cargo run -- -a 33,90`
+
 example: `cargo run -- -n f3K,L6T`
 
 # Steps To Run ThrowIO with UChicago AxLab Demo Structure or CHI 2023 Body-Scale Demo Structure
@@ -65,9 +66,15 @@ example: `cargo run -- -n f3K,L6T`
 4. Navigate to `demo_applications` folder and double click `demo_applications.pde` file. Once the Processing file is loaded, press the Play button.
 5. Place the two robots to the overhanging surface. If you don't know which robot goes to which corner, you can press `c` key to turn on calibration mode. By doing so, the robots will each automatically travel to their respective starting position. 
 6. Now, on the camera window, you can also calibrate the size of the detection toio mat area (calibration mode == position) and the color of the thrown object (calibration mode == color). You can also save and load the calibration results by hitting `s` key for saving and `l` key for loading.
-7. On the camera window, you can also switch the detection mode: color detection, IR detection, mouse clicking. You can hit `i` key to switch to IR, `m` key to switch to Mouse, `o` key to switch to Color (default). Please note that you will need to use the IR ball (ball embedded with a LED light) if you would like to use this IR mode.
+7. On the camera window, you can also switch the detection mode: color detection, IR detection, mouse clicking. You can hit `i` key to switch to IR, `m` key to switch to Mouse, `o` key to switch to Color (default). Please note that you will need to use the IR ball (ball embedded with LED light) if you would like to use this IR mode.
 8. On the camera window, you can also switch the application mode: practice (throw-catch practice), story (immersive haptic experience), storage (ceiling storage). You can do so by pressing `1` key to practice, `2` key to story, `3` key to storage. Please also note that color mode is not recommended for story because the projection may influence the accuracy for color detection.
 9. Once everything is set up and calibrated, you can ask your users to throw and catch with the ceiling robots. The details and other dependencies on how to run story (immersive haptic experience) and storage (ceiling storage) are specified below.
+
+## Thrown Objects
+
+<img src="https://github.com/AxLab-UofC/ThrowIO/assets/66953378/738c06aa-5906-4c2b-9f5f-207f4cf62f9f" width="600">
+
+## Kinect Camera Window
 
 <img width="1273" alt="camera-window" src="https://github.com/AxLab-UofC/ThrowIO/assets/66953378/49acfb6d-cc50-4c5b-84df-94af97b73b58">
 
