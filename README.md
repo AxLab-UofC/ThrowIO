@@ -22,7 +22,12 @@ ACM: https://dl.acm.org/doi/10.1145/3544548.3581267
 # ThrowIO Structures
 
 ## UChicago AxLab Demo Structure (shown in paper)
-Main materials and equipment: height-adjustable table, foam mats, ferromagnetic metal plate, magnets holding ferromagnetic metal plate, 4 toio mats. 
+
+### What does this structure demonstrate?
+This setup allows users to experience all of the applications of ThrowIO. Specifically, the height of the overhanging surface can be adjusted for different user's height.
+
+### Main materials and equipment: 
+height-adjustable table, foam mats, ferromagnetic metal plate, magnets holding ferromagnetic metal plate, 4 toio mats. 
 
 <img src="https://github.com/AxLab-UofC/ThrowIO/assets/66953378/98e6a020-ba04-4f10-9eee-f65262657710" width="600">
 
@@ -50,7 +55,7 @@ This setup allows users to closely see how ceiling robots collaborate and facili
 
 # How to Connect to toio Robots via Rust OSC
 
-1. Navigate to rust_osc folder in the terminal by typing `cd ThrowIO/rust_osc`
+1. Navigate to `rust_osc` folder in the terminal by typing `cd ThrowIO/rust_osc`
 2. Setup cargo environment by typing `source $HOME/.cargo/env` or `./build.sh`
 3. Connect to 2 toio robots by typing the following example commands (you can also connect to 3 toio robots by adjusting the following command)
 
@@ -126,6 +131,7 @@ Once you complete everything in Steps To Run ThrowIO with UChicago AxLab Demo St
 ![storage](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/d9ab4344-7888-48f2-8fc4-01990af091e6)
 
 # Other Notes
+
 ## Toio Mat Dimension and Coordinates
 
 ![toio-mat-dimension](https://github.com/AxLab-UofC/ThrowIO/assets/66953378/c6988aee-4d0d-4d11-a802-045bcebcda9c)
